@@ -1,0 +1,13 @@
+<?php
+// $Id$
+
+/**
+ * Load a jQuery UI theme by name.
+ *
+ * @param string $theme_name
+ *    Name of the theme to load.
+ */
+function jquery_ui_theme_load($theme_name = 'default') {
+  drupal_add_css(drupal_get_path('module', 'jquery_ui_theme') . '/' . $theme_name . '/ui.all.css');
+}
+

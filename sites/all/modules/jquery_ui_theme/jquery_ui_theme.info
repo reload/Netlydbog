@@ -1,0 +1,6 @@
+; $Id$
+name = jQuery UI themes
+description = Makes jQuery UI themes available for overrides via themes.
+package = User interface
+core = 6.x
+dependencies[] = jquery_ui
