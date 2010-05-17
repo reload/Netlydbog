@@ -1,0 +1,117 @@
+# $Id: admin_language.pot,v 1.1.2.1 2009/08/07 14:43:59 wulff Exp $
+#
+# LANGUAGE translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  admin_language.module,v 1.1.2.1 2009/07/22 08:31:23 wulff
+#  admin_language.info,v 1.1.2.1 2009/07/22 08:31:23 wulff
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2009-08-07 16:33+0200\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: admin_language.module:17
+msgid "Use the %admin column to select the default language for all administration pages. The language you select must be enabled."
+msgstr ""
+
+#: admin_language.module:109
+msgid "Administration pages (admin)"
+msgstr ""
+
+#: admin_language.module:110
+msgid "Node add/edit pages (node/add & node/N/edit)"
+msgstr ""
+
+#: admin_language.module:111
+msgid "User pages (user/N/edit)"
+msgstr ""
+
+#: admin_language.module:116
+msgid "Sections"
+msgstr ""
+
+#: admin_language.module:117
+msgid "Select the sections you want the administration language to affect."
+msgstr ""
+
+#: admin_language.module:133
+msgid "Only enabled languages can be chosen as the admin language."
+msgstr ""
+
+#: admin_language.module:169
+msgid "edit"
+msgstr ""
+
+#: admin_language.module:169
+msgid "delete"
+msgstr ""
+
+#: admin_language.module:173
+msgid "Enabled"
+msgstr ""
+
+#: admin_language.module:173
+msgid "Code"
+msgstr ""
+
+#: admin_language.module:173
+msgid "English name"
+msgstr ""
+
+#: admin_language.module:173
+msgid "Native name"
+msgstr ""
+
+#: admin_language.module:173
+msgid "Direction"
+msgstr ""
+
+#: admin_language.module:173
+msgid "Default"
+msgstr ""
+
+#: admin_language.module:173
+msgid "Admin"
+msgstr ""
+
+#: admin_language.module:173
+msgid "Weight"
+msgstr ""
+
+#: admin_language.module:173
+msgid "Operations"
+msgstr ""
+
+#: admin_language.module:26
+msgid "display admin pages in another language"
+msgstr ""
+
+#: admin_language.module:36
+msgid "Administration language"
+msgstr ""
+
+#: admin_language.module:37
+msgid "Select which parts of the site should use the selected administration language."
+msgstr ""
+
+#: admin_language.module:0
+msgid "admin_language"
+msgstr ""
+
+#: admin_language.info:0
+msgid "Admin Language"
+msgstr ""
+
+#: admin_language.info:0
+msgid "Makes sure all admin pages are displayed in the preferred language of the administrator."
+msgstr ""
+

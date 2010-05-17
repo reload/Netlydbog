@@ -1,0 +1,58 @@
+/* $Id$ */
+
+/**
+ * @file library_panel_layouts.module
+ * CSS for a 3 column panel where the left and middle columns are
+ * stacked with top and bottom rows.
+ */
+
+.panel-3col-left-stacked { 
+/*  overflow: hidden;  */
+}
+
+
+.panel-3col-left-stacked .left-wrapper {
+  margin-right: 25%;
+  width: 75%;
+}
+
+.panel-3col-left-stacked .panel-col.top .inside {
+  margin-bottom: .5em;
+}
+
+.panel-3col-left-stacked .panel-col.left { 
+  float: left; 
+  width: 100%; 
+}
+
+.panel-3col-left-stacked .panel-col .inside { 
+  margin: 0 .5em 1em .5em;
+}
+
+.panel-3col-left-stacked .panel-col.middle { 
+  float: right; 
+  width: 50%; 
+}
+
+.panel-3col-left-stacked .panel-col .inside { 
+  margin: 0 .5em 1em .5em;
+}
+
+.panel-3col-left-stacked .panel-col.right { 
+  float: right; 
+  width: 25%; 
+}
+
+.panel-3col-left-stacked .panel-col.right .inside { 
+  margin: 0 0 1em .5em;
+}
+
+.panel-3col-left-stacked .panel-col.bottom {
+  float: left;
+  width:50%;
+}
+
+.panel-3col-left-stacked .panel-separator {
+  margin: 0 0 1em 0;
+}
+

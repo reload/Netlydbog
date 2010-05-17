@@ -1,0 +1,12 @@
+; $Id: admin_language.info,v 1.1.2.1 2009/07/22 08:31:23 wulff Exp $
+name = Admin Language
+description = Makes sure all admin pages are displayed in the preferred language of the administrator.
+core = 6.x
+dependencies[] = locale
+
+; Information added by drupal.org packaging script on 2009-12-01
+version = "6.x-1.4"
+core = "6.x"
+project = "admin_language"
+datestamp = "1259664903"
+

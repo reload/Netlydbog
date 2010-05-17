@@ -1,0 +1,32 @@
+<?php
+// $Id: admin_language.install,v 1.1.2.3 2009/12/01 10:52:46 wulff Exp $
+
+/**
+ * @file
+ * Update functions for Administration language.
+ */
+
+/**
+ * Implementation of hook_update_N().
+ */
+function admin_language_update_6100() {
+  $ret = array();
+
+  $result = db_query('SELECT pid, perm FROM {permission}');
+  while ($perm = db_fetch_object($result)) {
+    $perm->perm = str_replace('display admin pages in english', 'display admin pages in another language', $perm->perm);
+    $ret[] = update_sql("UPDATE {permission} SET perm = '$perm->perm' WHERE pid = $perm->pid");
+  }
+
+  return $ret;
+}
+
+/**
+ * Implementation of hook_update_N().
+ */
+function admin_language_update_6101() {
+  variable_del('admin_language_sections');
+
+  return array();
+}
+
