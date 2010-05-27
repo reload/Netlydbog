@@ -1,0 +1,60 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * API module to generate Atom feeds.
+ */
+
+/**
+ * Implementation of hook_theme().
+ */
+function atom_api_theme() {
+  return array(
+    'atom_feed' => array(
+      'arguments' => array('feed' => NULL),
+      'template' => 'atom_feed',
+    ),
+    'atom_entry' => array(
+      'arguments' => array('entry' => NULL),
+      'template' => 'atom_entry',
+    ),
+    'atom_feed_link' => array(
+      'arguments' => array('title' => NULL, 'url' => NULL),
+    ), 
+  );
+}
+
+/**
+ * Preprocessor for rendering atom feeds.
+ */
+function template_preprocess_atom_feed(&$variables) {
+  // Make sure we have the required feed attributes.
+  if (!isset($variables['feed']['encoding'])) {
+    $variables['feed']['encoding'] = 'utf-8';
+  }
+
+  if (!isset($variables['feed']['id'])) {
+    $variables['feed']['id'] = url($_GET['q'], array('absolute' => TRUE));
+  }
+
+  if (!isset($variables['feed']['title'])) {
+    $variables['feed']['title'] = t('Atom feed');
+  }
+
+  if (!isset($variables['feed']['updated'])) {
+    $variables['feed']['updated'] = gmdate('c');
+  }
+
+  if (!isset($variables['feed']['self_link'])) {
+    $variables['feed']['self_link'] = url($_GET['q'], array('absolute' => TRUE));
+  }
+}
+
+/**
+ * Theme callback for generating atom feed links.
+ */
+function theme_atom_feed_link($title, $url) {
+  return '<link rel="alternate" type="application/atom+xml" title="' . $title . '" href="' . $url .'" />';
+}
+

@@ -1,0 +1,6 @@
+; $Id$
+name = Atom API
+description = "Provides API methods to generate Atom 1.0 feeds."
+package = Syndication
+core = 6.x
+

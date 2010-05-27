@@ -14,24 +14,27 @@ function devel_themer_menu() {
     'access arguments' => array('administer site configuration'),
     'type' => MENU_NORMAL_ITEM,
   );
+  $items['devel_themer/variables'] = array(
+    'title' => 'Theme Development AJAX variables',
+    'page callback' => 'devel_themer_ajax_variables',
+    'access callback' => 'devel_themer_user_access',
+    'type' => MENU_CALLBACK,
+  );
+  // @todo These are questionable, since how can a module enable itself if it
+  //   is disabled. Should these be removed, or implementation change to disable
+  //   somehow other than actually disabling the module?
   $items['devel_themer/enable'] = array(
     'title' => 'Devel Themer Enable',
     'page callback' => 'devel_themer_toggle',
     'page arguments' => array(1),
-    'access arguments' => array('access devel information'),
+    'access callback' => 'devel_themer_user_access',
     'type' => MENU_CALLBACK,
   );
   $items['devel_themer/disable'] = array(
-    'title' => 'Theme Development Enable',
+    'title' => 'Devel Themer Disable',
     'page callback' => 'devel_themer_toggle',
-    'page arguments' => array(0),
-    'access arguments' => array('access devel information'),
-    'type' => MENU_CALLBACK,
-  );
-  $items['devel_themer/variables'] = array(
-    'title' => 'Theme Development AJAX variables',
-    'page callback' => 'devel_themer_ajax_variables',
-    'access arguments' => array('access devel information'),
+    'page arguments' => array(1),
+    'access callback' => 'devel_themer_user_access',
     'type' => MENU_CALLBACK,
   );
   return $items;
@@ -75,8 +78,9 @@ function devel_themer_ajax_variables($request_id, $call) {
  */
 function devel_themer_toggle($action) {
   $function = $action == 'enable' ? 'module_enable' : 'module_disable';
-  $$function('devel_themer');
-  drupal_set_message(t('Devel Themer module %action.', array('%action' => $action)));
+  // @todo See the todo within hook_menu().
+  //$function(array('devel_themer'));
+  //drupal_set_message(t('Devel Themer module %action.', array('%action' => $action)));
   drupal_goto();
 }
 
@@ -89,14 +93,21 @@ function devel_themer_admin_settings() {
   return system_settings_form($form);
 }
 
+/**
+ * Implementation of hook_perm().
+ */
+function devel_themer_perm() {
+  return array('access devel theme information');
+}
 
 function devel_themer_init() {
-  if (user_access('access devel information')) {
+  if (devel_themer_user_access()) {
     $path = drupal_get_path('module', 'devel_themer');
+    $path_to_devel = drupal_get_path('module', 'devel');
     // we inject our HTML after page has loaded we have to add this manually.
     if (has_krumo()) {
-      drupal_add_js($path. '/krumo/krumo.js');
-      drupal_add_css($path. '/krumo/skins/default/skin.css');
+      drupal_add_js($path_to_devel. '/krumo/krumo.js');
+      drupal_add_css($path_to_devel. '/krumo/skins/default/skin.css');
     }
     drupal_add_css($path .'/devel_themer.css');
     drupal_add_js($path .'/devel_themer.js');
@@ -110,13 +121,13 @@ function devel_themer_init() {
     }
     else
     {
-      drupal_add_js($path .'/ui.mouse.js');
-      drupal_add_js($path .'/ui.draggable.js');
+      drupal_add_js($path_to_devel .'/ui.mouse.js');
+      drupal_add_js($path_to_devel .'/ui.draggable.js');
     }
     
     // This needs to happen after all the other CSS.
     drupal_set_html_head('<!--[if IE]>
-    <link href="' . $path .'/devel_themer_ie_fix.css" rel="stylesheet" type="text/css" media="screen" />
+    <link href="' . base_path() . $path .'/devel_themer_ie_fix.css" rel="stylesheet" type="text/css" media="screen" />
 <![endif]-->');
     devel_themer_popup();
 
@@ -217,9 +228,15 @@ function devel_themer_get_extension() {
 function devel_themer_catch_function() {
   $args = func_get_args();
 
-  // Get the function that is normally called.
+  // Get the hook argument passed to theme() by stepping through the backtrace
+  // to the closest entry of theme() being called, and get its first argument.
   $trace = debug_backtrace();
-  $hook = $trace[2]['args'][0];
+  foreach ($trace as $trace_entry) {
+    if ($trace_entry['function'] == 'theme') {
+      $hook = $trace_entry['args'][0];
+      break;
+    }
+  }
   array_unshift($args, $hook);
 
   $counter = devel_counter();
@@ -231,7 +248,7 @@ function devel_themer_catch_function() {
   $time = timer_stop($timer_name);
 
   $skip_calls = array('hidden', 'form_element', 'placeholder');
-  if (!empty($return) && !is_array($return) && !is_object($return) && user_access('access devel information')) {
+  if (!empty($return) && !is_array($return) && !is_object($return) && devel_themer_user_access()) {
     list($prefix, $suffix) = devel_theme_call_marker($hook, $counter, 'func');
     $start_return = substr($return, 0, 31);
     $start_prefix = substr($prefix, 0, 31);
@@ -244,7 +261,7 @@ function devel_themer_catch_function() {
         $GLOBALS['devel_themer_stop'] = TRUE;
       }
       else {
-        $output = $prefix. "\n  ". $return. $suffix. "\n";
+        $output = variable_get('devel_themer_no_whitespace', FALSE) ? ($prefix . $return . $suffix) : ($prefix. "\n  ". $return. $suffix. "\n");
       }
 
       if ($meta['type'] == 'func') {
@@ -372,13 +389,30 @@ function devel_themer_theme_twin() {
   $meta['path'] = $info['theme path'];
 
   // Include a file if the theme function or preprocess function is held elsewhere.
+  if (!empty($info['include files'])) {
+    foreach ($info['include files'] as $include_file) {
+      include_once($include_file);
+    }
+  }
+
+  // Handle compatibility with theme_registry_alters to prevent failures.
   if (!empty($info['file'])) {
+    static $included_files = array();
     $include_file = $info['file'];
-    if (isset($info['path'])) {
+    if (!empty($info['path'])) {
       $include_file = $info['path'] .'/'. $include_file;
     }
-    include_once($include_file);
+
+    if (empty($included_files[$include_file])) {
+      // Statically cache files we've already tried to include so we don't
+      // run unnecessary file_exists calls.
+      $included_files[$include_file] = TRUE;
+      if (file_exists('./'. $include_file)) {
+        include_once('./'. $include_file);
+      }
+    }
   }
+
   if (isset($info['devel_function_intercept'])) {
     // The theme call is a function.
     $output = call_user_func_array($info['devel_function_intercept'], $args);
@@ -487,8 +521,8 @@ function devel_themer_theme_twin() {
 }
 
 // We save the huge js array here instead of hook_footer so we can catch theme('page')
-function devel_themer_exit() {
-  if (!empty($GLOBALS['devel_theme_calls']) && $_SERVER['REQUEST_METHOD'] != 'POST') {
+function devel_themer_exit($destination = NULL) {
+  if (!isset($destination) && !empty($GLOBALS['devel_theme_calls']) && $_SERVER['REQUEST_METHOD'] != 'POST') {
     // A random string that is sent to the browser. It enables the popup to retrieve params/variables from this request.
     $request_id = uniqid(rand());
     // Write the variables information to the a file. It will be retrieved on demand via AJAX.
@@ -639,4 +673,22 @@ function devel_themer_cleanup() {
  */
 function devel_themer_cron() {
   devel_themer_cleanup();
+}
+
+/**
+ * Determine whether the user has permission to access the information provided by this module.
+ *
+ * @param $account
+ *   (optional) The account to check, if not given use currently logged in user.
+ *
+ * @return
+ *   Boolean TRUE if the user has permission to access the information provided
+ *   by this module.
+ *
+ * @see user_access()
+ */
+function devel_themer_user_access($account = NULL) {
+  // Users with access to devel information from the devel module should
+  // automatically get access to the theme information as well.
+  return (user_access('access devel information', $account) || user_access('access devel theme information', $account));
 }
