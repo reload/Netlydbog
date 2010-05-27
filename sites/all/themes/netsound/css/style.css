@@ -191,17 +191,18 @@ a.link-green, .link-green a, .green  {
   float: right;
 }
 
-#block-search {
+#ting-search-form {
   margin:4px 10px 0 0;
   text-align:left;
 }
 
+#block-ting-search h3 {display: none;}
 /** TEMPORARY **/
-#block-search label {display:none;}
-#block-search .form-item, #block-search .form-button {
+#block-ting-search label {display:none;}
+#block-ting-search .form-item, #block-search .form-button {
   float: left;
 }
-#block-search input#edit-search-block-form-1 {
+#block-ting-search input#edit-keys {
   font-size: 16px;
   height:34px;
   width: 380px;
@@ -209,7 +210,7 @@ a.link-green, .link-green a, .green  {
   padding:0 4px;
   background: #eae9e6;
 }
-#block-search input.form-submit {
+#block-ting-search input.form-submit {
   margin-top:16px;
   border: none;
   height:34px;
@@ -218,7 +219,8 @@ a.link-green, .link-green a, .green  {
   color: #fff;
   background: #666;
 }
-
+#block-ting-search .example { display: none;}
+#block-ting-search { clear: both;}
 /** PRIMARY MENU **/
 ul.links {
   position: absolute;
