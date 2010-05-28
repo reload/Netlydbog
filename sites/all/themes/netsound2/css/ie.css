@@ -1,0 +1,9 @@
+body.page-frontpage{
+	
+}
+#ting-search-form .form-item-textfield input{
+	border: 1px solid #ffffff;
+}
+#ting-search-form input.form-submit{
+	padding:1px;
+}
