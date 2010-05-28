@@ -5,6 +5,7 @@ base theme = mothership
 
 stylesheets[all][] = css/reset.css
 stylesheets[all][] = css/style.css
+conditional-stylesheets[if IE][all][] = ie7.css
 
 scripts[] = js/script.js
 
