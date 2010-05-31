@@ -55,7 +55,7 @@
     <div class="body clearfix">
       <div class="main">
       
-      <?php if ($breadcrumb) { print $breadcrumb; } // themename_breadcrumb in template.php ?>
+      <?php// if ($breadcrumb) { print $breadcrumb; } // themename_breadcrumb in template.php ?>
           <?php if ($help OR $messages) { ?>
               <?php print $help ?>
               <?php print $messages ?>

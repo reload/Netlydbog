@@ -153,7 +153,7 @@ body{
 }
 
 
-.pane-content h3{
+.pane-content h3.block{
 	font-family: "American Typewriter", "Courier New", serif;
 	font-weight:normal;
 	font-size:1.6em;
