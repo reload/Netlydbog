@@ -8,6 +8,7 @@ stylesheets[all][] = css/style.css
 conditional-stylesheets[if IE 7][all][] = css/ie.css
 
 scripts[] = js/script.js
+scripts[] = js/inlabelfield.jquery.js
 
 ;--------------------- regions -----------------------------
 regions[header]           = header

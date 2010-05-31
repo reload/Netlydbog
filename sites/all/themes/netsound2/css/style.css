@@ -81,11 +81,14 @@ body{
 }
 #ting-search-form .form-item-textfield label{
 	position:absolute;
-	top:0;
-	left:0;
+	top:29px;
+	left:9px;
 }
-#ting-search-form div{
+#ting-search-form .form-item-textfield{
 	float:left;
+}
+#ting-search-form .form-button{
+	float:right;
 }
 #ting-search-form input{ 
   border:0;
@@ -98,7 +101,7 @@ body{
 #ting-search-form input.form-submit{
 	padding:2px;
 }
-/*#ting-search-form .form-item-textfield .ting-autocomplete{
+#ting-search-form .form-item-textfield .ting-autocomplete{
   background: #e7e6e4;
 	color: #666666;
   width:422px;
@@ -107,7 +110,7 @@ body{
 	background: #666666;
 	color:#e7e6e4;
 	text-transform:uppercase;
-}*/
+}
 
 /* MENU SETTINGS */
 

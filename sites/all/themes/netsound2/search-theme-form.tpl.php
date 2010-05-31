@@ -38,4 +38,6 @@
  * </div>
  */
 ?>
-<?php print $search_form;
+bb
+<?php print $search_form; ?>
+bb

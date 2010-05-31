@@ -36,4 +36,6 @@
  * </div>
  */
 ?>
-<?php print $search_form; 
+aa
+<?php print $search_form; ?>
+aa 
