@@ -23,6 +23,17 @@ jQuery(function(){
   });
   */
 	
+	
+	
+/*	$(".fivestar-widget-static").each(function(){
+		var stars = parseInt($(this).text());
+		var list = $(this).after('<ul class="rating"></ul>');
+		$(this).remove();
+		for(i = 0;i<stars;i++){
+			list.append('<li>star</li>');
+		}
+	});*/
+	
 
 	$(".form-item-textfield label").inFieldLabels(); 
 	
