@@ -1,6 +1,6 @@
 jQuery(function(){
 	
-	pages = $('.top .pane-book');
+/*	pages = $('.top .pane-book');
 	$('.top').after('<ul class="top-pager"></ul>');
 	pages.each(function(i){
 		if (i > 0){
@@ -21,7 +21,7 @@ jQuery(function(){
 		 
 		 
   });
-  
+  */
 	
 
 	$(".form-item-textfield label").inFieldLabels(); 
