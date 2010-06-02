@@ -149,11 +149,17 @@ body{
 .panel-pane{
 }
 .panel-3col-left-stacked .panel-col .inside{
-	margin: 0 1em 1em;
+	margin: 0 0.5em 1em 1em;
 }
+.panel-3col-left-stacked .panel-col.middle .inside{
+	margin: 0 0.5em 1em 0.5em;
+}
+.panel-3col-left-stacked .panel-col.right .inside {
+	margin: 0 1em 1em 0.5em;
+}
+	
 
-
-.pane-content h3.block{
+h2.pane-title{
 	font-family: "American Typewriter", "Courier New", serif;
 	font-weight:normal;
 	font-size:1.6em;
@@ -161,6 +167,7 @@ body{
 	border-bottom: 1px dashed #999999;
 	padding: 0 0 0.5em 0;
 	margin: 0.5em 0;
+	text-transform:uppercase;
 }
 .page-frontpage .panel-display .top {
 	background-color: #e8e4df;

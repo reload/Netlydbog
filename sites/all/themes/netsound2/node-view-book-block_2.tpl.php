@@ -1,4 +1,4 @@
-<h3>UGENS LYDBOG</h3>
+<h2>UGENS LYDBOG</h2>
 <div style="width:710px;" class="display-book">
   
   <div style="float:left;width:165px;text-align:right;padding-right:10px;">
