@@ -1,0 +1,73 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Base Ding module
+ *
+ * Provides date formats and other things shared by all Ding modules.
+ */
+
+/**
+ * Implementation of hook_date_format_types().
+ */
+function ding_base_date_format_types() {
+  return array(
+    'date_short' => t('Date only (short)'),
+  );
+}
+
+/**
+ * Implementation of hook_date_formats().
+ *
+ * @return
+ *   An array of date formats with attributes 'type' (short, medium or long),
+ *   'format' (the format string) and 'locales'.  The 'locales' attribute is an
+ *   array of locales, which can include both 2 character language codes like
+ *   'en', 'fr', but also 5 character language codes like 'en-gb' and 'en-us'.
+ */
+function ding_base_date_formats() {
+  return array(
+    array(
+      'type' => 'date_short',
+      'format' => 'Y-m-d',
+      'locales' => array(),
+    ),
+    array(
+      'type' => 'date_short',
+      'format' => 'm/d/Y',
+      'locales' => array(),
+    ),
+    array(
+      'type' => 'date_short',
+      'format' => 'd/m/Y',
+      'locales' => array(),
+    ),
+    array(
+      'type' => 'date_short',
+      'format' => 'Y/m/d',
+      'locales' => array(),
+    ),
+    array(
+      'type' => 'date_short',
+      'format' => 'd.m.Y',
+      'locales' => array(),
+    ),
+    array(
+      'type' => 'date_short',
+      'format' => 'M j Y',
+      'locales' => array(),
+    ),
+    array(
+      'type' => 'date_short',
+      'format' => 'j M Y',
+      'locales' => array(),
+    ),
+    array(
+      'type' => 'date_short',
+      'format' => 'Y M j',
+      'locales' => array(),
+    ),
+  );
+}
+

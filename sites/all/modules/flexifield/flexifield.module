@@ -1,0 +1,678 @@
+<?php
+// $Id: flexifield.module,v 1.1.2.11 2009/07/07 23:19:16 effulgentsia Exp $
+
+/**
+ * @file
+ * Defines a field type where each field item can be a combination of fields.
+ */
+
+/**
+ * Implementation of hook_theme().
+ */
+function flexifield_theme($aExisting) {
+  $aResult = array(
+    'flexifield_default_widget' => array(
+      'file' => 'flexifield-widget.inc',
+      'arguments' => array('element' => NULL),
+    ),
+    'flexifield_fieldset' => array(
+      'file' => 'flexifield-widget.inc',
+      'arguments' => array('element' => NULL),
+    ),
+    'flexifield_formatter_default' => array(
+      'arguments' => array('element' => NULL),
+    ),
+    'flexifield_multiple_values' => array(
+      'file' => 'flexifield-cck-overrides.inc',
+      'arguments' => array('element' => NULL),
+    ),
+  );
+  // If element_themehook module is enabled, allow extra theming control
+  // of each item's type.
+  if (isset($aExisting['element'])) {
+    $aResult['flexifield_item_content'] = array(
+      'pattern' => 'flexifield_item_content__',
+      'template' => 'flexifield-item-content',
+      'original hook' => 'element',
+      'arguments' => $aExisting['element']['arguments'],
+    );
+  }
+  return $aResult;
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function flexifield_menu() {
+  $aItems = array();
+  $aItems['flexifield/ahah/changetype'] = array(
+    'file' => 'flexifield-widget.inc',
+    'page callback' => 'flexifield_ahah_changetype',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  $aItems['flexifield/ahah/addmore'] = array(
+    'file' => 'flexifield-widget.inc',
+    'page callback' => 'flexifield_ahah_addmore',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  $aItems['flexifield/test'] = array(
+    'file' => 'flexifield-test.inc',
+    'page callback' => 'flexifield_test',
+    'access arguments' => array('access devel information'),
+    'type' => MENU_CALLBACK,
+  );
+  return $aItems;
+}
+
+/**
+ * Implementation of hook_views_api().
+ */
+function flexifield_views_api() {
+  return array(
+    'api' => 2.0,
+    'path' => drupal_get_path('module', 'flexifield') . '/views',
+  );
+}
+
+/**
+ * Implementation of hook_field_info().
+ */
+function flexifield_field_info() {
+  return array(
+    'flexifield' => array(
+      'label' => t('Flexi-Field'),
+      'description' => t('Store one or more field combinations as items within a single field.'),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_field_settings().
+ */
+function flexifield_field_settings($sOperation, $aFieldSettings) {
+  switch ($sOperation) {
+    
+    // The settings form for the field
+    case 'form':
+      $aSettingsForm = array();
+      $aSettingsForm['item_types'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t('Content types that can be used as field items'),
+        '#multiple' => TRUE,
+        '#default_value' => is_array($aFieldSettings['item_types']) ? $aFieldSettings['item_types'] : array(),
+        '#options' => node_get_types('names'),
+      );
+      return $aSettingsForm;
+    break;
+
+    // The elements from the settings form to save in the database
+    case 'save':
+      return array('item_types');
+    break;
+
+    // The database columns to create for storing field item data
+    case 'database columns':
+      $aColumns = array();
+      $aColumns['type'] = array('type' => 'varchar', 'length' => 32, 'not null' => FALSE, 'sortable' => TRUE, 'views' => FALSE);
+      $aColumns['value'] = array('type' => 'text', 'size' => 'big', 'not null' => FALSE, 'sortable' => FALSE, 'serialize' => TRUE, 'views' => FALSE);
+      $aColumns['item_id'] = array('type' => 'int', 'unsigned' => TRUE, 'not null' => FALSE, 'views' => TRUE);
+      return $aColumns;
+    break;
+    
+    // Views Integration
+    case 'views data':
+      $aViewsData = content_views_field_views_data($aFieldSettings);
+      $aDbInfo = content_database_info($aFieldSettings);
+      $sTableAlias = content_views_tablename($aFieldSettings);
+
+      // Relationship: add a relationship for child fields
+      $aViewsData[$sTableAlias][$aFieldSettings['field_name'] .'_item_id']['relationship'] = array(
+        'base' => 'flexifield_items',
+        'field' => $aDbInfo['columns']['item_id']['column'],
+        'handler' => 'content_handler_relationship',
+        'label' => t($aFieldSettings['widget']['label']),
+        'content_field_name' => $aFieldSettings['field_name'],
+      );
+      return $aViewsData;
+    break;
+    
+  }
+}
+
+/**
+ * Implementation of hook_field().
+ */
+function flexifield_field($sOperation, &$oNode, $aFieldSettings, &$aItems, $bTeaser, $bPage) {
+  switch ($sOperation) {
+    
+    // Additional loading code, executed after content.module's content_storage() function
+    case 'load':
+      if (is_array($aItems)) {
+        foreach ($aItems as &$aItem) {
+          // This module is currently transitioning from storing child field data
+          // as a serialized value in the flexifield's 'value' column to delegating
+          // the storage to the child fields themselves, using a relationship between
+          // the "vid" column of the child field and the "item_id" column of the 
+          // flexifield item. Eventually, we'll get rid of the serialized
+          // storage entirely, but that will require implementing an appropriate
+          // hook_update_N() function, so that people who used older versions of this
+          // module don't lose their data. For now, we check to see if we should use
+          // the serialized storage or the child field storage.
+          if (!empty($aItem['item_id'])) {
+            $aItem['value'] = array();
+            flexifield_item_invoke($sOperation, $aItem, $oNode);
+          }
+          elseif (is_string($aItem['value'])) {
+            // Content_storage does serialize each field item's columns (if the 
+            // 'serialize' key for that column is set) upon writing to the db,
+            // but does not unserialize when reading from the db. Hopefully,
+            // this will be fixed in the future, but for now, we have to 
+            // explicitly unserialize.
+            $aItem['value'] = unserialize($aItem['value']);
+          }
+        }
+        return (array($aFieldSettings['field_name'] => $aItems));
+      }
+    break;
+    
+    // Storage operations that simply cascade to the child fields.
+    case 'insert':
+    case 'delete':
+    case 'delete revision':
+      flexifield_items_invoke($sOperation, $aItems, $oNode);
+    break;
+    
+    // 'update' operation is trickier
+    // @todo: find a way to know when there's no change, and in those
+    // cases, don't do a insert/delete.
+    case 'update':
+      $oOldNode = node_load($oNode->nid, $oNode->vid);
+      $sFieldName = $aFieldSettings['field_name'];
+      $aOldItems = $oOldNode->$sFieldName;
+      // Insert new before deleting old, so that filefield doesn't delete 
+      // files that only temporarily reach a reference count of 0.
+      flexifield_items_invoke('insert', $aItems, $oNode);
+      flexifield_items_invoke('delete revision', $aOldItems, $oOldNode);
+    break;
+    
+    // Validate user-submitted data
+    case 'validate':
+      flexifield_items_invoke($sOperation, $aItems, $oNode);
+    break;
+    
+    // Code to run before the field is saved to the database.
+    case 'presave':
+      // Let each field within each item presave itself.
+      flexifield_items_invoke($sOperation, $aItems, $oNode);
+      
+      // Make sure the items are properly sorted. We can't rely
+      // on content.module to do this, since our widget takes over
+      // multiple values processing.
+      // TODO: This seems like an improper mixing of field and widget
+      // code. We should probably relegate this to the widget's validate
+      // function.
+      $aItems = _content_sort_items($aFieldSettings, $aItems);
+    break;
+    
+    // Sanitization code
+    case 'sanitize':
+      // @todo: CCK doesn't invoke the "load" operation on fields loaded into
+      // a view. Is this a bug or a feature? If a bug, is it with CCK or with Views?
+      // What's the best way to solve it? In the meantime, this hack takes care of it.
+      if (!isset($aItems[0]['value']) || !is_array($aItems[0]['value'])) {
+        flexifield_field('load', $oNode, $aFieldSettings, $aItems, $bTeaser, $bPage);
+      }
+    break;
+  }
+}
+
+/**
+ * flexifield_items_invoke()
+ * 
+ * Wrapper function to call flexifield_item_invoke() on all items within the field.
+ */
+function flexifield_items_invoke($sOperation, &$aItems, $oNode, $bTeaser = NULL, $bPage = NULL) {
+  foreach ($aItems as &$aItem) {
+    flexifield_item_invoke($sOperation, $aItem, $oNode, $bTeaser, $bPage);
+  }
+}
+
+/**
+ * flexifield_item_invoke()
+ * 
+ * Invoke a field operation on a flexifield item's child fields. This consists of three parts:
+ * 1. An implementation specific to the needs of the flexifield container.
+ * 2. An implementation that allows the child fields to respond as they normally do within CCK.
+ * 3. Allowing other modules to alter the result of the above two steps.
+ */
+function flexifield_item_invoke($sOperation, &$aItem, $oNode, $bTeaser = NULL, $bPage = NULL) {
+  if ($sOperation === 'load') {
+    _flexifield_item_invoke_flexifield($sOperation, $aItem, $oNode, $bTeaser, $bPage);
+    _flexifield_item_invoke_cck($sOperation, $aItem, $oNode, $bTeaser, $bPage);
+  }
+  else {
+    _flexifield_item_invoke_cck($sOperation, $aItem, $oNode, $bTeaser, $bPage);
+    _flexifield_item_invoke_flexifield($sOperation, $aItem, $oNode, $bTeaser, $bPage);
+  }
+  drupal_alter('flexifield_item', $aItem, $sOperation, $oNode, $bTeaser, $bPage);
+}
+
+/**
+ * _flexifield_item_invoke_cck()
+ * 
+ * Operate on a flexifield item by letting the child fields behave as though they were in a node.
+ */
+function _flexifield_item_invoke_cck($sOperation, &$aItem, $oNode, $bTeaser = NULL, $bPage = NULL) {
+  // Sometimes, the "add another item" item gets passed into here, and we don't want 
+  // to do anything with that.
+  if (!is_array($aItem) || empty($aItem['type'])) {
+    return;
+  }
+  
+  // For inserts, we need a new item_id for the item. See the comment a few lines
+  // below, before we call the content_<op> function.
+  if ($sOperation === 'insert') {
+    $aNodeRevision = array(
+      'nid' => $oNode->nid,
+      'uid' => $oNode->uid,
+      'title' => '',
+      'body' => '',
+      'teaser' => '',
+      'log' => '',
+    );
+    $oNodeRevision = (object) $aNodeRevision;
+    drupal_write_record('node_revisions', $oNodeRevision);
+    $aItem['item_id'] = $oNodeRevision->vid;
+    db_query("DELETE FROM {node_revisions} WHERE nid = %d AND vid = %d", $oNodeRevision->nid, $oNodeRevision->vid);
+  }
+  
+  // There might be legacy data from before we added a item_id column to items. 
+  // To be safe, we do not want to call 'delete revision' on those items.
+  if ($sOperation === 'delete revision' && empty($aItem['item_id'])) {
+    return;
+  }
+  
+  // Leverage the content_<op> function from content.module. For the most part,
+  // this lets the child fields do what they need to do without even being aware
+  // that they are in a flexifield item. For this to work, we need to create a pseudo-node,
+  // which does not reflect any actual node. Instead, it has a nid that's the same as 
+  // the node that contains the top-level flexifield, a type that matches the type of 
+  // the flexifield item, and a vid that doesn't exist in the node_revisions table, 
+  // but matches the parent flexifield item's item_id. This is a hack that enables 
+  // the heirarchy to work without requiring changes to the CCK storage tables.
+  $f = 'content_' . str_replace(' ', '_', $sOperation);
+  if (function_exists($f)) {
+    $aPseudoNode = array(
+      'nid' => $oNode->nid,
+      'vid' => isset($aItem['item_id']) ? $aItem['item_id'] : NULL,
+      'type' => $aItem['type'],
+      'build_mode' => isset($aItem['build_mode']) ? $aItem['build_mode'] : (
+        isset($oNode->build_mode) ? $oNode->build_mode : NODE_BUILD_NORMAL
+      ),
+    );
+    if (is_array($aItem['value'])) {
+      $aPseudoNode = array_merge($aPseudoNode, $aItem['value']);
+    }
+    $oPseudoNode = (object) $aPseudoNode;
+    
+    // The view operation needs a content array to populate.
+    if ($sOperation === 'view') {
+      $oPseudoNode->content = array();
+    }
+    
+    // Call the appropriate function from content.module.
+    $f($oPseudoNode, $bTeaser, $bPage);
+    
+    // It's possible that the operation changed the field data in the pseudo-node.
+    // We want to have that change reflected in $aItem.
+    $aNewValue = array();
+    foreach ($oPseudoNode as $sFieldName => $aFieldItems) {
+      if (substr($sFieldName, 0, 6) == 'field_') {
+        $aNewValue[$sFieldName] = $aFieldItems;
+      }
+    }
+    if ($sOperation === 'view') {
+      $aNewValue['content'] = $oPseudoNode->content;
+    }
+    $aItem['value'] = $aNewValue;
+  }
+}
+
+/**
+ * _flexifield_item_invoke_flexifield()
+ * 
+ * Adjust the item after it went through _flexifield_item_invoke_cck() to take into
+ * account special needs of flexifield. 
+ * 
+ * For the "load" operation, and only for that operation, this function runs before
+ * _flexifield_item_invoke_cck().
+ */
+function _flexifield_item_invoke_flexifield($sOperation, &$aItem, $oNode, $bTeaser = NULL, $bPage = NULL) {
+  switch ($sOperation) {
+    case 'insert':
+      if (!empty($aItem['item_id'])) {
+        $oRecord = (object) array('item_id' => $aItem['item_id']);
+        drupal_write_record('flexifield_items', $oRecord);
+      }
+    break;
+    case 'delete':
+    case 'delete revision':
+      if (!empty($aItem['item_id'])) {
+        db_query("DELETE FROM {flexifield_items} WHERE item_id = %d", $aItem['item_id']);
+      }
+    break;  
+  }
+}
+
+/**
+ * Implementation of hook_content_is_empty().
+ */
+function flexifield_content_is_empty($aItem, $aFieldSettings) {
+  // Note: There seems to be a bug with content.module where if the first field item is empty,
+  // CCK doesn't remove it from the db. This needs more investigation, but is not a bug with 
+  // this module.
+  
+  // If no content type is specified, or if it's not a valid type, treat the item as empty.
+  $sItemType = $aItem['type'];
+  if (!$sItemType) {
+    return TRUE;
+  }
+  $aContentTypeInfo = content_types($sItemType);
+  if (!$aContentTypeInfo) {
+    return TRUE;
+  }
+  
+  // If the content type has no fields, treat the item as not empty.
+  if (!count($aContentTypeInfo['fields'])) {
+    return FALSE;
+  }
+  
+  // Easy check for if the item value is literally empty.
+  $aValue = $aItem['value'];
+  if (!is_array($aValue) || empty($aValue)) {
+    return TRUE;
+  }
+  
+  // If the item value isn't literally empty, check to see if any field is not empty by its own standards
+  // of what that means.
+  $bEmpty = TRUE;
+  foreach ($aValue as $sChildFieldName => $aChildFieldItems) {
+    $aChildFieldSettings = $aContentTypeInfo['fields'][$sChildFieldName];
+    if (is_array($aChildFieldSettings) && is_array($aChildFieldItems)) {
+      foreach ($aChildFieldItems as $aChildFieldItem) {
+        if (is_array($aChildFieldItem) && !module_invoke($aChildFieldSettings['module'], 'content_is_empty', $aChildFieldItem, $aChildFieldSettings)) {
+          $bEmpty = FALSE;
+          break;
+        }
+      }
+    }
+    if (!$bEmpty) {
+      break;
+    }
+  }
+  
+  return $bEmpty;
+}
+
+/**
+ * Implementation of hook_field_formatter_info().
+ */
+function flexifield_field_formatter_info() {
+  return array(
+    'default' => array(
+      'label' => t('Default'),
+      'field types' => array('flexifield'),
+      'multiple values' => CONTENT_HANDLE_CORE,
+    ),
+  );
+}
+
+/**
+ * Theme function for default flexifield formatter.
+ */
+function theme_flexifield_formatter_default($aElement) {
+  // Invoke 'view' on the item, and let the item and content element created by
+  // the view operation have access to the node.
+  $aItem = $aElement['#item'];
+  if (!isset($aItem['#node'])) {
+    $aItem['#node'] = $aElement['#node'];
+  }
+  flexifield_item_invoke('view', $aItem, $aElement['#node']);
+  $aContentElement = $aItem['value']['content'];
+  if (!isset($aContentElement['#node'])) {
+    $aContentElement['#node'] = $aItem['#node'];
+  }
+  
+  // Allow extra theming control. If the flexifield_item_content theme hook isn't
+  // defined (because the element_themehook module isn't enabled), then Drupal's
+  // default structured content renderer gets used.
+  if (!isset($aContentElement['#theme'])) {
+    $aContentElement['#flexifield_item'] = $aItem;
+    $aContentElement['#theme'] = array('flexifield_item_content__' . $aItem['type'], 'flexifield_item_content');
+  }
+  return drupal_render($aContentElement);
+}
+
+/**
+ * Implementation of hook_widget_info().
+ */
+function flexifield_widget_info() {
+  return array(
+    'flexifield_default_widget' => array(
+      'label' => t('Default Widget for Flexi-Field'),
+      'field types' => array('flexifield'),
+      'multiple values' => CONTENT_HANDLE_MODULE,
+    ),
+  );
+}
+
+/**
+ * Implementation of FAPI hook_elements().
+ */
+function flexifield_elements() {
+  return array(
+    'flexifield_default_widget' => array(
+      '#input' => TRUE,
+      '#columns' => array('type', 'value'), 
+      '#delta' => 0,
+      '#process' => array('flexifield_default_widget_process'),
+    ),
+    'flexifield_fieldset' => array(
+      '#input' => TRUE,
+      '#process' => array('flexifield_fieldset_process'),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_widget_settings().
+ */
+function flexifield_widget_settings($sOperation, $aWidgetSettings) {
+  switch ($sOperation) {
+    
+    // The settings form for the widget
+    case 'form':
+      $aSettingsForm = array();
+      $aSettingsForm['disable_tabledrag'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Disable drag-and-drop for this field'),
+        '#default_value' => isset($aWidgetSettings['disable_tabledrag']) ? $aWidgetSettings['disable_tabledrag'] : FALSE,
+        '#description' => t('By default, if this field has its <em>Number of values</em> set to more than 1, the editing form will allow you to use drag-and-drop for ordering the items. However, in cases where this field uses item types with child fields that use drag-and-drop, then due to a bug with nested drag-and-drop behavior, you should disable drag-and-drop for this field.'),
+      );
+      /* This is still experimental.
+      $aSettingsForm['disable_tabledrag_children'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Disable drag-and-drop for child fields'),
+        '#default_value' => isset($aWidgetSettings['disable_tabledrag_children']) ? $aWidgetSettings['disable_tabledrag_children'] : FALSE,
+        '#description' => t('If you do not want to disable drag-and-drop on this field, but are using item types with child fields that normally use drag-and-drop, you should select this option in order to get around the bug with nested drag-and-drop behavior.'),
+      );
+      */
+      return $aSettingsForm;
+    break;
+
+    // Validation for the widget settings form
+    case 'validate':
+    break;
+
+    // The elements from the widget settings form to save in the database
+    case 'save':
+      return array('disable_tabledrag', 'disable_tabledrag_children');
+    break;
+    
+  }
+}
+
+/**
+ * Implementation of hook_widget().
+ */
+function flexifield_widget(&$form, &$form_state, $field, $items, $delta = NULL) {
+  static $bReturnSingleItem = FALSE;
+  
+  // When called for a single item's widget.
+  if ($bReturnSingleItem) {
+    $element = array(
+      '#type' => $field['widget']['type'],
+      '#default_value' => isset($items[$delta]) ? $items[$delta] : '',
+    );
+  }
+  // When called for the container of multiple widgets. This happens because
+  // in hook_widget_info(), we specfy that we want to handle multiple values
+  // ourselves instead of using content.module's default. We do this in order
+  // to make adjustments to what content_multiple_value_form() does.
+  else {
+    $bReturnSingleItem = TRUE;
+    $element = content_multiple_value_form($form, $form_state, $field, $items);
+    $bReturnSingleItem = FALSE;
+    module_load_include('inc', 'flexifield', 'flexifield-widget');
+    _flexifield_alter_multiple_values_form($element, $form, $form_state, $field, $items);
+  }
+  return $element;
+}
+
+/**
+ * Process a widget element for an individual field item.
+ * 
+ * This needs to be in this file instead of flexifield-widget.inc, because
+ * when the form is submitted, it is retrieved from cache and then processed
+ * with no opportunity to do an include of another file. However, here, we can
+ * include the flexifield-widget.inc file, so the other process functions can
+ * be in that file.
+ */
+function flexifield_default_widget_process($aElement, $aSubmittedElementData, $aFormState, $aForm) {
+  module_load_include('inc', 'flexifield', 'flexifield-widget');
+  $aFieldSettings = $aForm['#field_info'][$aElement['#field_name']];
+  $nDelta = $aElement['#delta'];
+  $sItemType = isset($aElement['#value']['type']) ? $aElement['#value']['type'] : NULL;
+  $aItemValue = isset($aElement['#value']['value']) ? $aElement['#value']['value'] : array();
+  if (!is_array($aItemValue)) {
+    $aItemValue = array();
+  }
+  
+  // The element for choosing which type
+  $aAllowedItemTypes = is_array($aFieldSettings['item_types']) ? array_filter($aFieldSettings['item_types']) : array();
+  foreach (array_keys($aAllowedItemTypes) as $sType) {
+    $aAllowedItemTypes[$sType] = node_get_types('name', $sType);
+  }
+  $nTypes = count($aAllowedItemTypes);
+  if ($nTypes < 1) {
+    return $aElement;
+  }
+  elseif ($nTypes == 1) {
+    $sItemType = key($aAllowedItemTypes);
+    $aElement['type'] = array(
+      '#type' => 'value',
+      '#value' => $sItemType,
+    );
+  }
+  else {
+    $aOptions = array_merge(array('' => t('Please select')), $aAllowedItemTypes);
+    if ($sItemType && !$aAllowedItemTypes[$sItemType]) {
+      $sItemType = '';
+    }
+    $aElement['type'] = array(
+      '#type' => 'select',
+      '#default_value' => $sItemType,
+      '#options' => $aOptions,
+      '#ahah' => array(
+        'path' => 'flexifield/ahah/changetype/' . join(':', $aElement['#array_parents']),
+        'wrapper' => $aElement['#id'] . '-value-wrapper',
+        'method' => 'replace',
+        'effect' => 'fade',
+      ),
+    );
+  }
+  
+  // The element that contains the child fields
+  $sFieldKey = 'value';
+  $aElement[$sFieldKey] = array(
+    '#type' => 'flexifield_fieldset',
+    '#flexifield_item_type' => $sItemType,
+    '#default_value' => $aItemValue,
+
+    // The following values were set by the content module and need
+    // to be passed down to the nested element.
+    //'#title' => $aElement['#title'],
+    //'#description' => $aElement['#description'],
+    '#required' => $aElement['#required'],
+    '#field_name' => $aElement['#field_name'],
+    '#type_name' => $aElement['#type_name'],
+    '#delta' => $aElement['#delta'],
+    '#columns' => $aElement['#columns'],
+  );
+  
+  // @todo: This is a temporary hack. Solve this better or document it!!
+  if (($nTypes > 1) && module_exists('wysiwyg')) {
+    foreach (filter_formats() as $format => $object) {
+      if ($profile = wysiwyg_get_profile($format)) {
+        wysiwyg_load_editor($profile);
+      }
+    }
+  }
+
+  return $aElement;
+}
+
+/**
+ * flexifield_get_element_property
+ * 
+ * Helper function to return an element's property, its type's property, or a default value.
+ */
+function flexifield_get_element_property($aElement, $sProperty, $vDefault = NULL) {
+  if (isset($aElement[$sProperty])) {
+    return $aElement[$sProperty];
+  }
+  $aTypeInfo = _element_info(isset($aElement['#type']) ? $aElement['#type'] : 'markup');
+  if (isset($aTypeInfo[$sProperty])) {
+    return $aTypeInfo[$sProperty];
+  }
+  return $vDefault;
+}
+
+/**
+ * Preprocess function for item content
+ */
+function template_preprocess_flexifield_item_content(&$aVars) {
+  // For each fully rendered child field that's exposed as a variable, also
+  // expose each of its rendered items and the first rendered item as variables.
+  // See content.module's content_field(op='alter') for reference on
+  // relationship between #single and #children. 
+  foreach (element_children($aVars['element']) as $sFieldName) {
+    if (!isset($aVars[$sFieldName . '_items']) && isset($aVars['element'][$sFieldName]['field']['#single'])) {
+      $aVars[$sFieldName . '_items'] = array();
+      $aChildFieldElement = $aVars['element'][$sFieldName]['field'];
+      if ($aChildFieldElement['#single']) {
+        foreach (element_children($aChildFieldElement['items']) as $i) {
+          $aVars[$sFieldName . '_items'][$i] = isset($aChildFieldElement['items'][$i]['#children']) ? $aChildFieldElement['items'][$i]['#children'] : '';
+        }
+      }
+      else {
+        $aVars[$sFieldName . '_items'][0] = $aChildFieldElement['items']['#children'];
+      }
+      if (!isset($aVars[$sFieldName . '_item'])) {
+        $aVars[$sFieldName . '_item'] = $aVars[$sFieldName . '_items'][0];
+      }
+    }
+  }
+}

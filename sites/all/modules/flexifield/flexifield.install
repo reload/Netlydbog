@@ -1,0 +1,111 @@
+<?php
+// $Id: flexifield.install,v 1.1.2.1 2009/06/09 19:18:03 effulgentsia Exp $
+
+// Updates happen in random order, whether or not the module is enabled,
+// so include critical code here just to be sure.
+include_once('./'. drupal_get_path('module', 'content') .'/content.module');
+
+/**
+ * Implementation of hook_install().
+ */
+function flexifield_install() {
+  content_notify('install', 'flexifield');
+  drupal_install_schema('flexifield');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function flexifield_uninstall() {
+  content_notify('uninstall', 'flexifield');
+  drupal_uninstall_schema('flexifield');
+}
+
+/**
+ * Implementation of hook_enable().
+ *
+ * Notify content module when this module is enabled.
+ */
+function flexifield_enable() {
+  content_notify('enable', 'flexifield');
+}
+
+/**
+ * Implementation of hook_disable().
+ *
+ * Notify content module when this module is disabled.
+ */
+function flexifield_disable() {
+  content_notify('disable', 'flexifield');
+}
+
+/**
+ * Implementation of hook_schema().
+ */
+function flexifield_schema() {
+  $schema = array();
+
+  $schema['flexifield_items'] = array(
+    'fields' => array(
+      'item_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('item_id'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implementation of hook_update_N().
+ *
+ * Add the "item_id" column to existing fields.
+ */
+function flexifield_update_6001(&$sandbox) {
+  if ($abort = content_check_update('flexifield')) {
+    return $abort;
+  }
+  $ret = array();
+  include_once(drupal_get_path('module', 'content') .'/includes/content.admin.inc');
+  
+  // Clear content type cache
+  content_clear_type_cache(TRUE);
+  
+  // Ensure all flexifield fields are enabled
+  content_associate_fields('flexifield');
+
+  // Build a list of fields that need data updating.
+  $fields = array();
+  foreach (content_types_install() as $type_name => $type_fields) {
+    foreach ($type_fields as $field) {
+      if ($field['type'] == 'flexifield') {
+        // We only process a given field once.
+        $fields[$field['field_name']] = $field;
+      }
+    }
+  }
+
+  // Update database storage (add item_id column).
+  foreach ($fields as $field) {
+    // We don't know which version of flexifield module the user will have 
+    // when running this update. $field['columns'] contains whatever the schema
+    // is for the installed module at the time this function is run. By passing
+    // $field as both the previous and the new field definition, all that will
+    // happen is that columns that exist in $field['columns'], but not in the 
+    // field's table, will get added, which in this case, is what we want.
+    $ret = array_merge($ret, content_alter_db($field, $field));
+  }
+  
+  // Add flexifield_items table.
+  $schema = drupal_get_schema_unprocessed('flexifield');
+  _drupal_initialize_schema('flexifield', $schema);
+  if (isset($schema['flexifield_items'])) {
+    db_create_table($ret, 'flexifield_items', $schema['flexifield_items']);
+  }
+
+  return $ret;
+}

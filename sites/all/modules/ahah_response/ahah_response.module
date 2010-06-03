@@ -1,0 +1,62 @@
+<?php
+// $Id: ahah_response.module,v 1.1.2.1 2009/11/20 00:00:33 effulgentsia Exp $
+
+/**
+ * @file
+ * Provides a themehook to allow for greater control of the response object 
+ * sent by modules implementing an AHAH callback.
+ *
+ * Modules implementing AHAH callbacks are encouraged to finish their 
+ * callback with:
+ *    print theme('ahah_response', $content);
+ * instead of calling drupal_json() directly with data that combines content,
+ * messages, and settings, because the former is both simpler, and it allows
+ * for other modules to adjust the response.
+ */
+ 
+/**
+ * Implementation of hook_theme().
+ */
+function ahah_response_theme() {
+  return array(
+    'ahah_response' => array(
+      'template' => 'ahah-response',
+      'arguments' => array('content' => NULL, 'status' => TRUE, 'messages' => NULL, 'settings' => NULL),
+    ),
+    'ahah_response_settings_js' => array(
+      'arguments' => array('settings' => NULL),
+    ),
+  );
+}
+
+/**
+ * Preprocess variables for an AHAH response
+ */
+function template_preprocess_ahah_response(&$aVars) {
+  
+  // If explicit messages and settings weren't passed in, get them.
+  if (!isset($aVars['messages'])) {
+    $aVars['messages'] = theme('status_messages');
+  }
+  if (!isset($aVars['settings'])) {
+    $aJavaScript = drupal_add_js(NULL, NULL);
+    $aVars['settings'] = isset($aJavaScript['setting']) ? call_user_func_array('array_merge_recursive', $aJavaScript['setting']) : array();
+  }
+  
+  // Create a default response object. However, modules can implement
+  // preprocess functions to alter it, which is one reason we want
+  // to retain content, messages, and settings as independant variables.
+  $aVars['response'] = array(
+    'status' => $aVars['status'],
+    'data' => $aVars['messages'] . $aVars['content'] . theme('ahah_response_settings_js', $aVars['settings']),
+  );
+}
+
+/**
+ * Theme function for converting a PHP structure into javascript code embedded in script tags.
+ */
+function theme_ahah_response_settings_js($aSettings) {
+  // Must jQuery.extend() with the deep parameter; otherwise can clobber
+  // important settings.
+  return (is_array($aSettings) && !empty($aSettings)) ? ('<script type="text/javascript">jQuery.extend(true, Drupal.settings, '. drupal_to_js($aSettings) .');</script>') : '';
+}

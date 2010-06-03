@@ -1,0 +1,7 @@
+; $Id$
+name = Ding! base
+description = Base module providing formats and APIs used across all Ding module.
+package = Ding!
+core = 6.x
+dependencies[] = date_api
+

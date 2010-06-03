@@ -1,0 +1,1 @@
+<?php print implode('', $element['#rendered_children']); ?>

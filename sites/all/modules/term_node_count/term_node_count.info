@@ -1,0 +1,13 @@
+; $Id: term_node_count.info,v 1.1 2009/02/02 03:41:47 archard Exp $
+
+name = Term Node Count
+description = Provides a means for displaying the number of nodes associated with a term efficiently.
+core = 6.x
+version = "6.x-1.0"
+dependencies[] = taxonomy
+; Information added by drupal.org packaging script on 2009-03-05
+version = "6.x-1.3"
+core = "6.x"
+project = "term_node_count"
+datestamp = "1236293166"
+

@@ -1,0 +1,11 @@
+; $Id: ahah_response.info,v 1.1 2008/12/20 22:43:58 effulgentsia Exp $
+name = AHAH Response
+description = Provides a themehook to allow for greater control of the response object sent by modules implementing an AHAH callback.
+core = 6.x
+
+; Information added by drupal.org packaging script on 2009-11-20
+version = "6.x-1.2"
+core = "6.x"
+project = "ahah_response"
+datestamp = "1258675803"
+

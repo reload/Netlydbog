@@ -1,0 +1,295 @@
+<?php
+// $Id$
+
+/**
+ * @file ding_content.module
+ * Provides the profile node type for the Ding! project.
+ */
+
+/**
+ * Implementation of hook_perm().
+ *
+ * Since we are limiting the ability to create new nodes to certain users,
+ * we need to define what those permissions are here. We also define a permission
+ * to allow users to edit the nodes they created.
+ */
+function ding_content_perm() {
+  return array(
+    'create article',
+    'edit article',
+    'delete article',
+    'create event',
+    'edit event',
+    'delete event',
+    'create feature',
+    'edit feature',
+    'delete feature',
+    'create profile',
+    'edit profile',
+    'delete profile',
+    'create topic',
+    'edit topic',
+    'delete topic',
+    'edit advanced node properties',
+  );
+}
+
+/**
+ * Implementation of hook_node_info().
+ */
+function ding_content_node_info() {
+  return array(
+    'article' => array(
+      'name' => t('Blog post'),
+      'module' => 'ding_content',
+      'description' => 'A staff profile with description, profile picture, and tags.',
+      'title_label' => t('Name'),
+      'body_label' => t('Description'),
+    ),
+    'feature' => array(
+      'name' => t('Facility/service'),
+      'module' => 'ding_event',
+      'description' => 'An event, usually related to a library.',
+      'title_label' => t('Name'),
+      'body_label' => t('Description'),
+    ),
+    'profile' => array(
+      'name' => t('Staff profile'),
+      'module' => 'ding_content',
+      'description' => 'A staff profile with description, profile picture, and tags.',
+      'title_label' => t('Name'),
+      'body_label' => t('Description'),
+    ),
+    'topic' => array(
+      'name' => t('Topic'),
+      'module' => 'ding_content',
+      'description' => 'A collection of links and Ting objects relevant to a specific topic, possibly related to a library.',
+      'title_label' => t('Name'),
+      'body_label' => t('Description'),
+    ),
+    'flexifield_link' => array(
+      'name' => t('Link'),
+      'module' => 'ding_content',
+      'description' => 'Flexifield container: A link with a description.',
+      'has_title' => FALSE,
+      'has_body' => FALSE,
+    ),
+    'flexifield_ting_refs' => array(
+      'name' => t('Ting references'),
+      'module' => 'ding_content',
+      'description' => 'Flexifield container: A collection of Ting references.',
+      'has_title' => FALSE,
+      'has_body' => FALSE,
+    ),
+    'flexifield_text' => array(
+      'name' => t('Text'),
+      'module' => 'ding_content',
+      'description' => 'Flexifield container: A text block.',
+      'has_title' => FALSE,
+      'has_body' => FALSE,
+    ),
+    'event' => array(
+      'name' => t('Event'),
+      'module' => 'ding_event',
+      'description' => 'An event, usually related to a library.',
+      'title_label' => t('Name'),
+      'body_label' => t('Description'),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_access().
+ */
+function ding_content_access($op, $node, $account = NULL) {
+  // For nodes that have not been created yet, the $node parameter
+  // actually contains the type name.
+  if ($node instanceOf stdClass) {
+    $type = $node->type;
+  }
+  else {
+    $type = $node;
+  }
+
+  $permissions = array(
+    'article' => array(
+      'create' => 'create article',
+      'update' => 'edit article',
+      'delete' => 'delete article',
+    ),
+    'feature' => array(
+      'create' => 'create feature',
+      'update' => 'edit feature',
+      'delete' => 'delete feature',
+    ),
+    'profile' => array(
+      'create' => 'create profile',
+      'update' => 'edit profile',
+      'delete' => 'delete profile',
+    ),
+    'topic' => array(
+      'create' => 'create event',
+      'update' => 'edit event',
+      'delete' => 'delete event',
+    ),
+    'event' => array(
+      'create' => 'create event',
+      'update' => 'edit event',
+      'delete' => 'delete event',
+    ),
+  );
+
+  if (isset($permissions[$type][$op])) {
+    return user_access($permissions[$type][$op], $account);
+  }
+}
+
+/**
+ * Implementation of hook_menu_alter().
+ */
+function ding_content_menu_alter(&$items) {
+  // These node types are only used ad Flexifield placeholders and are not
+  // supposed to be used for creating nodes.
+  $items['node/add/flexifield-link']['access callback'] = FALSE;
+  $items['node/add/flexifield-text']['access callback'] = FALSE;
+  $items['node/add/flexifield-ting-refs']['access callback'] = FALSE;
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function ding_content_form_alter(&$form, $form_state, $form_id) {
+  // Allow access to certain features that are usually restricted to users with
+  // the "administer nodes" permission.
+  if (substr($form_id, -10) == '_node_form' && user_access('edit advanced node properties')) {
+    if (empty($form['revision_information']['revision']['#access'])) {
+      if (!isset($form['revision_information'])) {
+        // The following is copied from node_form().
+        $form['revision_information'] = array(
+          '#type' => 'fieldset',
+          '#title' => t('Revision information'),
+          '#collapsible' => TRUE,
+          // Collapsed by default when "Create new revision" is unchecked
+          '#collapsed' => !$node->revision,
+          '#weight' => 20,
+        );
+        $form['revision_information']['revision'] = array(
+          '#type' => 'checkbox',
+          '#title' => t('Create new revision'),
+          '#default_value' => $node->revision,
+        );
+        $form['revision_information']['log'] = array(
+          '#type' => 'textarea',
+          '#title' => t('Log message'),
+          '#default_value' => (isset($node->log) ? $node->log : ''),
+          '#rows' => 2,
+          '#description' => t('An explanation of the additions or updates being made to help other authors understand your motivations.'),
+        );
+      }
+      $form['revision_information']['revision']['#access'] = TRUE;
+
+      $form['author']['#access'] = TRUE;
+      $form['options']['#access'] = TRUE;
+    }
+  }
+}
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function ding_content_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  // Allow users other than those with the "administer nodes" permission to
+  // specify a node author other than themselves.
+  if ($op == 'presave' && user_access('edit advanced node properties')) {
+    // Populate the "authored by" field.
+    if ($account = user_load(array('name' => $node->name))) {
+      $node->uid = $account->uid;
+    }
+    else {
+      $node->uid = 0;
+    }
+  }
+}
+
+/**
+ * Implementation of hook_form().
+ *
+ * Provides the node editing form.
+ */
+function ding_content_form(&$node) {
+  // The site admin can decide if this node type has a title and body, and how
+  // the fields should be labeled. We need to load these settings so we can
+  // build the node form correctly.
+  $type = node_get_types('type', $node);
+  $form = array();
+
+  if ($type->has_title) {
+    $form['title'] = array(
+      '#type' => 'textfield',
+      '#title' => check_plain($type->title_label),
+      '#required' => TRUE,
+      '#default_value' => $node->title,
+      '#weight' => -5
+    );
+  }
+
+  if ($type->has_body) {
+    // In Drupal 6, we can use node_body_field() to get the body and filter
+    // elements. This replaces the old textarea + filter_form() method of
+    // setting this up. It will also ensure the teaser splitter gets set up
+    // properly.
+    $form['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
+  }
+
+  if (in_array($type->type, array('profile', 'article', 'feature'))) {
+    // For these node types, we don't want splittable teasers, so let's
+    // disable that.
+    unset($form['body_field']['teaser_js']);
+    unset($form['body_field']['teaser_include']);
+  }
+
+  return $form;
+}
+
+/**
+ * Implementation of hook_view().
+ *
+ * This is a typical implementation that simply runs the node text through
+ * the output filters.
+ */
+function ding_content_view($node, $teaser = FALSE, $page = FALSE) {
+  // Don't allow profile node to be viewed on its own, instead redirect to
+  // the user profile page.
+  if ($node->type == 'profile' && $_GET['q'] == 'node/' . $node->nid) {
+    // Use a 301 permanent redirect.
+    return drupal_goto('user/' . $node->uid, NULL, NULL, 301);
+  }
+
+  $node = node_prepare($node, $teaser);
+  return $node;
+}
+
+/**
+ * Implementation of hook_views_api() {
+ */
+function ding_content_views_api() {
+  return array(
+    'api' => 2.0,
+  );
+}
+
+/**
+ * Implementation of hook_ctools_plugin_api().
+ */
+function ding_content_ctools_plugin_api($module, $api) {
+  if ($module == 'page_manager' && $api == 'pages_default') {
+    return array('version' => 1);
+  }
+
+  module_load_include('inc', 'ding_content', 'ding_content.defaults');
+  $args = func_get_args();
+  return call_user_func_array('_ding_content_ctools_plugin_api', $args);
+}
+
+require_once('ding_content.features.inc');
+

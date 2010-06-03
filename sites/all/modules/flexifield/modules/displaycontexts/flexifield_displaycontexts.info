@@ -1,0 +1,12 @@
+; $Id: flexifield_displaycontexts.info $
+name = FlexiField Display Contexts
+description = Enables an administrator to setup custom display contexts for flexifields, providing additional display control for the child fields within.
+dependencies[] = flexifield
+package = CCK
+core = 6.x
+; Information added by drupal.org packaging script on 2009-07-07
+version = "6.x-1.0-alpha5"
+core = "6.x"
+project = "flexifield"
+datestamp = "1247009133"
+

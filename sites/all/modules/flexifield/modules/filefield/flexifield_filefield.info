@@ -1,0 +1,13 @@
+; $Id: flexifield_field.info $
+name = FlexiField FileField Integration
+description = Enables a file field to be used inside of a flexifield.
+dependencies[] = flexifield
+dependencies[] = filefield
+package = CCK
+core = 6.x
+; Information added by drupal.org packaging script on 2009-07-07
+version = "6.x-1.0-alpha5"
+core = "6.x"
+project = "flexifield"
+datestamp = "1247009133"
+

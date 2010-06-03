@@ -1,0 +1,141 @@
+<?php
+// $Id: flexifield_filefield.module $
+
+/**
+ * @file
+ * Enables a file field to be used inside of a flexifield 
+ */
+
+/**
+ * Implementation of hook_menu().
+ */
+function flexifield_filefield_menu() {
+  $aItems = array();
+  $aItems['flexifield-filefield/ahah/%/%/%/%'] = array(
+    'page callback' => 'flexifield_filefield_js',
+    'page arguments' => array(2, 3, 4, 5),
+    'access callback' => 'filefield_edit_access',
+    'access arguments' => array(3),
+    'type' => MENU_CALLBACK,
+  );
+  return $aItems;
+}
+
+/**
+ * Implementation of hook_flexifield_child_field_form_alter()
+ */
+function flexifield_filefield_flexifield_child_field_form_alter(&$aElement, $aForm, $aFormState, $aFieldSettings) {
+  // Loop through each item in the field. If that item uses the filefield_widget_process() function,
+  // then add our own process function to alter the AHAH path for the upload/remove buttons.
+  foreach (element_children($aElement) as $sKey) {
+    $aProcess = flexifield_get_element_property($aElement[$sKey], '#process');
+    if (isset($aProcess) && in_array('filefield_widget_process', $aProcess)) {
+      $aElement[$sKey]['#process'] = array_merge($aProcess, array('_flexifield_filefield_alter_ahah'));
+    }
+  }
+}
+
+/**
+ * Process function that runs after a filefield widget's process function.
+ */
+function _flexifield_filefield_alter_ahah($aElement, $aSubmittedElementData, $aFormState, &$aForm) {
+  $sAhahPath = implode('/', array('flexifield-filefield', 'ahah', $aElement['#type_name'], $aElement['#field_name'], $aElement['#delta'], implode(':', array_slice($aElement['#array_parents'], 0, -2))));
+  $aElement['filefield_upload']['#ahah']['path'] = $sAhahPath;
+  $aElement['filefield_remove']['#ahah']['path'] = $sAhahPath;
+  return $aElement;
+}
+
+/**
+ * Menu callback; Shared AHAH callback for uploads and deletions.
+ *
+ * This rebuilds the form element for a particular field item. As long as the
+ * form processing is properly encapsulated in the widget element the form
+ * should rebuild correctly using FAPI without the need for additional callbacks
+ * or processing.
+ */
+function flexifield_filefield_js($type_name, $field_name, $delta, $parents) {
+  $field = content_fields($field_name, $type_name);
+
+  if (empty($field) || empty($_POST['form_build_id'])) {
+    // Invalid request.
+    drupal_set_message(t('An unrecoverable error occurred. The uploaded file likely exceeded the maximum file size (@size) that this server supports.', array('@size' => format_size(file_upload_max_size()))), 'error');
+    print drupal_to_js(array('data' => theme('status_messages')));
+    exit;
+  }
+
+  // Build the new form.
+  $form_state = array('submitted' => FALSE);
+  $form_build_id = $_POST['form_build_id'];
+  $form = form_get_cache($form_build_id, $form_state);
+
+  if (!$form) {
+    // Invalid form_build_id.
+    drupal_set_message(t('An unrecoverable error occurred. This form was missing from the server cache. Try reloading the page and submitting again.'), 'error');
+    print drupal_to_js(array('data' => theme('status_messages')));
+    exit;
+  }
+
+  // Build the form. This calls the file field's #value_callback function and
+  // saves the uploaded file. Since this form is already marked as cached
+  // (the #cache property is TRUE), the cache is updated automatically and we
+  // don't need to call form_set_cache().
+  $args = $form['#parameters'];
+  $form_id = array_shift($args);
+  $form['#post'] = $_POST;
+  $form = form_builder($form_id, $form, $form_state);
+  
+  // Update the cached form with the new element at the right place in the form.
+  $form_element = $form;
+  foreach (explode(':', $parents) as $parent) {
+    $form_element = $form_element[$parent];
+  }
+  if (module_exists('fieldgroup') && ($group_name = _fieldgroup_field_get_group($type_name, $field_name))) {
+    if (isset($form_element['#multigroups']) && isset($form_element['#multigroups'][$group_name][$field_name])) {
+      $form_element = $form_element[$group_name][$delta][$field_name];
+    }
+    else {
+      $form_element = $form_element[$group_name][$field_name][$delta];
+    }
+  }
+  else {
+    $form_element = $form_element[$field_name][$delta];
+  }
+
+  if (isset($form_element['_weight'])) {
+    unset($form_element['_weight']);
+  }
+
+  $output = drupal_render($form_element);
+
+  // AHAH is not being nice to us and doesn't know the "other" button (that is,
+  // either "Upload" or "Delete") yet. Which in turn causes it not to attach
+  // AHAH behaviours after replacing the element. So we need to tell it first.
+
+  // Loop through the JS settings and find the settings needed for our buttons.
+  $javascript = drupal_add_js(NULL, NULL);
+  $filefield_ahah_settings = array();
+  if (isset($javascript['setting'])) {
+    foreach ($javascript['setting'] as $settings) {
+      if (isset($settings['ahah'])) {
+        foreach ($settings['ahah'] as $id => $ahah_settings) {
+          if (strpos($id, 'filefield-upload') || strpos($id, 'filefield-remove')) {
+            $filefield_ahah_settings[$id] = $ahah_settings;
+          }
+        }
+      }
+    }
+  }
+
+  // Add the AHAH settings needed for our new buttons.
+  if (!empty($filefield_ahah_settings)) {
+    $output .= '<script type="text/javascript">jQuery.extend(Drupal.settings.ahah, '. drupal_to_js($filefield_ahah_settings) .');</script>';
+  }
+
+  $output = theme('status_messages') . $output;
+
+  // For some reason, file uploads don't like drupal_json() with its manual
+  // setting of the text/javascript HTTP header. So use this one instead.
+  $GLOBALS['devel_shutdown'] = FALSE;
+  print drupal_to_js(array('status' => TRUE, 'data' => $output));
+  exit;
+}

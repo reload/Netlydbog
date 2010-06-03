@@ -1,0 +1,122 @@
+<?php
+// $Id: flexifield_displaycontexts.module $
+
+/**
+ * @file
+ * Enables an administrator to setup custom display contexts for flexifields, 
+ * providing additional display control for the child fields within.
+ */
+
+/**
+ * Implementation of hook_menu().
+ */
+function flexifield_displaycontexts_menu() {
+  $aItems = array();
+
+  $aItems['admin/settings/flexifield-displaycontexts'] = array(
+    'title' => 'Flexifield Display Contexts',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('flexifield_displaycontexts_settings'),
+    'access arguments' => array('administer site configuration'),
+  );
+
+  return $aItems;
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function flexifield_displaycontexts_theme() {
+  $aResult = array();
+  foreach (array_keys(_flexifield_displaycontexts_get_contexts()) as $sKey) {
+    $aResult['flexifield_displaycontexts_formatter_'. $sKey] = array(
+      'arguments' => array('element' => NULL),
+      'function' => 'theme_flexifield_displaycontexts_formatter',
+    );
+  }
+  return $aResult;
+}
+
+/**
+ * Settings form.
+ */
+function flexifield_displaycontexts_settings() {
+  $aForm = array();
+  $aForm['flexifield_displaycontexts'] = array(
+    '#type' => 'textarea',
+    '#rows' => 10,
+    '#title' => t('Display Contexts'),
+    '#description' => t('Enter one context name per line. Each context will be available as a formatter option for fields of type <em>flexifield</em>. Setting a flexifield to use this formatter will result in child fields being rendered using this context, which can be configured using the <em>Flexifield</em> sub-tab within the <em>Display fields</em> tab for the content type.'),
+    '#default_value' => variable_get('flexifield_displaycontexts', ''),
+  );
+  $aForm = system_settings_form($aForm);
+  return $aForm;
+}
+function flexifield_displaycontexts_settings_submit($aForm, &$aFormState) {
+  drupal_flush_all_caches();
+}
+
+/**
+ * Implementation of hook_content_build_modes().
+ */
+function flexifield_displaycontexts_content_build_modes() {
+  $aResult = array(
+    'flexifield' => array(
+      'title' => t('Flexifield'),
+      'build modes' => array(),
+    ),
+  );
+  foreach (_flexifield_displaycontexts_get_contexts() as $sKey => $sLabel) {
+    $aResult['flexifield']['build modes'][$sKey] = array(
+      'title' => $sLabel,
+      'views style' => FALSE,
+    );
+  }
+  return $aResult;
+}
+
+/**
+ * Implementation of hook_field_formatter_info().
+ */
+function flexifield_displaycontexts_field_formatter_info() {
+  $aResult = array();
+  foreach (_flexifield_displaycontexts_get_contexts() as $sKey => $sLabel) {
+    $aResult[$sKey] = array(
+      'label' => $sLabel,
+      'field types' => array('flexifield'),
+      'multiple values' => CONTENT_HANDLE_CORE,
+    );
+  }
+  return $aResult;
+}
+
+/**
+ * Theme function for default flexifield formatter.
+ */
+function theme_flexifield_displaycontexts_formatter($aElement) {
+  $aElement['#item']['build_mode'] = $aElement['#formatter'];
+  return theme('flexifield_formatter_default', $aElement);
+}
+
+/**
+ * Get the contexts as an array of key value pairs, where the key is a suitable
+ * key to use as the key for a formatter and build mode, and the value is safe for display.
+ */
+function _flexifield_displaycontexts_get_contexts($bReset = FALSE) {
+  static $aResult;
+  if (!$aResult || $bReset) {
+    $aResult = array();
+    $aUserEnteredContexts = explode("\n", variable_get('flexifield_displaycontexts', ''));
+    foreach ($aUserEnteredContexts as $sContextName) {
+      $sSafeName = check_plain(trim($sContextName));
+      if (!empty($sSafeName)) {
+        $sKey = 'flexifield_' . preg_replace('/\W+/', '_', trim($sContextName));
+        $sKey = strtolower(substr($sKey, 0, 32));
+        if (!isset($aResult[$sKey])) {
+          $aResult[$sKey] = $sSafeName;
+        }
+      }
+    }
+  }
+  return $aResult;
+}

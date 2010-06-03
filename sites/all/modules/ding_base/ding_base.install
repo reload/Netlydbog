@@ -1,0 +1,11 @@
+<?php
+
+/**
+ * @file
+ * Install file providing upgrade hooks for the entire Ding project.
+ *
+ * Here goes all the upgrades that does not pertain to a more specific 
+ * module. It is still preferable to store module-specific upgrades in 
+ * their own module.
+ */
+

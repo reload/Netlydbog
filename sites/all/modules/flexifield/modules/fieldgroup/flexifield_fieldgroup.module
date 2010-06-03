@@ -1,0 +1,69 @@
+<?php
+// $Id: flexifield_fieldgroup.module $
+
+/**
+ * @file
+ * Enables a field group to be used inside of a flexifield 
+ */
+
+/**
+ * Implementation of hook_flexifield_child_fields_form_alter()
+ * 
+ * Similar to what fieldgroup_form_alter() does for node edit forms.
+ */
+function flexifield_fieldgroup_flexifield_child_fields_form_alter(&$aElement, $aForm, $aFormState) {
+  foreach (fieldgroup_groups($aElement['#flexifield_item_type']) as $group_name => $group) {
+    $aElement[$group_name] = array(
+      '#type' => 'fieldset',
+      '#title' => check_plain(t($group['label'])),
+      '#collapsed' => $group['settings']['form']['style'] == 'fieldset_collapsed',
+      '#collapsible' => in_array($group['settings']['form']['style'], array('fieldset_collapsed', 'fieldset_collapsible')),
+      '#weight' => $group['weight'],
+      '#description' => content_filter_xss(t($group['settings']['form']['description'])),
+      '#attributes' => array('class' => strtr($group['group_name'], '_', '-')),
+    );
+    
+    $has_accessible_field = FALSE;
+    foreach ($group['fields'] as $field_name => $field) {
+      if (isset($aElement[$field_name])) {
+        $aElement[$group_name][$field_name] = $aElement[$field_name];
+        
+        //<flexifield_fieldgroup+>
+        // We don't want the group to be part of the submitted data structure, so set each child's #parents property to not include the group key.
+        // However, #array_parents should include the group key.
+        $aElement[$group_name][$field_name]['#parents'] = array_merge($aElement['#parents'], array($field_name));
+        $aElement[$group_name][$field_name]['#array_parents'] = array_merge($aElement['#array_parents'], array($group_name, $field_name));
+        //</flexifield_fieldgroup+>
+        
+        // Track whether this group has any accessible fields within it.
+        if (!isset($aElement[$field_name]['#access']) || $aElement[$field_name]['#access'] !== FALSE) {
+          $has_accessible_field = TRUE;
+        }
+        unset($aElement[$field_name]);
+      }
+    }
+    if (!empty($group['fields']) && !element_children($aElement[$group_name])) {
+      //hide the fieldgroup, because the fields are hidden too
+      unset($aElement[$group_name]);
+    }
+
+    if (!$has_accessible_field) {
+      // Hide the fieldgroup, because the fields are inaccessible.
+      $aElement[$group_name]['#access'] = FALSE;
+    }
+
+    // Allow other modules to alter the form.
+    // Can't use module_invoke_all because we want
+    // to be able to use a reference to $form and $form_state.
+    foreach (module_implements('fieldgroup_form') as $module) {
+      $function = $module .'_fieldgroup_form';
+      // TODO: We should call this function, but with what parameters?
+      // Should $form be the full form or the element?
+      // Should $form_state be the full form state?
+      // Should $form_id be the form's id or the element's id?
+      // A use-case (i.e., which modules implement this hook?) would be helpful.
+      //$function($form, $form_state, $form_id, $group);
+    }
+
+  }
+}
