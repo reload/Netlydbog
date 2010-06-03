@@ -20,10 +20,10 @@ body{
 }
 
 
-.left{
+.pagewrap .top-area .left{
 	float:left;
 }
-.right{
+.pagewrap .top-area .right{
 	float:right;
 }
 
@@ -52,6 +52,7 @@ body{
 	font-weight:normal;
 	margin-top:14px;
 	font-size:0.91em;
+	line-height:1;
 }
 .topmenu{
 	margin-right:20px;
@@ -62,7 +63,9 @@ body{
 }
 
 
-
+.pagewrap .main{
+	margin: 0 1em;
+}
 
 
 
