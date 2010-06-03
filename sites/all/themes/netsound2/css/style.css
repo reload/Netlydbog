@@ -1,12 +1,16 @@
 body{
 	background: #b1af9a url(../img/background-gradient.gif) repeat-y center top;
 	font-family: Helvetica, Arial, sans-serif;
+  line-height:1.125em;
+	
+
 }
 
 .pagewrap{
 	width: 1006px;
 	margin:0 auto;
 	background: #F7F2ED;
+	font-size:0.875em;
 }
 
 .pagewrap .top-area{
@@ -132,6 +136,7 @@ body{
 	display:block;
 	padding:5px 0;
 	overflow:hidden;
+	line-height:1;
 	height:11px;
 	width:94px;
 	text-decoration:none;
