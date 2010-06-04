@@ -2,7 +2,7 @@ body{
 	background: #b1af9a url(../img/background-gradient.gif) repeat-y center top;
 	font-family: Helvetica, Arial, sans-serif;
   line-height:1.125em;
-	
+	font-size:14px;
 
 }
 
@@ -160,6 +160,11 @@ body{
 
 .panel-pane{
 }
+
+.panel-3col-left-stacked .panel-col.top .inside{
+	margin : 0 0 1em 0;
+}
+
 .panel-3col-left-stacked .panel-col .inside{
 	margin: 0 0.5em 1em 1em;
 }
@@ -181,9 +186,41 @@ h2.pane-title{
 	margin: 0.5em 0;
 	text-transform:uppercase;
 }
-.page-frontpage .panel-display .top {
+
+/* top feature */
+#topfeature .feature-tab{
+	padding: 0 1em;
+}
+
+.page-frontpage .panel-display .top #topfeature .feature-tab {
 	background-color: #e8e4df;
 }
+#topfeature .page-selector{
+	background: transparent url(../img/topfeature-shadow.gif) repeat-x;
+	height:24px;
+	padding-left:30px;
+}
+#topfeature .page-selector li{
+	float:left;
+}
+
+#topfeature a.tab{
+	background: #dedad5 url(../img/topfeature-link-shadow.gif) repeat-x;
+	display:block;
+	padding:5px;
+	line-height:1;
+	margin-right:10px;
+	text-decoration:none;
+	text-transform:uppercase;
+	color: #999999;
+}
+#topfeature a.tab.active{
+  background: #E8E4DF;
+	border: 1px solid #aaa5a4;
+	border-top:0;
+}
+
+
 
 /* book display */
 
