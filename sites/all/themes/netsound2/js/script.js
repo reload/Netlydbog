@@ -1,5 +1,27 @@
 jQuery(function(){
 	
+	
+	$('.feature-tab:not(:first)').hide();
+		
+	$('#topfeature').append('<ul class="page-selector"></ul>');
+	
+	var link = $('#topfeature a.tab');
+	link.click(function(){
+
+		id = link.index($(this));
+		$('.feature-tab').hide();
+		$('.feature-tab:eq('+id+')').show();
+		return false;
+	});
+	// move buttons below
+	link.each(function(i){
+		$('.page-selector').append('<li></li>');
+		$('.page-selector > li:last').append($(this));
+	});
+	
+	
+	
+	
 /*	pages = $('.top .pane-book');
 	$('.top').after('<ul class="top-pager"></ul>');
 	pages.each(function(i){
