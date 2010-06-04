@@ -192,6 +192,10 @@ h2.pane-title{
 	padding: 0 1em;
 }
 
+.feature-tab .inner{
+	margin-bottom:1em;
+}
+
 .page-frontpage .panel-display .top #topfeature .feature-tab {
 	background-color: #e8e4df;
 }
