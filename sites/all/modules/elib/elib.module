@@ -1,0 +1,41 @@
+<?php 
+
+function elib_menu() {
+  $path  = drupal_get_path('module', 'elib') . '/includes';
+  $items = array();
+  
+  $items['admin/settings/ting/elib'] = array(
+    'title'            => 'eLib settings',
+    'description'      => 'settings for eLib SOAP webservice',
+    'access arguments' => array('access administration pages'),
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('ting_admin_settings_form_elib'),
+    'file'             => 'elib.admin.inc',
+    'file path'        => $path,
+    'type'             => MENU_LOCAL_TASK,
+    'weight'           => 2,
+  );
+
+  return $items;
+}
+
+
+
+
+function elib_client(){
+	  static $client;
+  if (!isset($client)) {
+    $path = drupal_get_path('module', 'elib');
+    include($path . '/lib/class.eLibClient.php');
+    $client = new AlmaClient(variable_get('alma_base_url', ''));
+  }
+  return $client;
+}
+
+
+
+
+
+
+
+?>
