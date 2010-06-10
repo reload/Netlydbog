@@ -9,7 +9,19 @@
  * - $object: The TingClientObject instance we're rendering.
  */
 
-//krumo($object);
+$response = elib_client()->getBooks('01-01-1999');
+
+dsm($response);
+
+dsm($object);
+
+if($object->record['dc:identifier']['dkdcplus:ISBN']){
+	$response = elib_client()->getBook(intval($object->record['dc:identifier']['dkdcplus:ISBN'][0]));
+	
+	dsm($response);
+}
+
+//
 ?>
 <!-- ting_object.tpl -->
 <div id="ting-object" class="line">

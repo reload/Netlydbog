@@ -1,8 +1,8 @@
 body{
 	background: #b1af9a url(../img/background-gradient.gif) repeat-y center top;
 	font-family: Helvetica, Arial, sans-serif;
-  line-height:1.125em;
-	font-size:14px;
+  /*line-height:1.125em;*/
+	 font-size:15px;
 
 }
 
@@ -13,9 +13,12 @@ body{
 	font-size:0.875em;
 }
 
+body.front .pagewrap .top-area{
+	background: transparent url(../img/top-ribbon.gif) no-repeat top left;
+}
 .pagewrap .top-area{
 	height: 121px;
-	background: transparent url(../img/top-ribbon.gif) no-repeat top left;
+	background: transparent url(../img/top-ribbon-normal.gif) no-repeat top left;
 	position:relative;
 }
 

@@ -5,43 +5,41 @@ function ting_admin_settings_form_elib($form_state) {
 
   $form['elib'] = array(
     '#type'        => 'fieldset',
-    '#title'       => t('Ting - Additional Information settings'),
-    '#description' => t('The Additional Information service is used to retrieve cover images and other information about objects. <a href="http://www.danbib.dk/index.php?doc=forsideservice">More information about the service (in Danish)</a>'),
+    '#title'       => t('eLib - SOAP webservice settings'),
+    '#description' => t('<p>The API is developed to allow libraries to integrate Elibs distribution platform closely with a site, portal, content management system or library system etc. Not all parts of the API are necessary for all types of use, for example a user validation might not be needed if the system used already has access to user validation features.</p>
+<p>The main feature of the API is the web services, which can be used to create a functional solution. Documentation is also a central part. Controlled and legal distribution of files and information is the main goal of the API.</p>
+<p>All web services are available here https://www.elib.se/webservices detailed documentation for each web service is available there with examples. This document in its most updated form can also be found there. Most of the API should be self explanatory; the following is to make things a little bit more understandable.</p>'),
     '#tree'        => FALSE,
   );
-  $form['elib']['addi_wdsl_url'] = array(
+  $form['elib']['elib_base_url_wsdl'] = array(
     '#type'          => 'textfield',
-    '#title'         => t('Service URL'),
-    '#description'   => t('URL to the Additional Information webservice, e.g. http://forside.addi.dk/addi.wsdl'),
+    '#title'         => t('Base URL of webservices'),
+    '#description'   => t('- : -'),
     '#required'      => TRUE,
-    '#default_value' => variable_get('addi_wdsl_url', ''),
+    '#default_value' => variable_get('elib_base_url_wsdl', ''),
   );
-  $form['elib']['addi_username'] = array(
+  $form['elib']['elib_retailer_id'] = array(
     '#type'          => 'textfield',
-    '#title'         => t('Username'),
-    '#description'   => t('Username for the Additional information webservice'),
+    '#title'         => t('Retailer ID'),
+    '#description'   => t(''),
     '#required'      => TRUE,
-    '#default_value' => variable_get('addi_username', ''),
+    '#default_value' => variable_get('elib_retailer_id', ''),
   );
-  $form['elib']['addi_group'] = array(
+  $form['elib']['elib_retailer_keycode'] = array(
     '#type'          => 'textfield',
-    '#title'         => t('Group'),
-    '#description'   => t('User group for the Additional information webservice'),
+    '#title'         => t('Retailer Key Code'),
+    '#description'   => t(''),
     '#required'      => TRUE,
-    '#default_value' => variable_get('addi_group', ''),
+    '#default_value' => variable_get('elib_retailer_keycode', ''),
   );
-  $form['elib']['addi_password'] = array(
+  $form['elib']['elib_language_code'] = array(
     '#type'          => 'textfield',
-    '#title'         => t('Password'),
-    '#description'   => t('Password for the Additional information webservice'),
-    '#required'      => TRUE,
-    '#default_value' => variable_get('addi_password', ''),
+    '#title'         => t('Language Code'),
+    '#description'   => t(''),
+    '#required'      => FALSE,
+    '#default_value' => variable_get('elib_language_code', ''),
   );
-  $form['elib']['addi_enable_logging'] = array(
-    '#type'          => 'checkbox',
-    '#title'         => t('Enable logging'),
-    '#default_value' => variable_get('addi_enable_logging', false),
-  );
+  
  
   return system_settings_form($form);
 }

@@ -19,15 +19,79 @@ function elib_menu() {
   return $items;
 }
 
+function elib_block($op = 'list', $delta = 0, $edit = array()) {
+  if ($op == 'list') {
+    return array(
+      'account' => array(
+        'info' => t('Login through eLib'),
+        'cache' => BLOCK_NO_CACHE,
+        'status' => 1,
+        'region' => 'account',
+      ),
+    );
+  }
+  elseif ($op == 'view' && $delta == 'account') {
+    global $user;
+    $block = array();
+
+    // If user is not logged in, display the login form.
+    if (!$user->uid) {
+      //jquery_ui_add('ui.dialog');
+      //jquery_ui_theme_load();
+      //drupal_add_js(drupal_get_path('module', 'alma_user') . '/alma_user.login.js');
+      $block['content'] = drupal_get_form('user_login_block');
+    }
+    else {
+      //$status = alma_user_get_status($GLOBALS['user'], FALSE);
+      
+        	$isbn = intval('8702048949');
+
+    	//global $testuser; $testuser = true;
+    	define(TESTUSER,true);
+    	$response = elib_client()->validateUser();
+    	
+    	//$xml = elib_client()->getBook($isbn);
+    	
+    	
+    	
+    	
+    	
+    	krumo($response);
+    	
+      $block['content'] = 'LOGIN HERE!';   
+    	
+      //$block['content'] = theme('alma_user_status_block', $status);
+    }
+
+    return $block;
+  }
+}
+
+
+
+
+
+
+
+
 
 
 
 function elib_client(){
-	  static $client;
+	global $user;
+  static $client;
+  global $testuser;
+
   if (!isset($client)) {
     $path = drupal_get_path('module', 'elib');
     include($path . '/lib/class.eLibClient.php');
-    $client = new AlmaClient(variable_get('alma_base_url', ''));
+    $client = new eLibClient(variable_get('elib_retailer_id', ''),variable_get('elib_retailer_keycode', ''),variable_get('elib_language_code', ''));
+    $client->base_url = variable_get('elib_base_url_wsdl', '');
+  }
+  if(TESTUSER){
+  	$no = 'kkbIntegrated';
+    $pin = 'kop94str';
+  	$client->setLoaner($no,$pin);
   }
   return $client;
 }

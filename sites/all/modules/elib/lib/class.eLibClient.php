@@ -1,74 +1,113 @@
 <?php 
 
+/**
+ * Adapter for eLib webservices
+ * 
+ * @author troelslenda
+ *
+ */
+
 class eLibClient{
 	
 	private $elibUsr;
 	private $retailerid;
 	private $retailerkeycode;
 	private $languagecode;
-	private $baseurl;
 	private $sc_params;
+	public $base_url;
 	
 	public function __construct($retailerid,$retailerkeycode,$languagecode){
 		$this->retailerid = $retailerid;
 		$this->retailerkeycode = $retailerkeycode;
 		$this->languagecode = $languagecode;
-		$this->baseurl = 'http://localhost:8080/webservices/';
-	  $this->sc_params = array(
+		$this->sc_params = array(
 	    'trace' => true, 
       'cache_wsdl' => WSDL_CACHE_NONE, 
       'proxy_host' => 'localhost', 
       'proxy_port' => 8080
 	  );	
 	}
-	public function validateUser($cardno,$pin){
-		try{
-			$request = new SoapClient($this->baseurl.'validatelibraryuser.asmx?wsdl',$this->sc_params);
-		}
-		catch(Exception $e){
-			//$this->echoError($e->getMessage());
-		}
+	
+	public function setLoaner($cardno,$pin){
+		$this->elibUsr = new loaner($cardno,$pin);
 	}
+	
+	public function validateUser(){
+		if(is_a($this->elibUsr,'loaner')){
+			$params = $this->elibUsr->loginParams();
+			return $this->soapCall($this->base_url.'validatelibraryuser.asmx?WSDL','ValidateLibraryUser',$params);
+		}
+		else{
+			throw new Exception('no user instance');
+		}
+		
+  }
+  /**
+   * 
+   * @param int $isbn
+   * @return SimpleXMLElement
+   */
+  public function getBook($isbn){
+    if(is_int($isbn)){
+      $response = $this->soapCall($this->base_url.'getproduct.asmx?WSDL','GetProduct',array('ebookid' => $isbn));
+      return simplexml_load_string($response->GetProductResult->any);
+    }
+    else{
+    	throw new Exception('the isbn need to be int');
+    }
+  }
+  public function getBooks($fromdate){
+    return $this->soapCall($this->base_url.'getproductlist.asmx?wsdl','GetProductList',array('countrycode'=> 'dk','fromdate' => $fromdate));
+  }
+  
+  public function soapCall($wsdl,$func,$ext_params=NULL){
+    $params = array(
+      'retailerid' => $this->retailerid,
+      'retailerkeycode' => md5($this->retailerkeycode),
+      'languagecode' => $this->languagecode
+    );
+    if(is_array($ext_params)){
+      $params = array_merge($params,$ext_params);
+    }
+    try{
+      $request = new SoapClient($wsdl,$this->sc_params);
+      return $request->$func($params);   
+    }
+    catch(Exception $e){
+      krumo($e->getMessage());
+    }
+  }
 }
   
 
-
-
-/*class eLibUser{
-	private $cardnumber;
+class loaner{
+	
+	private $cardno;
 	private $pin;
+	private $cpr;
 	
-	public function validateUser(){
-		try{
-			$request = new SoapClient('localhost:8080/webservices/validatelibraryuser.asmx?WSDL');
-			
-			var_dump($request->__getFunctions());
-		}
-		catch (Exception $e){
-			print $e->getMessage();
-		}
-		
-	}
-	
-	public function __construct($cardnumber,$pin){
-		$this->cardnumber = $cardnumber;
-		#TODO: salt the pin?
+	public function __construct($cardno='', $pin='',$cpr=''){
+		$this->cardno = $cardno;
 		$this->pin = $pin;
+		$this->cpr = $cpr;
 	}
-	public function getCardNo(){
-		return $this->cardnumber;
+	public function getId(){
+		if($this->cardno == ''){
+			return $this->cpr;
+		}
+		else{
+			return $this->cardno;
+		}
 	}
 	public function getPin(){
 		return $this->pin;
 	}
+	public function loginParams(){
+		return array(
+		  'cardno' => $this->getId(),
+      'pin' => $this->getPin()
+		);
+	}
 }
-*/
-
-
-$client = new eLibClient('810',md5('der89pot'),'da');
-
-
-
-
 
 ?>

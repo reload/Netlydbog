@@ -57,7 +57,9 @@
       
       <?php print $content; ?>
       
-      <?php// if ($breadcrumb) { print $breadcrumb; } // themename_breadcrumb in template.php ?>
+      </div>
+      
+       <?php// if ($breadcrumb) { print $breadcrumb; } // themename_breadcrumb in template.php ?>
           <?php if ($help OR $messages) { ?>
               <?php print $help ?>
               <?php print $messages ?>
@@ -67,13 +69,7 @@
             <?php print $tabs; ?>
           <?php }; ?>
 
-          <?php if ($title AND (arg(0) != "node")) {  ?><h1><?php print $title; ?></h1><?php } ?>
-
-      
-      
           
-
-      </div>
       <!-- <div class="right">
       <?php print mothership_userprofile($user); ?>
       </div> -->
