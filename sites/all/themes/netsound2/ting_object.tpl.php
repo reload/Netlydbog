@@ -11,9 +11,11 @@
 
 $response = elib_client()->getBooks('01-01-1999');
 
-dsm($response);
+//dsm($response);
 
-dsm($object);
+//dsm($object);
+
+krumo($object);
 
 if($object->record['dc:identifier']['dkdcplus:ISBN']){
 	$response = elib_client()->getBook(intval($object->record['dc:identifier']['dkdcplus:ISBN'][0]));
@@ -68,7 +70,7 @@ if($object->record['dc:identifier']['dkdcplus:ISBN']){
     
     <?php if (!empty($object->record['dc:description'])): ?>
     <?php foreach ($object->record['dc:description'] as $type => $dc_description): ?>
-    <?php print theme('item_list', $dc_description, t('Description'), 'span', array('class' => 'description'));?>
+    <?php //print theme('item_list', $dc_description, t('Description'), 'span', array('class' => 'description'));?>
     <?php endforeach; ?>
     <?php endif; ?>
     

@@ -56,7 +56,7 @@ function elib_block($op = 'list', $delta = 0, $edit = array()) {
     	
     	
     	
-    	krumo($response);
+    	//krumo($response);
     	
       $block['content'] = 'LOGIN HERE!';   
     	

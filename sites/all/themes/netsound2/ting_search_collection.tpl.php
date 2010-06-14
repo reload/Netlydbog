@@ -6,6 +6,8 @@
  * Template to render a Ting collection of books.
  */
 
+krumo($collection);
+
 //get lydbog in collection
 
 foreach ($collection->objects as $obj){
