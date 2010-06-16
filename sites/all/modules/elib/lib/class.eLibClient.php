@@ -35,7 +35,17 @@ class eLibClient{
 	public function validateUser(){
 		if(is_a($this->elibUsr,'loaner')){
 			$params = $this->elibUsr->loginParams();
-			return $this->soapCall($this->base_url.'validatelibraryuser.asmx?WSDL','ValidateLibraryUser',$params);
+			$response = $this->soapCall($this->base_url.'validatelibraryuser.asmx?WSDL','ValidateLibraryUser',$params);
+			
+			$xml = simplexml_load_string($response->ValidateLibraryUserResult->any);
+			
+			// if user credentials are valid 101 is returned in xml according to eLib
+			if($xml->status->code == '101'){
+				return true;
+			}
+			else{
+				return false;
+			}
 		}
 		else{
 			throw new Exception('no user instance');
@@ -71,10 +81,10 @@ class eLibClient{
     }
     try{
       $request = new SoapClient($wsdl,$this->sc_params);
-      return $request->$func($params);   
+      return ($request->$func($params));
     }
     catch(Exception $e){
-      krumo($e->getMessage());
+      watchdog('elib', 'validate_user_error: “@message”', array('@message' => $e->getMessage(), WATCHDOG_ERROR));
     }
   }
 }
@@ -104,8 +114,8 @@ class loaner{
 	}
 	public function loginParams(){
 		return array(
-		  'cardno' => $this->getId(),
-      'pin' => $this->getPin()
+		  'cardnumber' => $this->getId(),
+      'pincode' => $this->getPin()
 		);
 	}
 }

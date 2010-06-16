@@ -9,7 +9,7 @@
  * - $object: The TingClientObject instance we're rendering.
  */
 
-$response = elib_client()->getBooks('01-01-1999');
+//$response = elib_client()->getBooks('01-01-1999');
 
 //dsm($response);
 
@@ -20,7 +20,7 @@ krumo($object);
 if($object->record['dc:identifier']['dkdcplus:ISBN']){
 	$response = elib_client()->getBook(intval($object->record['dc:identifier']['dkdcplus:ISBN'][0]));
 	
-	dsm($response);
+//	dsm($response);
 }
 
 //

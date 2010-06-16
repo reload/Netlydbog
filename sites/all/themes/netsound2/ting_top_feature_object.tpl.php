@@ -21,16 +21,9 @@
       <div class="author">
         <?php echo t('By %creator_name%', array('%creator_name%' => $collection->creators_string)) ?>
       </div>
-      <ul class="rating">
-        <li class="on">star</li>
-        <li class="on">star</li>
-        <li class="on">star</li>
-        <li class="off">star</li>
-        <li class="off">star</li>
-      </ul>
        <div class="icons">
-        <img src="/sites/all/themes/netsound/img/listen.png" />
-        <img src="/sites/all/themes/netsound/img/fetch.png" />
+       <?php print l(theme('image', 'sites/all/themes/netsound/img/listen.png', '', '', null, false), $collection->url.'/stream', array('html' => true)); ?>
+       <?php print l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $collection->url.'/download', array('html' => true)); ?>
       </div>
   </div>
 </li>

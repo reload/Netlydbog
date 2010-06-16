@@ -1,4 +1,4 @@
-jQuery(function(){
+jQuery(function($){
 	
 	
 	$('.feature-tab:not(:first)').hide();

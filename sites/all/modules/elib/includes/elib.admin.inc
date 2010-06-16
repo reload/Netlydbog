@@ -40,7 +40,6 @@ function ting_admin_settings_form_elib($form_state) {
     '#default_value' => variable_get('elib_language_code', ''),
   );
   
- 
   return system_settings_form($form);
 }
 ?>

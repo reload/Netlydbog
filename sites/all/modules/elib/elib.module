@@ -4,7 +4,7 @@ function elib_menu() {
   $path  = drupal_get_path('module', 'elib') . '/includes';
   $items = array();
   
-  $items['admin/settings/ting/elib'] = array(
+  $items['admin/settings/elib'] = array(
     'title'            => 'eLib settings',
     'description'      => 'settings for eLib SOAP webservice',
     'access arguments' => array('access administration pages'),
@@ -12,12 +12,64 @@ function elib_menu() {
     'page arguments'   => array('ting_admin_settings_form_elib'),
     'file'             => 'elib.admin.inc',
     'file path'        => $path,
-    'type'             => MENU_LOCAL_TASK,
+  //  'type'             => MENU_LOCAL_TASK,
     'weight'           => 2,
   );
-
+  $items['admin/settings/elib/main'] = array(
+    'title' => 'eLib',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  
+  $items['ting/object/%/stream'] = array(
+    'title' => 'stream',
+    'page callback' => 'elib_get_lydbog',
+    'page arguments' => array(2,3),
+    'access arguments' => array('access content'),
+    
+  );
+  $items['ting/object/%/download'] = array(
+    'title' => 'wma',
+    'page callback' => 'elib_get_lydbog',
+    'page arguments' => array(2,3),
+    'access arguments' => array('access content'),
+    
+  );
   return $items;
 }
+
+function elib_form_alter(&$form, $form_state, $form_id) {
+  switch ($form_id) {
+    case 'user_login':
+    case 'user_login_block':
+    	array_unshift($form['#validate'], 'elib_login_validate');
+      //$form['#submit'][] = 'elib_login_submit';
+    	break;
+  }
+}
+
+function elib_get_lydbog($tingObjectID,$format){
+	
+	global $user;
+
+	//no user logged in
+	if(!$user->uid){
+		header('Location: /user/login/?'.drupal_get_destination());
+		exit();
+	}
+	
+  switch($format){
+  	case 'stream':
+  		$content = 'embed stream';
+  		break;
+  	case 'download':
+  		$content = 'file for download';
+  		break;
+	}
+	
+	return $content;
+}
+
+
 
 function elib_block($op = 'list', $delta = 0, $edit = array()) {
   if ($op == 'list') {
@@ -47,8 +99,7 @@ function elib_block($op = 'list', $delta = 0, $edit = array()) {
         	$isbn = intval('8702048949');
 
     	//global $testuser; $testuser = true;
-    	define(TESTUSER,true);
-    	$response = elib_client()->validateUser();
+    	//$response = elib_client()->validateUser();
     	
     	//$xml = elib_client()->getBook($isbn);
     	
@@ -69,13 +120,7 @@ function elib_block($op = 'list', $delta = 0, $edit = array()) {
 
 
 
-
-
-
-
-
-
-
+/*init elib client as singleton */
 
 function elib_client(){
 	global $user;
@@ -88,14 +133,91 @@ function elib_client(){
     $client = new eLibClient(variable_get('elib_retailer_id', ''),variable_get('elib_retailer_keycode', ''),variable_get('elib_language_code', ''));
     $client->base_url = variable_get('elib_base_url_wsdl', '');
   }
-  if(TESTUSER){
-  	$no = 'kkbIntegrated';
-    $pin = 'kop94str';
-  	$client->setLoaner($no,$pin);
-  }
   return $client;
 }
 
+function elib_login_validate($form, &$form_state) {
+  if (empty($form_state['values']['name']) || empty($form_state['values']['pass'])) {
+    // empty user name or password makes little sense to try and validate.
+    return;
+  }
+
+  // Remove everything from numbers from the “name” field to try and
+  // validate it as a library/borrower card.
+  $card = preg_replace('/\D+/', '', $form_state['values']['name']);
+
+  //var_dump($card);
+  //die();
+  
+  // Only try validation if we have 10 digits.
+  if (strlen($card) == 10) {
+    $uid = elib_check_credentials($card, $form_state['values']['pass']);
+
+    if ($uid && $account = user_load($uid)) {
+      global $user;
+      $user = $account;
+      user_authenticate_finalize($form_state['values']);
+
+      // If we have Alma credentials and a user was logged in, cache the
+      // credentials in our own cache bin.
+      //alma_user_cache_credentials($user, $form_state['values']['name'], $form_state['values']['pass']);
+    }
+  }
+}
+
+function elib_check_credentials($cardno,$pin){
+	elib_client()->setLoaner($cardno,$pin);
+	if(!elib_client()->validateUser()){
+		return false;
+	}
+	
+// Check if user exists.
+  $uid = db_result(db_query("SELECT uid FROM {alma_user} WHERE alma_id = '%s';", $data['patron_id']));
+  if ($uid) {
+    $account = user_load($uid);
+    // When logging in a returning normal user, update its display name.
+    if ($login && (!isset($account->has_secure_role) || !$account->has_secure_role)) {
+      db_query("UPDATE {ding_user} SET display_name = '%s' WHERE uid = %d;", $data['patron_name'], $uid);
+    }
+
+    if (isset($data['preferences']['patron_branch'])) {
+      db_query("UPDATE {alma_user} SET preferred_branch = '%s' WHERE uid = %d;", $data['preferences']['patron_branch'], $uid);
+    }
+
+    return $uid;
+  }
+  elseif (is_array($data) && !empty($data['patron_id'])) {
+    $random_name = $_SERVER['REQUEST_TIME'] . mt_rand();
+    // User data to pass to user_save().
+    $user_data = array(
+      'name' => $random_name,
+      'display_name' => $data['patron_name'],
+      'mail' => $data['mails'][0]['mail'],
+      // Login via Drupal's standard login should not be possible.
+      'pass' => microtime(TRUE) . mt_rand(),
+      'status' => 1,
+    );
+
+    // If no e-mail was set in the XML, we need to generate a
+    // random, invalid address,  since Drupal has a unique
+    // constraint on the mail column in the users table.
+    if (empty($user_data['mail'])) {
+      $user_data['mail'] = $random_name . '@mail.invalid';
+    }
+    // Set the initial e-mail to the same e-mail-address.
+    $user_data['init'] = $user_data['mail'];
+
+    // Saves the user and returns the user UID.
+    $user = user_save(NULL, $user_data);
+
+    $branch = (isset($data['preferences']['patron_branch'])) ? $data['preferences']['patron_branch'] : '';
+
+    // Store Alma user reference in our own table.
+    db_query("INSERT INTO {alma_user} (uid, alma_id, preferred_branch) VALUES (%d, '%s', '%s');", $user->uid, $data['patron_id'], $branch);
+
+    return($user->uid);
+  }
+}
 
 
 

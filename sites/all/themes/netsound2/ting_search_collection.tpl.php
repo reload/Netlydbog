@@ -6,7 +6,7 @@
  * Template to render a Ting collection of books.
  */
 
-krumo($collection);
+//krumo($collection);
 
 //get lydbog in collection
 
