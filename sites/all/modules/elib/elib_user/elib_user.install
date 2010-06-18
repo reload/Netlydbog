@@ -4,15 +4,15 @@
 /**
  * Implementation of hook_install().
  */
-function elib_install() {
-  drupal_install_schema('elib_loans');
+function elib_user_install() {
+  drupal_install_schema('elib_user');
 }
 
 /**
  * Implementation of hook_uninstall().
  */
-function elib_uninstall() {
-  drupal_uninstall_schema('elib_loans');
+function elib_user_uninstall() {
+  drupal_uninstall_schema('elib_user');
   //variable_del('alma_user_credential_cache_duration');
   //variable_del('alma_user_pin_length');
 }
@@ -20,34 +20,31 @@ function elib_uninstall() {
 /**
  * Implementation of hook_schema().
  */
-function elib_loans_schema() {
+function elib_user_schema() {
   $schema = array();
 
-  $schema['elib_loan'] = array(
-    'description' => t('Loans'),
+  $schema['elib_user'] = array(
+    'description' => t('Local storage of elib users and their libraries'),
     'fields' => array(
-      'tstamp' => array(
-        'description' => 'time of loan',
+      'uid' => array(
+        'description' => '{users}.uid for user',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
-      'isbn' => array(
-        'description' => 'isbn',
+      'elib_id' => array(
+        'description' => 'Hashed eLib cardno',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
       ),
-      'elib_id' => array(
-        'description' => 'elib_id',
+      'elib_library' => array(
+        'description' => 'retailerID',
         'type' => 'varchar',
-        'length' => 255,
-      ),
-      'downloadurl' => array(
-        'description' => 'downloadurl',
-        'type' => 'text',
+        'length' => 50,
       ),
     ),
+    'primary key' => array('uid'),
   );
   //$schema['cache_alma_credentials'] = drupal_get_schema_unprocessed('system', 'cache');
 

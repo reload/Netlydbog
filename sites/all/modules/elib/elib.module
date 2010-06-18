@@ -47,9 +47,25 @@ function elib_form_alter(&$form, $form_state, $form_id) {
   }
 }
 
+function elib_get_isbn_from_object_id($oid){
+  module_load_include('client.inc', 'ting');
+  try {
+    $object = ting_get_object_by_id($oid);
+    $eliburl = $object->record['dc:identifier']['dcterms:URI'][0];
+    $first = substr($eliburl,strpos($eliburl,'&id=')+4);
+    $isbn = intval(substr($first,0,strpos($first,'&lib')));
+  }
+  catch (TingClientException $e) {
+    // If the specified object id does not exist, an exception is throw.
+  }
+  return $isbn;
+}
+
+
 function elib_get_lydbog($tingObjectID,$format){
 	
 	global $user;
+	$alreadyloaned = false;
 
 	//no user logged in
 	if(!$user->uid){
@@ -57,14 +73,51 @@ function elib_get_lydbog($tingObjectID,$format){
 		exit();
 	}
 	
-  switch($format){
-  	case 'stream':
-  		$content = 'embed stream';
-  		break;
-  	case 'download':
-  		$content = 'file for download';
-  		break;
+  $isbn = elib_get_isbn_from_object_id($tingObjectID);
+	$userinfo = elib_user_get_cred();
+	// verify user
+  elib_client()->setLoaner($userinfo['cpr'],$userinfo['pin'],$userinfo['lib']);
+  
+  // kig om bogen allerede er lånt GetLibraryUserOrder
+  
+  // get all the books that are loaned!
+	$loans = elib_client()->getLoans();
+	
+	
+	if($loans){
+		foreach($loans as $obj){
+			if(trim($obj->book['idtype']) == 'ISBN'){
+			  if(trim($obj->book['id']) == $isbn){
+			  	// book is already loaned
+			  	$alreadyloaned = true;
+			  }	
+			}
+		}
 	}
+	if($alreadyloaned){
+		// get local
+	}
+	else{
+		$response = elib_client()->makeLoan($isbn,$format);
+		if($response->status->code == 120){
+		// else show cart	
+		$content =  "du kan ikke låne flere bøgre, put den i kurven!";
+		}
+		else{
+			var_dump($response);
+			
+			$content = '<iframe src="" style="width:600px;height:400px"></iframe>';
+		}
+		// call create loan
+		// if loan show stream and create local
+		
+	}
+	//krumo($response);
+	
+	// hvis ikke bogen er lånt, så CreateLoan og opret lokal kopi i tabel elib_loan
+	
+	// ellers så hent lokal URL
+
 	
 	return $content;
 }
@@ -88,27 +141,9 @@ function elib_block($op = 'list', $delta = 0, $edit = array()) {
 
     // If user is not logged in, display the login form.
     if (!$user->uid) {
-      //jquery_ui_add('ui.dialog');
-      //jquery_ui_theme_load();
-      //drupal_add_js(drupal_get_path('module', 'alma_user') . '/alma_user.login.js');
       $block['content'] = drupal_get_form('user_login_block');
     }
     else {
-      //$status = alma_user_get_status($GLOBALS['user'], FALSE);
-      
-        	$isbn = intval('8702048949');
-
-    	//global $testuser; $testuser = true;
-    	//$response = elib_client()->validateUser();
-    	
-    	//$xml = elib_client()->getBook($isbn);
-    	
-    	
-    	
-    	
-    	
-    	//krumo($response);
-    	
       $block['content'] = 'LOGIN HERE!';   
     	
       //$block['content'] = theme('alma_user_status_block', $status);
@@ -130,7 +165,7 @@ function elib_client(){
   if (!isset($client)) {
     $path = drupal_get_path('module', 'elib');
     include($path . '/lib/class.eLibClient.php');
-    $client = new eLibClient(variable_get('elib_retailer_id', ''),variable_get('elib_retailer_keycode', ''),variable_get('elib_language_code', ''));
+    $client = new eLibClient(variable_get('elib_language_code', ''));
     $client->base_url = variable_get('elib_base_url_wsdl', '');
   }
   return $client;
@@ -149,9 +184,9 @@ function elib_login_validate($form, &$form_state) {
   //var_dump($card);
   //die();
   
-  // Only try validation if we have 10 digits.
+  // Only try validation if we have 10 digits
   if (strlen($card) == 10) {
-    $uid = elib_check_credentials($card, $form_state['values']['pass']);
+    $uid = elib_check_credentials($card, $form_state['values']['pass'],$form_state['values']['library']);
 
     if ($uid && $account = user_load($uid)) {
       global $user;
@@ -165,59 +200,6 @@ function elib_login_validate($form, &$form_state) {
   }
 }
 
-function elib_check_credentials($cardno,$pin){
-	elib_client()->setLoaner($cardno,$pin);
-	if(!elib_client()->validateUser()){
-		return false;
-	}
-	
-// Check if user exists.
-  $uid = db_result(db_query("SELECT uid FROM {alma_user} WHERE alma_id = '%s';", $data['patron_id']));
-  if ($uid) {
-    $account = user_load($uid);
-    // When logging in a returning normal user, update its display name.
-    if ($login && (!isset($account->has_secure_role) || !$account->has_secure_role)) {
-      db_query("UPDATE {ding_user} SET display_name = '%s' WHERE uid = %d;", $data['patron_name'], $uid);
-    }
-
-    if (isset($data['preferences']['patron_branch'])) {
-      db_query("UPDATE {alma_user} SET preferred_branch = '%s' WHERE uid = %d;", $data['preferences']['patron_branch'], $uid);
-    }
-
-    return $uid;
-  }
-  elseif (is_array($data) && !empty($data['patron_id'])) {
-    $random_name = $_SERVER['REQUEST_TIME'] . mt_rand();
-    // User data to pass to user_save().
-    $user_data = array(
-      'name' => $random_name,
-      'display_name' => $data['patron_name'],
-      'mail' => $data['mails'][0]['mail'],
-      // Login via Drupal's standard login should not be possible.
-      'pass' => microtime(TRUE) . mt_rand(),
-      'status' => 1,
-    );
-
-    // If no e-mail was set in the XML, we need to generate a
-    // random, invalid address,  since Drupal has a unique
-    // constraint on the mail column in the users table.
-    if (empty($user_data['mail'])) {
-      $user_data['mail'] = $random_name . '@mail.invalid';
-    }
-    // Set the initial e-mail to the same e-mail-address.
-    $user_data['init'] = $user_data['mail'];
-
-    // Saves the user and returns the user UID.
-    $user = user_save(NULL, $user_data);
-
-    $branch = (isset($data['preferences']['patron_branch'])) ? $data['preferences']['patron_branch'] : '';
-
-    // Store Alma user reference in our own table.
-    db_query("INSERT INTO {alma_user} (uid, alma_id, preferred_branch) VALUES (%d, '%s', '%s');", $user->uid, $data['patron_id'], $branch);
-
-    return($user->uid);
-  }
-}
 
 
 

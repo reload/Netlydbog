@@ -16,9 +16,9 @@ class eLibClient{
 	private $sc_params;
 	public $base_url;
 	
-	public function __construct($retailerid,$retailerkeycode,$languagecode){
-		$this->retailerid = $retailerid;
-		$this->retailerkeycode = $retailerkeycode;
+	public function __construct($languagecode){
+		//$this->retailerid = $retailerid;
+		//$this->retailerkeycode = $retailerkeycode;
 		$this->languagecode = $languagecode;
 		$this->sc_params = array(
 	    'trace' => true, 
@@ -28,7 +28,9 @@ class eLibClient{
 	  );	
 	}
 	
-	public function setLoaner($cardno,$pin){
+	public function setLoaner($cardno,$pin,$lib){
+		$this->retailerid = $lib;
+		$this->retailerkeycode = elib_libraries_get_library_keycode($lib);
 		$this->elibUsr = new loaner($cardno,$pin);
 	}
 	
@@ -50,8 +52,42 @@ class eLibClient{
 		else{
 			throw new Exception('no user instance');
 		}
-		
   }
+  public function makeLoan($ebookid,$format){
+  	switch ($format){
+  		case 'stream':
+  			$f = 71;
+  			break;
+  		default:
+  			$f = 71;
+  			break;
+  	}
+  	$params = $this->elibUsr->loginParams();
+  	$params['ebookid'] = $ebookid;
+  	$params['format'] = $f;
+  	$params['mobipocketid'] = '';
+  	
+  	$response = $this->soapCall($this->base_url.'createloan.asmx?WSDL','CreateLoan',$params);
+  	 	 	
+  	$xml = simplexml_load_string($response->CreateLoanResult->any);
+  	
+  	return $xml;
+  	
+  }
+  
+  // not used?!
+  public function getSingleLoan($retailerorderid){
+  	$response = $this->soapCall($this->base_url.'getlibraryuserorder.asmx?WSDL','GetLibraryUserOrder',array('retailerorderid' => $retailerorderid));
+  	$xml = simplexml_load_string($response->GetLibraryUserOrderResult->any);    
+    return $xml->data->orderitem;
+    
+  }
+  public function getLoans(){
+  	$response = $this->soapCall($this->base_url.'getlibraryuserorderlist.asmx?WSDL','GetLibraryUserOrderList',array('cardnumber' => $this->elibUsr->getId()));
+   	$xml = simplexml_load_string($response->GetLibraryUserOrderListResult->any);
+  	return $xml->data->orderitem;
+  }
+  
   /**
    * 
    * @param int $isbn
@@ -84,7 +120,8 @@ class eLibClient{
       return ($request->$func($params));
     }
     catch(Exception $e){
-      watchdog('elib', 'validate_user_error: “@message”', array('@message' => $e->getMessage(), WATCHDOG_ERROR));
+    	print ($e->getMessage());
+      watchdog('elib', 'eLib SOAP: “@message”', array('@message' => $e->getMessage(), WATCHDOG_ERROR));
     }
   }
 }

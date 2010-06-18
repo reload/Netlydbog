@@ -1,0 +1,80 @@
+<?php 
+
+
+
+function elib_user_elib_id($cardno){
+	
+	// @todo: check for distinct/unique
+	return md5($cardno+'f4ds56fs');	
+}
+function elib_user_get_elib_info(){
+	
+	return array(
+	 'cardno',
+	 'pin',
+	 'retailerid'
+	);
+}
+
+function elib_check_credentials($cardno,$pin,$lib){
+  elib_client()->setLoaner($cardno,$pin,$lib);
+  if(!elib_client()->validateUser()){
+    return false;
+  }
+  
+  // @todo: do something else here preferably
+  $_SESSION['ssn'] = $cardno;
+  $_SESSION['pin'] = $pin;
+  
+  $elibid = elib_user_elib_id($cardno);
+  
+// Check if user exists.
+  $uid = db_result(db_query("SELECT uid FROM {elib_user} WHERE elib_id = '%s';", $elibid));
+  if ($uid) {
+  	db_query("UPDATE {elib_user} SET elib_library = %d WHERE elib_id = '%s' ;",$lib,$elibid);
+    //$account = user_load($uid);
+
+    return $uid;
+  }
+  else {
+    $random_name = $_SERVER['REQUEST_TIME'] . mt_rand();
+    // User data to pass to user_save().
+    $user_data = array(
+      'name' => $random_name,
+      'display_name' => 'unknown',
+      'mail' => $random_name . '@mail.invalid',
+      // Login via Drupal's standard login should not be possible.
+      'pass' => microtime(TRUE) . mt_rand(),
+      'status' => 1,
+    );
+
+    // If no e-mail was set in the XML, we need to generate a
+    // random, invalid address,  since Drupal has a unique
+    // constraint on the mail column in the users table.
+    // Set the initial e-mail to the same e-mail-address.
+    $user_data['init'] = $user_data['mail'];
+
+    // Saves the user and returns the user UID.
+    $user = user_save(NULL, $user_data);
+
+    
+    // Store Alma user reference in our own table.
+    db_query("INSERT INTO {elib_user} (uid, elib_id, elib_library) VALUES (%d, '%s', '%s');", $user->uid, $elibid, $lib);
+
+    return($user->uid);
+  }
+}
+
+function elib_user_get_cred(){
+	global $user;
+	
+	 $elibuser = db_fetch_array(db_query('SELECT * FROM {elib_user} WHERE uid = %d',$user->uid));
+	
+	return array(
+	 'cpr' => $_SESSION['ssn'],
+	 'pin' => $_SESSION['pin'],
+	 'lib' => $elibuser['elib_library'],
+	 //'key' => elib_libraries_get_library_keycode($elibuser['elib_library'])
+	);
+}
+?>

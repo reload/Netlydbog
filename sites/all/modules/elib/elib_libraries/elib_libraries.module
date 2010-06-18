@@ -1,0 +1,68 @@
+<?php 
+
+function elib_libraries_menu() {
+  $items = array();
+  
+  //return;
+  
+  $items['admin/settings/elib/lib'] = array(
+    'title'            => 'eLib settings',
+    'description'      => 'settings for eLib SOAP webservice',
+    'access arguments' => array('access administration pages'),
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('ting_admin_settings_form_elib'),
+    'file'             => 'elib_libraries.admin.inc',
+    'type'             => MENU_LOCAL_TASK,
+    'weight'           => 2,
+  );
+  return $items;
+}
+
+
+function elib_libraries_form_alter(&$form, $form_state, $form_id) {
+  switch ($form_id) {
+    case 'user_login':
+    case 'user_login_block':
+      $form['library'] = array(
+        '#type' => 'select',
+        '#title' => t('Choose your library'),
+        //'#default_value' => variable_get('feed_item_length','teaser'),
+          '#options' => array(
+            elib_libraries_get_libraries()
+          ),
+        '#description' => t('Choose the library with which you\'re connected inorder to loan the audio book'),
+      );
+      break;
+  }
+}
+
+
+function elib_libraries_get_libraries(){
+	$matrix = variable_get('elib_libraries', '');
+	if($matrix == ''){
+		return false;
+	}
+	$libraries = explode("\n",$matrix);
+	foreach ($libraries as $library){
+		 $p = explode('|',$library);
+		  $libs[trim($p[0])] = trim($p[2]);		
+	}
+	return $libs;
+}
+function elib_libraries_get_library_keycode($lib){
+  $matrix = variable_get('elib_libraries', '');
+  if($matrix == ''){
+    return false;
+  }
+  $libraries = explode("\n",$matrix);
+  foreach ($libraries as $library){
+    $p = explode('|',$library);
+    if($p[0] == $lib){
+     	return $p[1];
+    }    
+  }
+}
+
+
+
+?>
