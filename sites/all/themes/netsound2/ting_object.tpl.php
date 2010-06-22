@@ -15,13 +15,6 @@
 
 //dsm($object);
 
-krumo($object);
-
-if($object->record['dc:identifier']['dkdcplus:ISBN']){
-	$response = elib_client()->getBook(intval($object->record['dc:identifier']['dkdcplus:ISBN'][0]));
-	
-//	dsm($response);
-}
 
 //
 ?>

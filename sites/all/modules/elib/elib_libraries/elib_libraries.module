@@ -62,7 +62,20 @@ function elib_libraries_get_library_keycode($lib){
     }    
   }
 }
-
+function elib_libraries_get_maxloans($lib){
+  $matrix = variable_get('elib_libraries', '');
+  if($matrix == ''){
+    return false;
+  }
+  $libraries = explode("\n",$matrix);
+  foreach ($libraries as $library){
+    $p = explode('|',$library);
+    if($p[0] == $lib){
+      return $p[3];
+    }    
+  }
+	
+}
 
 
 ?>

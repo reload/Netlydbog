@@ -42,4 +42,19 @@ function ting_admin_settings_form_elib($form_state) {
   
   return system_settings_form($form);
 }
+
+function elib_loginform(&$form_state) {
+  $form = array();
+   $form['elib']['elib_language_code'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Language Code'),
+    '#description'   => t(''),
+    '#required'      => FALSE,
+    '#default_value' => variable_get('elib_language_code', ''),
+  );
+
+
+  return drupal_render($form);
+}
+
 ?>

@@ -15,6 +15,17 @@ function elib_menu() {
   //  'type'             => MENU_LOCAL_TASK,
     'weight'           => 2,
   );
+  $items['user/elib_login'] = array(
+    //'title'            => 'eLib settings',
+    //'description'      => 'settings for eLib SOAP webservice',
+    'access arguments' => array('access content'),
+    'page callback'    => 'elib_loginform',
+    //'page arguments'   => array(''),
+    //'file'             => 'elib.admin.inc',
+    //'file path'        => $path,
+  //  'type'             => MENU_LOCAL_TASK,
+   // 'weight'           => 2,
+  );
   $items['admin/settings/elib/main'] = array(
     'title' => 'eLib',
     'type' => MENU_DEFAULT_LOCAL_TASK,
@@ -36,6 +47,21 @@ function elib_menu() {
   );
   return $items;
 }
+function elib_theme() {
+  return array(
+    'page' =>  array(
+      'template' => 'page-clean',
+      'arguments' => array(
+        'content' => NULL,
+        'show_blocks' => TRUE,
+        'show_messages' => TRUE,
+      ),
+   ),
+
+  );
+}
+
+
 
 function elib_form_alter(&$form, $form_state, $form_id) {
   switch ($form_id) {
@@ -61,31 +87,43 @@ function elib_get_isbn_from_object_id($oid){
   return $isbn;
 }
 
+function elib_loginform(){
+	return drupal_get_form('user_login_block');
+}
+
 
 function elib_get_lydbog($tingObjectID,$format){
 	
-	global $user;
-	$alreadyloaned = false;
-
+  global $user;
 	//no user logged in
-	if(!$user->uid){
-		header('Location: /user/login/?'.drupal_get_destination());
-		exit();
-	}
+  if(!$user->uid){
+    header('Location: /user/login/?'.drupal_get_destination());
+    exit();
+  }
 	
   $isbn = elib_get_isbn_from_object_id($tingObjectID);
-	$userinfo = elib_user_get_cred();
+  $userinfo = elib_user_get_cred();
 	// verify user
   elib_client()->setLoaner($userinfo['cpr'],$userinfo['pin'],$userinfo['lib']);
   
   // kig om bogen allerede er lånt GetLibraryUserOrder
   
   // get all the books that are loaned!
-	$loans = elib_client()->getLoans();
+  $loans = elib_client()->getLoans();
 	
-	
-	if($loans){
+  $loans = $loans->orderitem;
+
+  $alreadyloaned = false;
+  $loanlimit = 1000000000000;
+  if($loans){
+    $nob = sizeof($loans);
 		foreach($loans as $obj){
+			
+      if($loanlimit > elib_str_to_time($obj->loanexpiredate,true)){
+        $loanlimit = elib_str_to_time($obj->loanexpiredate,true);
+      }
+			 
+			 
 			if(trim($obj->book['idtype']) == 'ISBN'){
 			  if(trim($obj->book['id']) == $isbn){
 			  	// book is already loaned
@@ -96,33 +134,54 @@ function elib_get_lydbog($tingObjectID,$format){
 	}
 	if($alreadyloaned){
 		// get local
+		$content = 'book already loaned!';
 	}
 	else{
 		$response = elib_client()->makeLoan($isbn,$format);
 		if($response->status->code == 120){
-		// else show cart	
-		$content =  "du kan ikke låne flere bøgre, put den i kurven!";
+		// else show cart
+		$libmax = elib_libraries_get_maxloans($userinfo['lib']);
+		if($nob == $libmax){
+		  $content =  t("<p>du har allerede lånt %books bøger og har derfor nået dit maximum</p><p>Læs mere om antal af lån om måneden</p>",array('%books' => $nob));
+		  $content .= t('<p>Du kan låne en lydbog igen om %dage og %time</p>', array('%dage' => format_plural(ceil(($loanlimit-time())/86400), 'en dag', '@count dage'),'%time' => format_plural((($loanlimit-time())/86400), 'en time', '@count timer')));
+		  
+		  //$content .= 	t('<p>Lån igen om %s dage</p>',);
+		}	
+		
 		}
 		else{
-			var_dump($response);
+			//var_dump($response);
+			if($response->status->code == 101){
+			 $src = $response->data->downloadurl;
+			 $content = '<iframe src="'.$src.'" style="width:600px;height:400px"></iframe>';	
+			}
 			
-			$content = '<iframe src="" style="width:600px;height:400px"></iframe>';
+			
 		}
 		// call create loan
 		// if loan show stream and create local
-		
+		$status = $response->status->code;
 	}
 	//krumo($response);
 	
 	// hvis ikke bogen er lånt, så CreateLoan og opret lokal kopi i tabel elib_loan
 	
 	// ellers så hent lokal URL
-
+	
+	$content .= '<div class="status">lån status:'.$status.'</div>';
 	
 	return $content;
 }
 
-
+function elib_str_to_time($str,$aststamp = false){
+	list($d,$t) = explode(" ",$str);
+	list($r['y'],$r['m'],$r['d']) = explode("-",$d);
+	list($r['h'],$r['i'],$r['s']) = explode(":",$t);
+	if($aststamp){
+		return mktime($r['h'],$r['i'],$r['s'],$r['m'],$r['d'],$r['y']);
+	}
+	return $r;
+}
 
 function elib_block($op = 'list', $delta = 0, $edit = array()) {
   if ($op == 'list') {

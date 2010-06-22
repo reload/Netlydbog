@@ -244,3 +244,8 @@ h2.pane-title{
 .display-book .fivestar-widget-static{
 	margin-bottom:2px;
 }
+
+
+#lightboxFrame{
+	border:0 none;
+}
