@@ -80,7 +80,7 @@ jQuery(function($){
 	});*/
 	
 
-	$(".form-item-textfield label").inFieldLabels(); 
+	$(".topmenu #ting-search-form .form-item-textfield label").inFieldLabels(); 
 	
 	
 });

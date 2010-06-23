@@ -54,3 +54,16 @@ function showEntriesFromVocab($node, $vid) {
   }
   return $entries;
 }
+
+
+
+
+
+function netsound2_preprocess_page(&$vars, $hook) {
+  
+  if(arg(3) == 'stream' || arg(3) == 'download' || $_GET['clean'] == 1 ){
+  	$vars['template_files'] = array('page-clean');
+  	$vars['css']['all']['theme']['sites/all/themes/netsound2/css/style.css'] = false;
+  }
+  //krumo($vars);
+}

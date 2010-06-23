@@ -106,11 +106,11 @@ if ($op == 'list') {
         
         $object = ting_get_object_by_isbn(trim($book->book->attributes()->id));
         
-        krumo($object);
+        //krumo($object);
+        $bookdisplay = elib_displaybook($object);
+         
         
-        $book = 'ab';
-        
-        $out[] = '<li class="unit size1of'.sizeof($loans->book).'">'.$book.'</li>';
+        $out[] = '<li class="unit size1of'.sizeof($loans->orderitem).'"><div class="loanedbook">'.$bookdisplay.'</div></li>';
       }
       
       $block['content'] = '<ul class="line">'.implode($out).'</ul>';

@@ -8,12 +8,19 @@
 ?>
 <li class="display-book unit size1of5">
   <div class="inner">
-    <div class="picture">
+    
+
       <?php $image_url = ting_covers_collection_url($collection->objects[0], '172_x'); ?>
-      <?php if ($image_url) { ?>
+
+      <?php if (strpos($image_url,'imagecache')): ?>
+      <div class="picture">
         <?php print l(theme('image', $image_url, '', '', null, false), $collection->url, array('html' => true)); ?>
-      <?php } ?>
-    </div>
+      </div>
+      <?php else: ?>
+      <div class="picture nopicture">
+      </div>
+      <?php endif;?>
+
 
     <h3 class="title">
         <?php print l($collection->title, $collection->url, array('attributes' => array('class' =>'title'))) ;?> 

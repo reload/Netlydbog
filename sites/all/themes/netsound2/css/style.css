@@ -5,6 +5,9 @@ body{
 	 font-size:15px;
 
 }
+body.clean{
+	background:none;
+}
 
 .pagewrap{
 	width: 1006px;
@@ -226,7 +229,12 @@ h2.pane-title{
 	border: 1px solid #aaa5a4;
 	border-top:0;
 }
-
+.feature-tab .picture{
+	margin-bottom:10px;
+}
+.feature-tab .picture img {
+	display:block;
+}
 
 
 /* book display */
@@ -248,4 +256,28 @@ h2.pane-title{
 
 #lightboxFrame{
 	border:0 none;
+}
+
+
+.nopicture{
+	background: #abcd48 url(../img/nopic.png) no-repeat center center;
+}
+
+
+.loanedbook{
+	margin:0 auto;
+	width:160px;
+	border:1px solid #000000;
+}
+
+
+
+
+/* cLEARN */
+
+
+body.clean h1{
+	font-size:2em;
+	font-weight:bold;
+	
 }
