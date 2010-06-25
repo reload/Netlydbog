@@ -6,11 +6,11 @@
  * Template to render a Ting collection of books.
  */
 ?>
-<li class="display-book unit size1of5">
-  <div class="inner">
+<li class="unit size1of5">
+  <div class="inner display-book">
     
 
-      <?php $image_url = ting_covers_collection_url($collection->objects[0], '172_x'); ?>
+      <?php $image_url = ting_covers_collection_url($collection->objects[0], '170_x'); ?>
 
       <?php if (strpos($image_url,'imagecache')): ?>
       <div class="picture">

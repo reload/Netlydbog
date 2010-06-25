@@ -27,6 +27,20 @@ class eLibClient{
       'proxy_port' => 8080
 	  );	
 	}
+	public function GetUrl($retailerorderid){
+		$params['retailerorderid'] = $retailerorderid;
+		$params['md5checksum'] = md5($this->retailerid.$retailerorderid.$this->retailerkeycode);
+		
+		$response = $this->soapCall($this->base_url.'getlibraryloanurl.asmx?WSDL','GetLibraryLoanUrl',$params);
+		
+		$xml = simplexml_load_string($response->GetLibraryLoanUrlResult->any);
+		return $xml;
+	}
+	
+	public function setLibrary($lib){
+		$this->retailerid = $lib;
+    $this->retailerkeycode = elib_libraries_get_library_keycode($lib);
+	}
 	
 	public function setLoaner($cardno,$pin,$lib){
 		$this->retailerid = $lib;
@@ -52,6 +66,35 @@ class eLibClient{
 		else{
 			throw new Exception('no user instance');
 		}
+  }
+  public function getNewBooks(){
+  	$params['top'] = 5;
+  	$params['listtype'] = 1;
+  	$params['fromdate'] = date('Y-m-d',time()-12592000);
+  	
+  	$response = $this->soapCall($this->base_url.'getlibrarylist.asmx?WSDL','GetNewBooks',$params);
+  	
+  	return simplexml_load_string($response->GetNewBooksResult->any);
+  	
+  }
+  public function getLatestLoans(){
+    
+  	$params['fromdate'] = date('Y-m-d',time()-2592000);
+    
+  	$response = $this->soapCall($this->base_url.'getlibrarylist.asmx?WSDL','GetLastLoans',$params);
+  	$xml = simplexml_load_string($response->GetLastLoansResult->any);
+
+  	$ids = array();
+  	
+  	foreach($xml->data->orderinformationitem as $line){
+  		if(!in_array(trim($line->ebookid),$ids)){
+  			$ids[] = trim($line->ebookid);
+  		}
+  	}
+  	return  array_reverse($ids);
+  	
+  	
+  	
   }
   public function makeLoan($ebookid,$format){
   	switch ($format){
@@ -120,7 +163,7 @@ class eLibClient{
       return ($request->$func($params));
     }
     catch(Exception $e){
-    	print ($e->getMessage());
+    	print ('Der er sket en fejl i forbindelsen med eLib: '. $e->getMessage());
       watchdog('elib', 'eLib SOAP: “@message”', array('@message' => $e->getMessage(), WATCHDOG_ERROR));
     }
   }

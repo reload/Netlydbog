@@ -87,9 +87,6 @@ function elib_get_isbn_from_object_id($oid){
   return $isbn;
 }
 
-function elib_loginform(){
-	return drupal_get_form('user_login_block');
-}
 
 
 function elib_get_lydbog($tingObjectID,$format){
@@ -112,7 +109,7 @@ function elib_get_lydbog($tingObjectID,$format){
   $loans = elib_client()->getLoans();
 	
   $loans = $loans->orderitem;
-
+  
   $alreadyloaned = false;
   $loanlimit = 1000000000000;
   if($loans){
@@ -126,6 +123,11 @@ function elib_get_lydbog($tingObjectID,$format){
 			 
 			if(trim($obj->book['idtype']) == 'ISBN'){
 			  if(trim($obj->book['id']) == $isbn){
+			  	
+			  	//krumo($obj);
+			  	
+			  	$response = elib_client()->GetUrl(intval($obj->retailerordernumber).'');
+			  	
 			  	// book is already loaned
 			  	$alreadyloaned = true;
 			  }	
@@ -134,7 +136,8 @@ function elib_get_lydbog($tingObjectID,$format){
 	}
 	if($alreadyloaned){
 		// get local
-		$content = t('<h1>Her skal der streames eller downloades</h1><p>Bogen er allerede lånt</p>');
+		$src = $response->data->downloadurl;
+    $content = '<iframe src="'.$src.'" class="audioplayer"></iframe>';
 	}
 	else{
 		$response = elib_client()->makeLoan($isbn,$format);
@@ -162,7 +165,7 @@ function elib_get_lydbog($tingObjectID,$format){
 			//var_dump($response);
 			if($response->status->code == 101){
 			 $src = $response->data->downloadurl;
-			 $content = '<iframe src="'.$src.'" style="width:600px;height:400px"></iframe>';	
+			 $content = '<iframe src="'.$src.'" class="audioplayer"></iframe>';	
 			}
 			
 			
@@ -269,24 +272,71 @@ function elib_login_validate($form, &$form_state) {
 }
 
 
-function elib_displaybook(TingClientObject $object){
+function elib_displaybook(TingClientObject $object,$elib_data = false){
 	
-	 $image_url = ting_covers_collection_url($object, '172_x');
+	 $image_url = ting_covers_collection_url($object, '170_x');
 	
-  return '
-    <div class="picture">' . 
+	 $out[] = '<div class="picture">' . 
       l(theme('image', $image_url, '', '', null, false), $object->url, array('html' => true)) .
-    '</div>'.
-    '<h3 class="title">' . 
+    '</div>';
+   if($elib_data->loanexpiredate){
+   	$loanlimit = elib_str_to_time($elib_data->loanexpiredate,true);
+   	$diff = $loanlimit-time();
+    $days = floor($diff/86400);
+    $loanperiod_class = 'long';
+    if($days < 14){
+    	$loanperiod_class = 'medium';
+    }
+    if($days < 7){
+      $loanperiod_class = 'short';
+    }
+    $out[] = '<div class="loanperiod '.$loanperiod_class.'">'.t('Lånet udløber om <div>%days',array('%days' => format_plural($days, 'en dag', '@count dage'))).'</div></div>';
+    
+   }
+	 $out[] = '<h3 class="title">' . 
        l($object->title, $object->url, array('attributes' => array('class' =>'title'))) . 
-    '</h3>' . 
-    '<div class="author">' .
+    '</h3>';
+   $out[] = '<div class="author">' .
       t('By %creator_name%', array('%creator_name%' => $object->creators_string)) . 
-    '</div>'.
-    '<div class="icons">' .
-      l(theme('image', 'sites/all/themes/netsound/img/listen.png', '', '', null, false), $object->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .
+    '</div>';
+   $out[] = '<div class="icons">' .
+      l(theme('image', 'sites/all/themes/netsound/img/listen.png', '', '', null, false), $object->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.
       l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $object->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .
     '</div>';
+      
+  return implode($out);
+    
+}
+
+function elib_displaybookNEW(TingClientObject $obj,$elib='',$displaysize=false){
+	switch($displaysize){
+		case 'small':
+			$image_url = ting_covers_collection_url($obj, '70_x');
+			break;
+		case 'medium':
+			$image_url = ting_covers_collection_url($obj, '170_x');			
+			break;
+	}
+	$part['picture'] = '<div class="picture">' . l(theme('image', $image_url, '', '', null, false), $object->url, array('html' => true)) . '</div>';
+  if($elib_data->loanexpiredate){
+    $loanlimit = elib_str_to_time($elib_data->loanexpiredate,true);
+    $diff = $loanlimit-time();
+    $days = floor($diff/86400);
+    $loanperiod_class = 'long';
+    if($days < 14){
+      $loanperiod_class = 'medium';
+    }
+    if($days < 7){
+      $loanperiod_class = 'short';
+    }
+    $part['loginexpire'] = '<div class="loanperiod '.$loanperiod_class.'">'.t('Lånet udløber om <div>%days',array('%days' => format_plural($days, 'en dag', '@count dage'))).'</div></div>';
+  }
+  $part['title'] = '<h3 class="title">' . l($obj->title, $obj->url, array('attributes' => array('class' =>'title'))) . '</h3>';
+  $part['author'] = '<div class="author">' . t('By %creator_name%', array('%creator_name%' => $obj->creators_string)) . '</div>';
+  $part['icons'] = '<div class="icons">' . l(theme('image', 'sites/all/themes/netsound/img/listen.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .'</div>';
+  
+  return '<div class="display-book '.$displaysize.'">'.$part['picture'].$part['loginexpire'].$part['title'].$part['author'].$part['icons'].'</div>';
+  
 }
 
 

@@ -1,0 +1,82 @@
+<?php 
+
+
+function elib_block_lastloans_block($op = 'list', $delta = 0) {
+  if ($op == 'list') {
+	  $blocks[0]['info'] = t('Last loans');
+	  $blocks[1]['info'] = t('Newest books');
+	  $blocks[1]['info'] = t('Popular books books');
+	  return $blocks;
+  }
+  elseif ($op == 'view') {
+    //global $user;
+    $block = array();
+     
+    
+    elib_client()->setLibrary(variable_get('elib_retailer_id', ''));
+    module_load_include('client.inc', 'ting');
+    
+    switch($delta){
+    	case 0:
+		    $response = elib_client()->getLatestLoans();
+		    
+		    
+		    
+		    foreach($response as $isbn){
+		      $out .= elib_displaybookNEW(ting_get_object_by_isbn($isbn),'','small'); 
+		    }
+		    $block['subject'] = t('Top 5 mest lånte');	
+    		break;
+    	case 1:
+    		$response = elib_client()->getNewBooks();
+    		
+    		foreach($response->data->toplistitem as $item){
+    			//var_dump($item->ebookid);
+    			//print $item['ebookid'].'--';
+    			if(ting_get_object_by_isbn(trim($item->ebookid))){
+    				$out .= elib_displaybookNEW(ting_get_object_by_isbn(trim($item->ebookid)),'','small');
+    			}
+    			if($out == ''){
+    				$out = t('Der er ingen nye bøger');
+    			}
+    		} 
+    		$block['subject'] = t('Nyeste bøger');
+    		break;
+    	case 3:
+    		$out = 'popular books';
+    		$block['subject'] = t('populære bøger');
+    		break;
+    		
+    }
+    
+    //krumo($books);
+    
+    //$response = elib_client()->getNewBooks();
+    
+ 
+    
+      
+      $block['content'] = $out;
+
+    
+    
+    return $block;
+  }
+  
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+?>

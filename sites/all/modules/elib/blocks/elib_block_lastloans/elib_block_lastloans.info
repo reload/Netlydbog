@@ -1,0 +1,7 @@
+; $Id$
+name = eLIB Last Loans
+description = Extends eLib
+package = Ding!
+core = 6.x
+dependencies[] = elib
+

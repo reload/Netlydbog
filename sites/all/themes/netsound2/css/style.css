@@ -249,8 +249,28 @@ h2.pane-title{
 	font-weight:normal;
 	font-size:14px;
 }
-.display-book .fivestar-widget-static{
-	margin-bottom:2px;
+.display-book{
+	width:170px;
+	margin:0 auto;
+}
+.display-book .picture{
+	height:270px;
+	
+}
+.display-book .picture img{
+	display:block;
+}
+.display-book.small{
+	margin:0;
+	width:auto;
+}
+.display-book.small .picture{
+	height:120px;
+	float:left;
+	margin-right:10px;
+}
+.display-book.small .icons{
+	height:100px;
 }
 
 
@@ -264,12 +284,19 @@ h2.pane-title{
 }
 
 
-.loanedbook{
-	margin:0 auto;
-	width:160px;
-	border:1px solid #000000;
+.loanperiod{
+	text-align:center;
+	padding:5px;
 }
-
+.loanperiod.long{
+	background:green;
+}
+.loanperiod.medium{
+	background:yellow;
+}
+.loanperiod.short{
+	background:red;
+}
 
 
 
@@ -280,4 +307,9 @@ body.clean h1{
 	font-size:2em;
 	font-weight:bold;
 	
+}
+.audioplayer{
+	width:620px;
+	height:250px;
+	border:0;
 }

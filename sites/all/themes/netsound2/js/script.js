@@ -17,7 +17,7 @@ jQuery(function($){
 		id = link.index($(this));
 		$('.feature-tab').hide();
 		$('.feature-tab:eq('+id+')').show();
-		readpictureheight(id);
+		//readpictureheight(id);
 		return false;
 	});
 	// move buttons below
@@ -27,7 +27,7 @@ jQuery(function($){
 	});
 	
 	function readpictureheight(page){
-		
+		return ;
 		page = $('#topfeature .feature-tab:eq('+page+')');
 		
 			var pictures = page.find('.picture');

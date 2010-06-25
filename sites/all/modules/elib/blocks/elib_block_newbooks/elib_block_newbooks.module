@@ -1,0 +1,61 @@
+<?php 
+
+
+function elib_block_lastloans_block($op = 'list', $delta = 0) {
+if ($op == 'list') {
+    return array(
+      'account' => array(
+        'info' => t('Last Loans'),
+        'cache' => BLOCK_NO_CACHE,
+        'status' => 1,
+        //'region' => 'account',
+      ),
+    );
+  }
+  elseif ($op == 'view' && $delta == 'account') {
+    //global $user;
+    $block = array();
+     
+    
+    elib_client()->setLibrary(variable_get('elib_retailer_id', ''));
+    
+    $response = elib_client()->getLatestLoans();
+    
+    module_load_include('client.inc', 'ting');
+    
+    foreach($response as $isbn){
+    $out .= elib_displaybookNEW(ting_get_object_by_isbn($isbn),'','small');	
+    	
+    }
+    
+    //krumo($books);
+    
+    //$response = elib_client()->getNewBooks();
+    
+ 
+    $block['subject'] = t('Top 5 mest lånte');   
+      
+      $block['content'] = $out;
+
+    
+    
+    return $block;
+  }
+  
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+?>
