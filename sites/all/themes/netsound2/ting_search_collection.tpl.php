@@ -36,13 +36,6 @@ foreach ($collection->objects as $obj){
       <div class="author">
         <?php echo t('By %creator_name%', array('%creator_name%' => $collection->creators_string)) ?>
       </div>
-      <ul class="rating">
-        <li class="on">star</li>
-        <li class="on">star</li>
-        <li class="on">star</li>
-        <li class="off">star</li>
-        <li class="off">star</li>
-      </ul>
       <?php if (!empty($lydbogObj->record['dc:contributor']['oss:dkind'])): ?>
         <div class="reader">
         <?php print theme('item_list', $lydbogObj->record['dc:contributor']['oss:dkind'], t('Reader'), 'span', array('class' => 'contributor'));?>

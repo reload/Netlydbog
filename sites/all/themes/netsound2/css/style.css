@@ -280,6 +280,13 @@ h2.pane-title{
 .display-book.small .icons{
 	height:100px;
 }
+#ting-result .display-book{
+	margin:0;
+	width:auto;
+}
+#ting-result .display-book .picture{
+	height:auto;
+}
 
 
 #lightboxFrame{
