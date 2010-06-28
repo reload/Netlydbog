@@ -3,11 +3,11 @@
 
 function elib_block_lastloans_block($op = 'list', $delta = 0) {
   if ($op == 'list') {
-	  $blocks[]['info'] = t('Last loans');
-	  $blocks[]['info'] = t('Newest books');
-	  $blocks[]['info'] = t('Popular books books');
-	  $blocks[]['info'] = t('dummyblock1 books');
-	  $blocks[]['info'] = t('dummyblock2 books');
+	  $blocks[0]['info'] = t('Last loans');
+	  $blocks[1]['info'] = t('Newest books');
+	  $blocks[2]['info'] = t('Popular books books');
+	  $blocks[3]['info'] = t('dummyblock1 books');
+	  $blocks[4]['info'] = t('dummyblock2 books');
 	  return $blocks;
   }
   elseif ($op == 'view') {
@@ -45,11 +45,21 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
     		} 
     		$block['subject'] = t('Nyeste bøger');
     		break;
-    	case 3:
+    	case 2:
     		$out = 'popular books';
     		$block['subject'] = t('populære bøger');
     		break;
-    		
+    	case 3:
+        
+        $response = elib_client()->getLatestLoans();  
+        
+        shuffle($response);
+        
+        foreach($response as $isbn){
+          $out .= elib_displaybookNEW(ting_get_object_by_isbn($isbn),'','small'); 
+        }
+        $block['subject'] = t('Populære bøger');  
+        break;
     }
     
     //krumo($books);

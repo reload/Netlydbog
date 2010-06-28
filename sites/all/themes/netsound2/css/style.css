@@ -5,6 +5,14 @@ body{
 	 font-size:15px;
 
 }
+
+
+
+a{
+	color: #439ec1;
+	text-decoration:none;
+}
+
 body.clean{
 	background:none;
 }
@@ -325,4 +333,41 @@ body.front .messageouter{
 .messages.error{
 	padding:1em;
 	margin:0 1em;
+}
+
+
+
+/* questions */
+
+.view-promoted-questions h3{
+	font-weight:bold;
+}
+.view-promoted-questions li{
+	list-style-type:disc;
+	list-style-position:inside;
+}
+.view-promoted-questions li .title{
+	display:inline;
+}
+
+/* news */
+.pane-latest-news-panel-pane-1 .title a{
+	font-weight:bold;
+	color:#000;
+	padding-bottom:0.5em;
+} 
+ 
+.view-latest-news .created{
+	float:left;
+	color:#999999;
+	margin-right:0.4em;
+	font-weight:bold;
+}
+.view-latest-news div {
+  border-bottom:1px dashed #999999;
+	padding: 0.5em 0;
+}
+.view-latest-news div div{
+	padding:0;
+	border:0 none;
 }
