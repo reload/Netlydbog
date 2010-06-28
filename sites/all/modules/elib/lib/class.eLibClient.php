@@ -23,8 +23,8 @@ class eLibClient{
 		$this->sc_params = array(
 	    'trace' => true, 
       'cache_wsdl' => WSDL_CACHE_NONE, 
-      'proxy_host' => 'localhost', 
-      'proxy_port' => 8080
+      #'proxy_host' => 'localhost', 
+      #'proxy_port' => 8080
 	  );	
 	}
 	public function GetUrl($retailerorderid){
@@ -45,7 +45,9 @@ class eLibClient{
 	public function setLoaner($cardno,$pin,$lib){
 		$this->retailerid = $lib;
 		$this->retailerkeycode = elib_libraries_get_library_keycode($lib);
-		$this->elibUsr = new loaner($cardno,$pin);
+		if(strlen($cardno)>9){
+		  $this->elibUsr = new loaner($cardno,$pin);	
+		}
 	}
 	
 	public function validateUser(){
@@ -64,7 +66,7 @@ class eLibClient{
 			}
 		}
 		else{
-			throw new Exception('no user instance');
+			throw new Exception('No user instance: '.__FUNCTION__);
 		}
   }
   public function getNewBooks(){
@@ -74,7 +76,12 @@ class eLibClient{
   	
   	$response = $this->soapCall($this->base_url.'getlibrarylist.asmx?WSDL','GetNewBooks',$params);
   	
-  	return simplexml_load_string($response->GetNewBooksResult->any);
+  	$xml = array();
+  	if(simplexml_load_string($response->GetNewBooksResult->any)){
+  		$xml = simplexml_load_string($response->GetNewBooksResult->any);
+  	}
+  	
+  	return $xml;
   	
   }
   public function getLatestLoans(){
@@ -84,37 +91,50 @@ class eLibClient{
   	$response = $this->soapCall($this->base_url.'getlibrarylist.asmx?WSDL','GetLastLoans',$params);
   	$xml = simplexml_load_string($response->GetLastLoansResult->any);
 
+  	//var_dump($xml);
+  	
   	$ids = array();
   	
-  	foreach($xml->data->orderinformationitem as $line){
-  		if(!in_array(trim($line->ebookid),$ids)){
-  			$ids[] = trim($line->ebookid);
-  		}
+    if(($xml->data->orderinformationitem)){
+      foreach($xml->data->orderinformationitem as $line){
+        if(!in_array(trim($line->ebookid),$ids)){
+          $ids[] = trim($line->ebookid);
+        }
+      }
   	}
-  	return  array_reverse($ids);
+  	
+  //	var_dump($ids);
+  	
+  	return array_reverse($ids);
+  
   	
   	
   	
   }
   public function makeLoan($ebookid,$format){
-  	switch ($format){
-  		case 'stream':
-  			$f = 71;
-  			break;
-  		default:
-  			$f = 71;
-  			break;
+  	if(is_a($this->elibUsr,'loaner')){
+	  	switch ($format){
+	  		case 'stream':
+	  			$f = 71;
+	  			break;
+	  		default:
+	  			$f = 71;
+	  			break;
+	  	}
+	  	$params = $this->elibUsr->loginParams();
+	  	$params['ebookid'] = $ebookid;
+	  	$params['format'] = $f;
+	  	$params['mobipocketid'] = '';
+	  	
+	  	$response = $this->soapCall($this->base_url.'createloan.asmx?WSDL','CreateLoan',$params);
+	  	 	 	
+	  	$xml = simplexml_load_string($response->CreateLoanResult->any);
+	  	
+	  	return $xml;
   	}
-  	$params = $this->elibUsr->loginParams();
-  	$params['ebookid'] = $ebookid;
-  	$params['format'] = $f;
-  	$params['mobipocketid'] = '';
-  	
-  	$response = $this->soapCall($this->base_url.'createloan.asmx?WSDL','CreateLoan',$params);
-  	 	 	
-  	$xml = simplexml_load_string($response->CreateLoanResult->any);
-  	
-  	return $xml;
+    else{
+      throw new Exception('No user instance: '.__FUNCTION__);
+    }
   	
   }
   
@@ -126,9 +146,15 @@ class eLibClient{
     
   }
   public function getLoans(){
-  	$response = $this->soapCall($this->base_url.'getlibraryuserorderlist.asmx?WSDL','GetLibraryUserOrderList',array('cardnumber' => $this->elibUsr->getId()));
-   	$xml = simplexml_load_string($response->GetLibraryUserOrderListResult->any);
-  	return $xml->data;
+  	
+  	if(is_a($this->elibUsr,'loaner')){
+	  	$response = $this->soapCall($this->base_url.'getlibraryuserorderlist.asmx?WSDL','GetLibraryUserOrderList',array('cardnumber' => $this->elibUsr->getId()));
+	   	$xml = simplexml_load_string($response->GetLibraryUserOrderListResult->any);
+	  	return $xml->data;
+  	}
+    else{
+      throw new Exception('No user instance: '.__FUNCTION__);
+    }
   }
   
   /**
@@ -159,12 +185,13 @@ class eLibClient{
       $params = array_merge($params,$ext_params);
     }
     try{
-      $request = new SoapClient($wsdl,$this->sc_params);
+      $request = @new SoapClient($wsdl,$this->sc_params);
       return ($request->$func($params));
     }
     catch(Exception $e){
-    	print ('Der er sket en fejl i forbindelsen med eLib: '. $e->getMessage());
-      watchdog('elib', 'eLib SOAP: “@message”', array('@message' => $e->getMessage(), WATCHDOG_ERROR));
+      elib_display_error($e);
+    	//	print ('Der er sket en fejl i forbindelsen med eLib: '. $e->getMessage());
+     // watchdog('elib', 'eLib SOAP: “@message”', array('@message' => $e->getMessage(), WATCHDOG_ERROR));
     }
   }
 }

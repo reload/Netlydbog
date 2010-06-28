@@ -3,9 +3,11 @@
 
 function elib_block_lastloans_block($op = 'list', $delta = 0) {
   if ($op == 'list') {
-	  $blocks[0]['info'] = t('Last loans');
-	  $blocks[1]['info'] = t('Newest books');
-	  $blocks[1]['info'] = t('Popular books books');
+	  $blocks[]['info'] = t('Last loans');
+	  $blocks[]['info'] = t('Newest books');
+	  $blocks[]['info'] = t('Popular books books');
+	  $blocks[]['info'] = t('dummyblock1 books');
+	  $blocks[]['info'] = t('dummyblock2 books');
 	  return $blocks;
   }
   elseif ($op == 'view') {
@@ -18,9 +20,8 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
     
     switch($delta){
     	case 0:
-		    $response = elib_client()->getLatestLoans();
-		    
-		    
+    		
+		    $response = elib_client()->getLatestLoans();  
 		    
 		    foreach($response as $isbn){
 		      $out .= elib_displaybookNEW(ting_get_object_by_isbn($isbn),'','small'); 
@@ -30,15 +31,17 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
     	case 1:
     		$response = elib_client()->getNewBooks();
     		
-    		foreach($response->data->toplistitem as $item){
-    			//var_dump($item->ebookid);
-    			//print $item['ebookid'].'--';
-    			if(ting_get_object_by_isbn(trim($item->ebookid))){
-    				$out .= elib_displaybookNEW(ting_get_object_by_isbn(trim($item->ebookid)),'','small');
-    			}
-    			if($out == ''){
-    				$out = t('Der er ingen nye bøger');
-    			}
+    		if(is_array($response->data->toplistitem)){
+	    		foreach($response->data->toplistitem as $item){
+	    			//var_dump($item->ebookid);
+	    			//print $item['ebookid'].'--';
+	    			if(ting_get_object_by_isbn(trim($item->ebookid))){
+	    				$out .= elib_displaybookNEW(ting_get_object_by_isbn(trim($item->ebookid)),'','small');
+	    			}
+	    			if($out == ''){
+	    				$out = t('Der er ingen nye bøger');
+	    			}
+	    		}
     		} 
     		$block['subject'] = t('Nyeste bøger');
     		break;

@@ -340,6 +340,15 @@ function elib_displaybookNEW(TingClientObject $obj,$elib='',$displaysize=false){
 }
 
 
-
+function elib_display_error($error){
+	// singleton display error 
+	static $isset;
+	
+	if(!$isset){
+		drupal_set_message(t('Oops! We cound\'nt connect to the library').'<div class="spec" style="font-size:.7em">'.$error->getMessage().'</div>','error');
+		$isset = true;
+	}
+	
+}
 
 ?>

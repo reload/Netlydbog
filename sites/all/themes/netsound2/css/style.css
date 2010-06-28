@@ -313,3 +313,16 @@ body.clean h1{
 	height:250px;
 	border:0;
 }
+body .messageouter{
+  padding: 1em 0;
+}
+
+
+body.front .messageouter{
+	background: #E8E4DF;
+}
+
+.messages.error{
+	padding:1em;
+	margin:0 1em;
+}

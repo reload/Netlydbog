@@ -35,14 +35,18 @@
   <?php if (!empty($admin)) print $admin; ?>
   <div class="clean">
       
+      <?php if($messages): ?>
+      <div class="messageouter"><?php print $messages ?></div>
+      <?php endif; ?>
+      
+      
       <?php print $content; ?>
 
 
        <?php// if ($breadcrumb) { print $breadcrumb; } // themename_breadcrumb in template.php ?>
           <?php if ($help OR $messages) { ?>
               <?php print $help ?>
-              <?php print $messages ?>
-          <?php } ?>
+            <?php } ?>
           
 
 
