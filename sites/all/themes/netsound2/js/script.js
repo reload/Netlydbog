@@ -83,4 +83,18 @@ jQuery(function($){
 	$(".topmenu #ting-search-form .form-item-textfield label").inFieldLabels(); 
 	
 	
+	 $('#ting-search-results').mousedown(function() {
+		 //console.log('down');
+		 Lightbox.initList();
+		 
+		 
+    /*    $('.icons a').unbind('click').click(function(){
+        	console.log('click');
+ 
+//        	return false;
+        });*/
+    });
+
+	
+	
 });

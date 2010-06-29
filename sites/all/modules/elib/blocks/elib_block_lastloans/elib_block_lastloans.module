@@ -23,10 +23,12 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
     		
 		    $response = elib_client()->getLatestLoans();  
 		    
+		    unset($response[3]);
+		    unset($response[4]);
 		    foreach($response as $isbn){
-		      $out .= elib_displaybookNEW(ting_get_object_by_isbn($isbn),'','small'); 
+		      $out .= elib_displaybookNEW(ting_get_object_by_isbn($isbn),'','lorem'); 
 		    }
-		    $block['subject'] = t('Top 5 mest lånte');	
+		    $block['subject'] = t('Seneste anmeldelser');	
     		break;
     	case 1:
     		$response = elib_client()->getNewBooks();

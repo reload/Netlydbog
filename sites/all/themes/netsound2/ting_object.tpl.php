@@ -13,7 +13,7 @@
 
 //dsm($response);
 
-//dsm($object);
+dsm($object);
 
 
 //
@@ -42,97 +42,7 @@
         <li class="off">star</li>
         <li class="off">star</li>
       </ul>
-      <?php if (!empty($object->record['dc:subject']['oss:genre'])): ?>
-        <?php print theme('item_list', $object->record['dc:subject']['oss:genre'], t('Genre'), 'span', array('class' => 'subject'));?>
-      <?php endif; ?>
-      <?php if (!empty($object->record['dc:identifier']['dkdcplus:ISBN'])):?>
-        <?php print theme('item_list', $object->record['dc:identifier']['dkdcplus:ISBN'], t('ISBN no.'), 'span', array('class' => 'identifier'));?>
-      <?php endif; ?>
-      <?php if (!empty($object->record['dc:language']['oss:spoken'])):?>
-        <?php print theme('item_list', $object->record['dc:language']['oss:spoken'], t('Speech'), 'span', array('class' => 'language'));?>
-      <?php endif; ?>
-      <?php if (!empty($object->record['dc:publisher'][''])): ?>
-        <?php print theme('item_list', $object->record['dc:publisher'][''], t('Publisher'), 'span', array('class' => 'publisher'));?>
-      <?php endif; ?>
-    </div>
-  </div>
-
-  <div class="content-left unit lastUnit">
-	  <div class="inner right">
-    <?php print check_plain($object->record['dcterms:abstract'][''][0]); ?>
-    
-    <?php if (!empty($object->record['dc:description'])): ?>
-    <?php foreach ($object->record['dc:description'] as $type => $dc_description): ?>
-    <?php //print theme('item_list', $dc_description, t('Description'), 'span', array('class' => 'description'));?>
-    <?php endforeach; ?>
-    <?php endif; ?>
-    
-	  </div>
- </div>
-
-<!-- 
-
-    <div class="tab-navigation-main">
-      <div class="tab-navigation-main-inner">
-        <div id="ting-item-<?php print $object->localId; ?>" class="ting-item ting-item-full">
-          <div class="ting-overview clearfix">
-
-            <div class="left-column left">
-              <div class="picture">
-
-              </div>
-
-            </div>
-
-       <div class="right-column left">
-              <h2><?php print check_plain($object->record['dc:title'][''][0]); ?></h2>
-              <?php
-                $titles = array();
-                foreach (array_diff_key($object->record['dc:title'], array('' => 1)) as $type => $dc_title) {
-                  $titles = array_merge($titles, $dc_title);
-                }
-              ?>
-              <?php if (!empty($titles)) { ?>
-                <h2><?php print check_plain(implode(', ', $titles)); ?></h2>
-              <?php } ?>
-              <?php if (!empty($object->record['dcterms:alternative'][''])) { ?>
-                <?php foreach ($object->record['dcterms:alternative'][''] as $title) { ?>
-                  <h2>(<?php print check_plain($title); ?>)</h2>
-                <?php } ?>
-              <?php } ?>
-
-              <div class='creator'>
-                <span class='byline'><?php echo ucfirst(t('by')); ?></span>
-                <?php
-                  $creators = array();
-                  foreach ($object->creators as $i => $creator) {
-                    $creators[] = l($creator, 'search/ting/' . $creator, array('attributes' => array('class' => 'author')));
-                  }
-                  print implode(', ', $creators);
-                ?>
-                <?php if (!empty($object->date)) { ?>
-                  <span class='date'>(<?php print $object->date; ?>)</span>
-                <?php } ?>
-              </div>
-              <p><?php print check_plain($object->record['dcterms:abstract'][''][0]); ?></p>
-              <?php if ($object->type != 'Netdokument' && module_exists('alma')) { ?>
-                <div class="alma-status waiting"><?php print t('waiting for data'); ?></div>
-              <?php } ?>
-            </div>
-            
-            <?php if (module_exists('alma')): ?>
-              <?php print theme('alma_cart_reservation_buttons', $object); ?>
-            <?php endif; ?>
-
-          </div>
-
-          <div class="object-information clearfix">
-            <?php 
-              //we printed the first part up above so remove that 
-              unset($object->record['dcterms:abstract'][''][0]);
-            ?>
-            <div class="abstract"><?php print implode(' ; ', format_danmarc2((array)$object->record['dcterms:abstract'][''])) ?></div>
-
+         
             <?php print theme('item_list', array($object->type), t('Type'), 'span', array('class' => 'type')); ?>
             <?php if (!empty($object->record['dc:format'][''])) { ?>
               <?php print theme('item_list', $object->record['dc:format'][''], t('Format'), 'span', array('class' => 'format'));?>
@@ -186,7 +96,7 @@
 
             <?php if (!empty($object->record['dc:description'])) { ?>
               <?php foreach ($object->record['dc:description'] as $type => $dc_description) { ?>
-                <?php print theme('item_list', $dc_description, t('Description'), 'span', array('class' => 'description'));?>
+                <?php #print theme('item_list', $dc_description, t('Description'), 'span', array('class' => 'description'));?>
               <?php } ?>
             <?php } ?>
 
@@ -210,7 +120,7 @@
                 foreach ($object->record['dc:identifier']['dcterms:URI'] as $uri) {
                   $uris[] = l($uri, $uri);
                 }
-                print theme('item_list', $uris, t('Host publication'), 'span', array('class' => 'identifier'));                
+                #print theme('item_list', $uris, t('Host publication'), 'span', array('class' => 'identifier'));                
               }
             ?>
 
@@ -230,52 +140,20 @@
             <?php if (!empty($object->record['dc:rights'][''])) { ?>
               <?php print theme('item_list', $object->record['dc:rights'][''], t('Rights'), 'span', array('class' => 'rights'));?>
             <?php } ?>
-          </div>
-
-          <?php
-          $collection = ting_get_collection_by_id($object->id);
-          if ($collection instanceof TingClientObjectCollection && is_array($collection->types)) {
-            // Do we have more than only this one type?
-            if (count($collection->types) > 1) {
-              print '<div class="ding-box-wide object-otherversions">';
-              print '<h3>'. t('Also available as: ') . '</h3>';  
-              print "<ul>";
-              foreach ($collection->types as $type) {
-                if ($type != $object->type) {
-                  $material_links[] = '<li class="category">' . l($type, $collection->url, array('fragment' => $type)). '</li>';
-                }
-              }
-              print implode(' ', $material_links);
-              print "</ul>";
-              print "</div>";
-            }
-          }
-          ?>
-          
-
-          <?php
-          $referenced_nodes = ting_reference_nodes($object);
-          if ($referenced_nodes) {
-            print '<h3>Omtale på websitet</h3>';
-            foreach ($referenced_nodes as $node) {
-              print node_view($node, TRUE);
-            }
-          }
-          ?>
-
-          <?php if ($object->type[0] != 'Netdokument' && module_exists('alma')) { ?>
-            <div class="ding-box-wide alma-availability">
-              <h3>Følgende biblioteker har "<?php print check_plain($object->title); ?>" hjemme:</h3>
-              <ul class="library-list">
-                <li class="alma-status waiting even"><?php print t('waiting for data'); ?></li>
-              </ul>
-            </div>
-          <?php } ?>
-        </div>
-      </div>
     </div>
   </div>
 
-</div>
-
- -->
+  <div class="content-left unit lastUnit">
+	  <div class="inner right">
+    <?php print check_plain($object->record['dcterms:abstract'][''][0]); ?>
+    
+    <?php if (!empty($object->record['dc:description'])): ?>
+    <?php foreach ($object->record['dc:description'] as $type => $dc_description): ?>
+    <?php //print theme('item_list', $dc_description, t('Description'), 'span', array('class' => 'description'));?>
+    <?php endforeach; ?>
+    <?php endif; ?>
+    
+	  </div>
+ </div>
+ <div class="line"></div>
+ 

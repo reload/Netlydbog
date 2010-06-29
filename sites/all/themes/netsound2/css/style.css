@@ -378,3 +378,30 @@ body.front .messageouter{
 	padding:0;
 	border:0 none;
 }
+
+
+
+
+/* footer */
+
+.footer{
+	background : #e9e7e4;
+	padding:20px;
+	border-top:1px solid #999999;
+	color : #999999;
+}
+.footer h1{
+	text-transform:uppercase;
+	font-weight:bold;
+}
+
+
+
+#ting-object .item-list .title{
+	font-weight:normal;
+	padding-right:4px;
+	text-transform:uppercase;
+}
+#ting-object .item-list  .item-list span{
+ 	color:#439EC1;
+ }

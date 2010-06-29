@@ -53,9 +53,10 @@ foreach ($collection->objects as $obj){
         <?php print check_plain($collection->abstract); ?>
       </div>
       <div class="icons">
-        <img src="/sites/all/themes/netsound/img/listen.png" />
-        <img src="/sites/all/themes/netsound/img/fetch.png" />
+        <?php print l(theme('image', 'sites/all/themes/netsound/img/listen.png', '', '', null, false), $lydbogObj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) ?>
+        <?php print l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $lydbogObj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe')))?>
       </div>
+   
       </div>
     </div>
     <?php endif; ?>

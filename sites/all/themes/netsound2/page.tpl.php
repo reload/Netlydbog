@@ -59,6 +59,12 @@
       <div class="messageouter"><?php print $messages ?></div>
       <?php endif; ?>
       
+       <?php if ($tabs) { ?>
+            <?php print $tabs; ?>
+          <?php }; ?>
+      
+      
+      
       <?php print $content; ?>
       
       </div>
@@ -69,22 +75,24 @@
               
           <?php } ?>
 
-          <?php if ($tabs) { ?>
-            <?php print $tabs; ?>
-          <?php }; ?>
-
+         
           
       <!-- <div class="right">
-      <?php print mothership_userprofile($user); ?>
+      <?php #print mothership_userprofile($user); ?>
       </div> -->
     </div>
 
-    <div class="footer">
+    <div class="footer line">
 
+   <div class="unit size1of2"><a href="http://ting.dk"><img src="/sites/all/themes/netsound2/img/tinglogo.png" alt=""/></a><?php  print $footer; ?></div>
+   <div class="unit size1of2">
    
-      <?php print $footer; ?>
+   <h1>om netlydbog.dk</h1>
+   <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam nec imperdiet lacus. Vivamus sem augue, semper sit amet porta a, bibendum at magna. Curabitur sed tortor eros, sit amet tristique augue. In convallis diam ac nulla condimentum interdum ultrices nisi gravida.</p>
+   </div>
+      
 
-      <?php print $feed_icons; ?>
+      <?php # print $feed_icons; ?>
     </div>
 
   <?php print $closure; ?>

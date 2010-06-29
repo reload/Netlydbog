@@ -311,6 +311,7 @@ function elib_displaybook(TingClientObject $object,$elib_data = false){
 function elib_displaybookNEW(TingClientObject $obj,$elib='',$displaysize=false){
 	switch($displaysize){
 		case 'small':
+		case 'lorem':
 			$image_url = ting_covers_collection_url($obj, '70_x');
 			break;
 		case 'medium':
@@ -334,8 +335,18 @@ function elib_displaybookNEW(TingClientObject $obj,$elib='',$displaysize=false){
   $part['title'] = '<h3 class="title">' . l($obj->title, $obj->url, array('attributes' => array('class' =>'title'))) . '</h3>';
   $part['author'] = '<div class="author">' . t('By %creator_name%', array('%creator_name%' => $obj->creators_string)) . '</div>';
   $part['icons'] = '<div class="icons">' . l(theme('image', 'sites/all/themes/netsound/img/listen.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .'</div>';
+   
+  if($displaysize == 'lorem'){
+  	$words = explode(' ','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam aliquet risus vitae purus rutrum tincidunt. Vivamus consectetur enim quam, ac viverra felis. Cras vitae urna id tortor suscipit rutrum quis vel metus. Nullam vulputate rhoncus diam, ultricies bibendum nulla aliquam sit amet.');
+    shuffle($words);
+    $words = implode(' ',$words);
+  	$part['text'] = '<div class="text" style="margin-bottom:1em;">'.$words.' <a href="#">Læs mere</a></div>';
+  	$part['icons'] = '<div class="iconsnoheight">' . l(theme('image', 'sites/all/themes/netsound/img/listen.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .'</div>';
+  	$part['picture'] = '<div class="picture" style="height:170px;">' . l(theme('image', $image_url, '', '', null, false), $object->url, array('html' => true)) . '</div>';
+  	$displaysize = 'small';
+  }
   
-  return '<div class="display-book '.$displaysize.'">'.$part['picture'].$part['loginexpire'].$part['title'].$part['author'].$part['icons'].'</div>';
+  return '<div class="display-book '.$displaysize.'">'.$part['picture'].$part['loginexpire'].$part['title'].$part['author'].$part['icons'].$part['text'].'</div>';
   
 }
 
