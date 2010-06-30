@@ -60,6 +60,12 @@ function showEntriesFromVocab($node, $vid) {
 
 
 function netsound2_preprocess_page(&$vars, $hook) {
+	global $user;
+	
+	if(arg(0) == 'min_side' && $user->uid == 0){
+	 drupal_goto('user/login',drupal_get_destination());
+	}
+	
   
   if(arg(3) == 'stream' || arg(3) == 'download' || $_GET['clean'] == 1 ){
   	$vars['template_files'] = array('page-clean');

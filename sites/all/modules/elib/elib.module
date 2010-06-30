@@ -36,7 +36,6 @@ function elib_menu() {
     'page callback' => 'elib_get_lydbog',
     'page arguments' => array(2,3),
     'access arguments' => array('access content'),
-    
   );
   $items['ting/object/%/download'] = array(
     'title' => 'wma',
@@ -144,7 +143,7 @@ function elib_get_lydbog($tingObjectID,$format){
 		if($response->status->code == 120){
 		// else show cart
 		$libmax = elib_libraries_get_maxloans($userinfo['lib']);
-		if($nob == $libmax){
+		/*if($nob >= $libmax){
 			$diff = $loanlimit-time();
 			$days = floor($diff/86400);
 			
@@ -158,7 +157,7 @@ function elib_get_lydbog($tingObjectID,$format){
 		  $content .= t('<p>Der kommer en feature her hvor du kan tilføjge bogen til din huske liste!</p>');
 		  
 		  //$content .= 	t('<p>Lån igen om %s dage</p>',);
-		}	
+		}	*/
 		
 		}
 		else{
@@ -337,9 +336,7 @@ function elib_displaybookNEW(TingClientObject $obj,$elib='',$displaysize=false){
   $part['icons'] = '<div class="icons">' . l(theme('image', 'sites/all/themes/netsound/img/listen.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .'</div>';
    
   if($displaysize == 'lorem'){
-  	$words = explode(' ','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam aliquet risus vitae purus rutrum tincidunt. Vivamus consectetur enim quam, ac viverra felis. Cras vitae urna id tortor suscipit rutrum quis vel metus. Nullam vulputate rhoncus diam, ultricies bibendum nulla aliquam sit amet.');
-    shuffle($words);
-    $words = implode(' ',$words);
+  	$words = dummy_lorem(45);
   	$part['text'] = '<div class="text" style="margin-bottom:1em;">'.$words.' <a href="#">Læs mere</a></div>';
   	$part['icons'] = '<div class="iconsnoheight">' . l(theme('image', 'sites/all/themes/netsound/img/listen.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .'</div>';
   	$part['picture'] = '<div class="picture" style="height:170px;">' . l(theme('image', $image_url, '', '', null, false), $object->url, array('html' => true)) . '</div>';
@@ -349,7 +346,14 @@ function elib_displaybookNEW(TingClientObject $obj,$elib='',$displaysize=false){
   return '<div class="display-book '.$displaysize.'">'.$part['picture'].$part['loginexpire'].$part['title'].$part['author'].$part['icons'].$part['text'].'</div>';
   
 }
-
+function dummy_lorem($numberofwords=100){
+	$words = explode(' ','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam aliquet risus vitae purus rutrum tincidunt. Vivamus consectetur enim quam, ac viverra felis. Cras vitae urna id tortor suscipit rutrum quis vel metus. Nullam vulputate rhoncus diam, ultricies bibendum nulla aliquam sit amet.');
+  for($i=0;$i<$numberofwords;$i++){
+  	$new[] = $words[array_rand($words)];
+  }
+  return implode(' ',$new);
+	
+}
 
 function elib_display_error($error){
 	// singleton display error 

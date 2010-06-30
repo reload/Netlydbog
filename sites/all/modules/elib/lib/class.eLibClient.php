@@ -118,7 +118,7 @@ class eLibClient{
 	  			$f = 71;
 	  			break;
 	  		default:
-	  			$f = 71;
+	  			$f = 75;
 	  			break;
 	  	}
 	  	$params = $this->elibUsr->loginParams();

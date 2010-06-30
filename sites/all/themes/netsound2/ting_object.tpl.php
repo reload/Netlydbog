@@ -155,5 +155,8 @@ dsm($object);
     
 	  </div>
  </div>
- <div class="line">anmeldlser</div>
+ <div class="line">
+<div class="unit size1of4">Vores anmeldelse</div>
+<div class="unit lastUnit"><?php print dummy_lorem(130); ?></div>
+</div>
  
