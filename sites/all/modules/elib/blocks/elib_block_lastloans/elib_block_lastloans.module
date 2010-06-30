@@ -64,7 +64,7 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
         break;
     	case 5:
     		$block['subject'] = t('Min profil');
-    		$out = '<p>Du er logget ind<p>'.l('logud','logout',array('attributes' => array('class' => 'biglogoutbutton')));
+    		$out = '<p>Du er logget ind<p>'.l('Log ud','logout',array('attributes' => array('class' => 'biglogoutbutton')));
     		break;
     }
     

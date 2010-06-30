@@ -498,3 +498,23 @@ margin:0 0 1em;
 .view-latest-news .created{
 	display:none;
 } 
+
+
+
+
+
+
+
+
+
+
+
+.biglogoutbutton{
+	display:block;
+	padding:10px;
+	background:#90C50F;
+	color:#fff;
+	font-weight:bold;
+	text-align:center;
+	margin-top:10px;
+}
