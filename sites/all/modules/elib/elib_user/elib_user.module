@@ -108,14 +108,14 @@ if ($op == 'list') {
       $out = array();
       module_load_include('client.inc', 'ting');
       
-      if(is_array($loans->orderitem)){
+      //if(is_array($loans->orderitem)){
 	      foreach($loans->orderitem as $book){  
 	        $object = ting_get_object_by_isbn(trim($book->book->attributes()->id));
 	        //krumo($object);
 	        $bookdisplay = elib_displaybook($object,$book); 
 	        $out[] = '<li class="unit size1of'.sizeof($loans->orderitem).'"><div class="display-book biglist">'.$bookdisplay.'</div></li>';
 	      }
-      }
+      //}
       
       $block['content'] = '<ul class="line">'.implode($out).'</ul>';
     
