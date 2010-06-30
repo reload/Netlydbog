@@ -73,18 +73,12 @@ function elib_form_alter(&$form, $form_state, $form_id) {
 }
 
 function elib_get_isbn_from_object_id($oid){
-	
-	//krumo($oid);
-	
   module_load_include('client.inc', 'ting');
   try {
     $object = ting_get_object_by_id($oid);
-    
     $eliburl = $object->record['dc:identifier']['dcterms:URI'][0];
-    krumo($eliburl);
     $first = substr($eliburl,strpos($eliburl,'&id=')+4);
-    $isbn = substr($first,0,strpos($first,'&lib'));
-    krumo($isbn);
+    $isbn = trim(substr($first,0,strpos($first,'&lib')));
   }
   catch (TingClientException $e) {
     // If the specified object id does not exist, an exception is throw.
@@ -139,9 +133,8 @@ function elib_get_lydbog($tingObjectID,$format){
 			}
 		}
 	}
-	if(1==2){
+	if($alreadyloaned){
 		// get local
-		
 		$src = $response->data->downloadurl;
     $content = '<iframe src="'.$src.'" class="audioplayer"></iframe>';
 	}
@@ -150,7 +143,7 @@ function elib_get_lydbog($tingObjectID,$format){
 		if($response->status->code == 120){
 		// else show cart
 		$libmax = elib_libraries_get_maxloans($userinfo['lib']);
-		/*if($nob >= $libmax){
+		if($nob >= $libmax){
 			$diff = $loanlimit-time();
 			$days = floor($diff/86400);
 			
@@ -164,7 +157,7 @@ function elib_get_lydbog($tingObjectID,$format){
 		  $content .= t('<p>Der kommer en feature her hvor du kan tilføjge bogen til din huske liste!</p>');
 		  
 		  //$content .= 	t('<p>Lån igen om %s dage</p>',);
-		}	*/
+		}	
 		
 		}
 		else{
