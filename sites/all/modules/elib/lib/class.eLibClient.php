@@ -123,9 +123,10 @@ class eLibClient{
 	  	}
 	  	$params = $this->elibUsr->loginParams();
 	  	$params['ebookid'] = $ebookid;
-	  	krumo($f);
+	  	//krumo($f);
 	  	$params['format'] = $f;
 	  	$params['mobipocketid'] = '';
+	  	krumo($params);
 	  	
 	  	$response = $this->soapCall($this->base_url.'createloan.asmx?WSDL','CreateLoan',$params);
 	  	 	 	
