@@ -73,6 +73,9 @@ function elib_form_alter(&$form, $form_state, $form_id) {
 }
 
 function elib_get_isbn_from_object_id($oid){
+	
+	krumo($oid);
+	
   module_load_include('client.inc', 'ting');
   try {
     $object = ting_get_object_by_id($oid);
@@ -133,8 +136,9 @@ function elib_get_lydbog($tingObjectID,$format){
 			}
 		}
 	}
-	if($alreadyloaned){
+	if(1==2){
 		// get local
+		
 		$src = $response->data->downloadurl;
     $content = '<iframe src="'.$src.'" class="audioplayer"></iframe>';
 	}
