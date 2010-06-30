@@ -74,11 +74,12 @@ function elib_form_alter(&$form, $form_state, $form_id) {
 
 function elib_get_isbn_from_object_id($oid){
 	
-	krumo($oid);
+	//krumo($oid);
 	
   module_load_include('client.inc', 'ting');
   try {
     $object = ting_get_object_by_id($oid);
+    krumo($object);
     $eliburl = $object->record['dc:identifier']['dcterms:URI'][0];
     $first = substr($eliburl,strpos($eliburl,'&id=')+4);
     $isbn = intval(substr($first,0,strpos($first,'&lib')));
