@@ -13,21 +13,25 @@
 
 //dsm($response);
 
-dsm($object);
+//dsm($object);
 
 
 //
 ?>
 <!-- ting_object.tpl -->
-<div id="ting-object" class="line">
+<div id="ting-object" class="line rulerafter">
 
-  <div class="picture unit">
+  <div class="picture unit ">
   <?php $image_url = ting_covers_collection_url($object, '160_x'); ?>
   <?php if ($image_url) { ?>
     <div class="inner left">
     <?php print theme('image', $image_url, '', '', null, false); ?>
     </div>
   <?php } ?>
+  <div class="icons">
+        <?php print l(theme('image', 'sites/all/themes/netsound/img/listen.png', '', '', null, false), $object->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) ?>
+        <?php print l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $object->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe')))?>
+      </div>
   
   
   </div>
@@ -155,8 +159,18 @@ dsm($object);
     
 	  </div>
  </div>
- <div class="line">
-<div class="unit size1of4">Vores anmeldelse</div>
+ </div>
+ <div class="line clear-block rulerafter">
+<div class="unit size1of4 review-title">Vores anmeldelse</div>
 <div class="unit lastUnit"><?php print dummy_lorem(130); ?></div>
 </div>
+ <div class="line clear-block rulerafter">
+<div class="unit size1of4 review-title">Anmeldelser fra litteratursiden.dk</div>
+<div class="unit lastUnit"><?php print dummy_lorem(130); ?></div>
+</div>
+ <div class="line clear-block rulerafter">
+<div class="unit size1of4 review-title">Bruger anmeldelser</div>
+<div class="unit lastUnit"><?php print dummy_lorem(130); ?></div>
+</div>
+
  

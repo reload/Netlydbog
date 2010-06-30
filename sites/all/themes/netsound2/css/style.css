@@ -6,7 +6,15 @@ body{
 
 }
 
-
+.rulerafter{
+	border-bottom:1px dashed #999999;
+  margin:0.5em 0;
+  padding:0 0 0.5em;
+}
+.review-title{
+	color:#90c50f;
+	text-transform:uppercase;
+}
 
 a{
 	color: #439ec1;
