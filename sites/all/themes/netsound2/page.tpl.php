@@ -54,7 +54,7 @@
     </div>
  
     <div class="body clearfix">
-      <div class="main">
+      <div class="maina">
       <?php if($messages): ?>
       <div class="messageouter"><?php print $messages ?></div>
       <?php endif; ?>

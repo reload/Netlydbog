@@ -85,11 +85,11 @@ body.front .pagewrap .top-area{
 }
 
 
-.front .pagewrap .main{
+.front .pagewrap .maina{
 	margin:0;
 }
 
-.pagewrap .main{
+.pagewrap .maina{
 	margin: 0 1em;
 }
 
@@ -216,6 +216,9 @@ h2.pane-title{
 
 .feature-tab .inner{
 	margin-bottom:1em;
+}
+.feature-tab .display-book{
+	width:auto;
 }
 
 .page-frontpage .panel-display .top #topfeature .feature-tab {
