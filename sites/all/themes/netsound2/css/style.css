@@ -456,42 +456,21 @@ body.front .messageouter{
 
 /* COL FIX */
 
-.panel-3col-left-stacked {
-}
 .panel-3col-left-stacked .left-wrapper {
 margin-right:24.99%;
 width:74.99%;
 }
-.panel-3col-left-stacked .panel-col.top .inside {
-margin-bottom:0.5em;
-}
 .panel-3col-left-stacked .panel-col.left {
-float:left;
 width:99.99%;
 }
-.panel-3col-left-stacked .panel-col .inside {
-margin:0 0.5em 1em;
-}
 .panel-3col-left-stacked .panel-col.middle {
-float:right;
 width:49.99%;
-}
-.panel-3col-left-stacked .panel-col .inside {
-margin:0 0.5em 1em;
 }
 .panel-3col-left-stacked .panel-col.right {
-float:right;
 width:24.99%;
 }
-.panel-3col-left-stacked .panel-col.right .inside {
-margin:0 0 1em 0.5em;
-}
 .panel-3col-left-stacked .panel-col.bottom {
-float:left;
 width:49.99%;
-}
-.panel-3col-left-stacked .panel-separator {
-margin:0 0 1em;
 }
 
 
