@@ -34,7 +34,7 @@ foreach ($collection->objects as $obj){
         <?php print l($collection->title, $lydbogObj->url, array('attributes' => array('class' =>'title'))) ;?> 
       </h3>
       <div class="author">
-        <?php echo t('By %creator_name%', array('%creator_name%' => $collection->creators_string)) ?>
+        <?php echo l(t('By %creator_name%', array('%creator_name%' => $collection->creators_string)),'ting/search/'.$collection->creators_string,array('html' => true)); ?>
       </div>
       <?php if (!empty($lydbogObj->record['dc:contributor']['oss:dkind'])): ?>
         <div class="reader">

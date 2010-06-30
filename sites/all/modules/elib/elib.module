@@ -339,7 +339,7 @@ function elib_displaybookNEW(TingClientObject $obj,$elib='',$displaysize=false){
 			$image_url = ting_covers_collection_url($obj, '170_x');			
 			break;
 	}
-	$part['picture'] = '<div class="picture">' . l(theme('image', $image_url, '', '', null, false), $object->url, array('html' => true)) . '</div>';
+	$part['picture'] = '<div class="picture">' . l(theme('image', $image_url, '', '', null, false), $obj->url, array('html' => true)) . '</div>';
   if($elib_data->loanexpiredate){
     $loanlimit = elib_str_to_time($elib_data->loanexpiredate,true);
     $diff = $loanlimit-time();
@@ -361,7 +361,7 @@ function elib_displaybookNEW(TingClientObject $obj,$elib='',$displaysize=false){
   	$words = dummy_lorem(45);
   	$part['text'] = '<div class="text" style="margin-bottom:1em;">'.$words.' <a href="#">Læs mere</a></div>';
   	$part['icons'] = '<div class="iconsnoheight">' . l(theme('image', 'sites/all/themes/netsound/img/listen.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .'</div>';
-  	$part['picture'] = '<div class="picture" style="height:170px;">' . l(theme('image', $image_url, '', '', null, false), $object->url, array('html' => true)) . '</div>';
+  	$part['picture'] = '<div class="picture" style="height:170px;">' . l(theme('image', $image_url, '', '', null, false), $obj->url, array('html' => true)) . '</div>';
   	$displaysize = 'small';
   }
   

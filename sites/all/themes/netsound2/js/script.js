@@ -1,7 +1,7 @@
 jQuery(function($){
 	
 	
-	$('.feature-tab:not(:first)').hide();
+	$('.feature-tab:not(:first)').parent().hide();
 	$('a.tab:first').addClass('active');
 	readpictureheight(0);	
 	$('#topfeature').append('<ul class="page-selector"></ul>');
@@ -15,8 +15,8 @@ jQuery(function($){
 		$(this).addClass('active');
 		
 		id = link.index($(this));
-		$('.feature-tab').hide();
-		$('.feature-tab:eq('+id+')').show();
+		$('.feature-tab').parent().hide();
+		$('.feature-tab:eq('+id+')').parent().show();
 		//readpictureheight(id);
 		return false;
 	});
