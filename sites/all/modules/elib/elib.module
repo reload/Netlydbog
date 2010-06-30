@@ -66,9 +66,17 @@ function elib_form_alter(&$form, $form_state, $form_id) {
   switch ($form_id) {
     case 'user_login':
     case 'user_login_block':
+    	$form['name']['#prefix'] = '<h1>Velkommen til netlydbog.dk</h1><p>Vi kan se at du ikke er logget ind endnu.</p><p>Indtast derfor dit CPR nummer + din pinkode for at logge ind</p>';
+    	$form['name']['#title'] = 'CPR. nr.';
+    	$form['pass']['#title'] = 'Pinkode';
+    	unset($form['name']['#description']);
+    	unset($form['pass']['#description']);
+    	//unset($form['name']['#description']);
     	array_unshift($form['#validate'], 'elib_login_validate');
       //$form['#submit'][] = 'elib_login_submit';
+    //  var_dump($form);
     	break;
+    	
   }
 }
 
@@ -135,13 +143,17 @@ function elib_get_lydbog($tingObjectID,$format){
 	}
 	if($alreadyloaned){
 		
+		$pretext = '<h1 style="text-align:center;">Din lydbog afspilles nu nedenfor</h1>';
 		$src = $response->data->downloadurl;
 		if($format != 'stream'){
 			$src = (trim($response->data[1]->files[0]->file));
+			$pretext = '<h1 style="text-align:center;">Vi er ved at generere din lydbog.<br/> Vent venligst...</h1>';
 		}
 		//var_dump($response);
 		
-    $content = '<iframe src="'.$src.'" class="audioplayer"></iframe>';
+		$content = $pretext;
+		
+    $content .= '<iframe src="'.$src.'" class="audioplayer-'.$format.'" scrolling="no"></iframe>';
 	}
 	else{
 		$response = elib_client()->makeLoan($isbn);
@@ -172,7 +184,7 @@ function elib_get_lydbog($tingObjectID,$format){
 			if($format != 'stream'){
        $src = (trim($response->data[1]->files[0]->file));
       }
-			 $content = '<iframe src="'.$src.'" class="audioplayer"></iframe>';	
+			 $content = '<iframe src="'.$src.'" class="audioplayer-'.$format.'" scrolling="no"></iframe>';
 			}
 			
 			
@@ -189,7 +201,7 @@ function elib_get_lydbog($tingObjectID,$format){
 	
 	// ellers så hent lokal URL
 	
-	$content .= '<div class="status">ws status:'.$status.'</div>';
+	$content .= '<div class="status" style="position:absolute;bottom:0;">ws status:'.$status.'</div>';
 	
 	return $content;
 }

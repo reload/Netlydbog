@@ -25,12 +25,12 @@ function elib_libraries_form_alter(&$form, $form_state, $form_id) {
     case 'user_login_block':
       $form['library'] = array(
         '#type' => 'select',
-        '#title' => t('Choose your library'),
+        '#title' => t('Dit bibliotek'),
         //'#default_value' => variable_get('feed_item_length','teaser'),
           '#options' => array(
             elib_libraries_get_libraries()
           ),
-        '#description' => t('Choose the library with which you\'re connected inorder to loan the audio book'),
+        #'#description' => t('Choose the library with which you\'re connected inorder to loan the audio book'),
       );
       break;
   }

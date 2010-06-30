@@ -327,15 +327,29 @@ h2.pane-title{
 /* cLEARN */
 
 
+body.clean #user-login{
+	width:500px;
+	margin: 0 auto;
+}
+
+body.clean #user-login .form-text{
+	width:99%;
+}
+
 body.clean h1{
 	font-size:2em;
 	font-weight:bold;
 	
 }
-.audioplayer{
-	width:620px;
-	height:250px;
+.audioplayer-stream{
+	width:616px;
+	height:232px;
 	border:0;
+}
+.audioplayer-download{
+  width:620px;
+  height:10px;
+  border:0;
 }
 body .messageouter{
   padding: 1em 0;
@@ -414,3 +428,9 @@ body.front .messageouter{
 #ting-object .item-list  .item-list span{
  	color:#439EC1;
  }
+
+ 
+#imageData{
+	display:none;
+	
+}
