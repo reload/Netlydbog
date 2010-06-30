@@ -160,7 +160,7 @@ function elib_get_lydbog($tingObjectID,$format){
     $content .= '<iframe src="'.$src.'" class="audioplayer-'.$format.'" scrolling="no"></iframe>';
 	}
 	else{
-		
+		#
 	 if(!$_GET['confirm']){
     
 	 	global $base_root;
