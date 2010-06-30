@@ -107,6 +107,8 @@ function elib_get_lydbog($tingObjectID,$format){
   // get all the books that are loaned!
   $loans = elib_client()->getLoans();
 	
+  krumo($format);
+  
   $loans = $loans->orderitem;
   
   $alreadyloaned = false;

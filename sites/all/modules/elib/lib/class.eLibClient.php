@@ -123,6 +123,7 @@ class eLibClient{
 	  	}
 	  	$params = $this->elibUsr->loginParams();
 	  	$params['ebookid'] = $ebookid;
+	  	krumo($f);
 	  	$params['format'] = $f;
 	  	$params['mobipocketid'] = '';
 	  	

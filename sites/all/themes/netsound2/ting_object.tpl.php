@@ -162,15 +162,15 @@
  </div>
  <div class="line clear-block rulerafter">
 <div class="unit size1of4 review-title">Vores anmeldelse</div>
-<div class="unit lastUnit"><?php print dummy_lorem(130); ?></div>
+<div class="unit lastUnit"><span style="color:#999999"> Afventer afklaring</span><?php print dummy_lorem(130); ?></div>
 </div>
  <div class="line clear-block rulerafter">
 <div class="unit size1of4 review-title">Anmeldelser fra litteratursiden.dk</div>
-<div class="unit lastUnit"><?php print dummy_lorem(130); ?></div>
+<div class="unit lastUnit"><span style="color:#999999"> Kommer i version 1.2</span><?php print dummy_lorem(130); ?></div>
 </div>
  <div class="line clear-block rulerafter">
 <div class="unit size1of4 review-title">Bruger anmeldelser</div>
-<div class="unit lastUnit"><?php print dummy_lorem(130); ?></div>
+<div class="unit lastUnit"><span style="color:#999999"> Kommer i version 1.1</span><?php print dummy_lorem(130); ?></div>
 </div>
 
  
