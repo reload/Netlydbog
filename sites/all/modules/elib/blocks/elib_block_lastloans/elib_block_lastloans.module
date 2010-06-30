@@ -8,6 +8,7 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
 	  $blocks[2]['info'] = t('Popular books books');
 	  $blocks[3]['info'] = t('dummyblock1 books');
 	  $blocks[4]['info'] = t('dummyblock2 books');
+	  $blocks[5]['info'] = t('Logout block button');
 	  return $blocks;
   }
   elseif ($op == 'view') {
@@ -23,8 +24,7 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
     		
 		    $response = elib_client()->getLatestLoans();  
 		    
-		    unset($response[3]);
-		    unset($response[4]);
+		    
 		    foreach($response as $isbn){
 		      $out .= elib_displaybookNEW(ting_get_object_by_isbn($isbn),'','lorem'); 
 		    }
@@ -62,6 +62,10 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
         }
         $block['subject'] = t('Populære bøger');  
         break;
+    	case 5:
+    		$block['subject'] = t('Min profil');
+    		$out = '<p>Du er logget ind<p>'.l('logud','logout',array('attributes' => array('class' => 'biglogoutbutton')));
+    		break;
     }
     
     //krumo($books);
