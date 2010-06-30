@@ -489,11 +489,5 @@ width:49.99%;
 
 
 .biglogoutbutton{
-	display:block;
-	padding:10px;
-	background:#90C50F;
-	color:#fff;
-	font-weight:bold;
-	text-align:center;
-	margin-top:10px;
+	color:#90C50F;
 }
