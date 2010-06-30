@@ -63,8 +63,11 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
         $block['subject'] = t('Populære bøger');  
         break;
     	case 5:
+    		global $user;
     		$block['subject'] = t('Min profil');
-    		$out = '<p>Du er logget ind: '.l('Log ud','logout',array('attributes' => array('class' => 'biglogoutbutton'))).'</p>';
+    		if($user->uid){
+    			$out = '<p>Du er logget ind: '.l('Log ud','logout',array('attributes' => array('class' => 'biglogoutbutton'))).'</p>';
+    		}
     		break;
     }
     

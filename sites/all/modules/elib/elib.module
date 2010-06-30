@@ -160,7 +160,7 @@ function elib_get_lydbog($tingObjectID,$format){
 		if($response->status->code == 120){
 		// else show cart
 		$libmax = elib_libraries_get_maxloans($userinfo['lib']);
-		if($nob >= $libmax){
+		//if($nob >= $libmax){
 			$diff = $loanlimit-time();
 			$days = floor($diff/86400);
 			
@@ -174,7 +174,7 @@ function elib_get_lydbog($tingObjectID,$format){
 		  $content .= t('<p>Der kommer en feature her hvor du kan tilføjge bogen til din huske liste!</p>');
 		  
 		  //$content .= 	t('<p>Lån igen om %s dage</p>',);
-		}	
+		//}	
 		
 		}
 		else{
