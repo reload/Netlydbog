@@ -105,25 +105,18 @@ class eLibClient{
   	
   //	var_dump($ids);
   	
-  	return array_reverse($ids);
+  	return array_slice(array_reverse($ids),0,5);
   
   	
   	
   	
   }
-  public function makeLoan($ebookid,$format){
+  public function makeLoan($ebookid){
   	if(is_a($this->elibUsr,'loaner')){
-	  	switch ($format){
-	  		case 'stream':
-	  			$f = 71;
-	  			break;
-	  		default:
-	  			$f = 75;
-	  			break;
-	  	}
+	  	
 	  	$params = $this->elibUsr->loginParams();
 	  	$params['ebookid'] = $ebookid;
-	  	$params['format'] = $f;
+	  	$params['format'] = '230';
 	  	$params['mobipocketid'] = '';
 	  		  	
 	  	$response = $this->soapCall($this->base_url.'createloan.asmx?WSDL','CreateLoan',$params);

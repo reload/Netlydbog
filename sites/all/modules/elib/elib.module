@@ -134,12 +134,17 @@ function elib_get_lydbog($tingObjectID,$format){
 		}
 	}
 	if($alreadyloaned){
-		// get local
+		
 		$src = $response->data->downloadurl;
+		if($format != 'stream'){
+			$src = (trim($response->data[1]->files[0]->file));
+		}
+		//var_dump($response);
+		
     $content = '<iframe src="'.$src.'" class="audioplayer"></iframe>';
 	}
 	else{
-		$response = elib_client()->makeLoan($isbn,$format);
+		$response = elib_client()->makeLoan($isbn);
 		if($response->status->code == 120){
 		// else show cart
 		$libmax = elib_libraries_get_maxloans($userinfo['lib']);
@@ -164,11 +169,16 @@ function elib_get_lydbog($tingObjectID,$format){
 			//var_dump($response);
 			if($response->status->code == 101){
 			 $src = $response->data->downloadurl;
+			if($format != 'stream'){
+       $src = (trim($response->data[1]->files[0]->file));
+      }
 			 $content = '<iframe src="'.$src.'" class="audioplayer"></iframe>';	
 			}
 			
 			
 		}
+		
+		//krumo($response );
 		// call create loan
 		// if loan show stream and create local
 		$status = $response->status->code;
