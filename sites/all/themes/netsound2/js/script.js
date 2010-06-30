@@ -43,7 +43,10 @@ jQuery(function($){
 		
 	}
 	
-	
+	$('.annullerknap').click(function(){
+		window.parent.Lightbox.end();
+		return false;
+	});
 	
 /*	pages = $('.top .pane-book');
 	$('.top').after('<ul class="top-pager"></ul>');

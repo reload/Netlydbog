@@ -491,3 +491,28 @@ width:49.99%;
 .biglogoutbutton{
 	color:#90C50F;
 }
+
+
+.okknap, .annullerknap{
+	text-transform:uppercase;
+  display:block;
+	margin:0 auto;
+	font-weight:bold;
+  text-align:center;
+  	
+}
+.okknap{
+  margin-top:50px;
+	font-size:3em;
+	padding:10px;
+	background:#90C50F;
+	color:#fff;
+	width:150px;
+	
+}
+.annullerknap{
+	width:75px;
+	padding:10px;
+	margin-top:10px;
+	border:1px solid #999999;
+}

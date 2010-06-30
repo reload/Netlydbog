@@ -98,6 +98,10 @@ function elib_get_isbn_from_object_id($oid){
 
 function elib_get_lydbog($tingObjectID,$format){
 	
+	
+	
+	
+	
   global $user;
 	//no user logged in
   if(!$user->uid){
@@ -156,6 +160,17 @@ function elib_get_lydbog($tingObjectID,$format){
     $content .= '<iframe src="'.$src.'" class="audioplayer-'.$format.'" scrolling="no"></iframe>';
 	}
 	else{
+		
+	 if(!$_GET['confirm']){
+    
+	 	global $base_root;
+    //krumo(request_uri());
+ 	
+    return '<h1 style="text-align:center;">Bekræft lån</h1><p style="text-align:center;">Bekræft at du gerne vil foretage et lån</p>'.l('Ok',$base_root.request_uri(),array('query'=> 'confirm=1','attributes' => array('class' => 'okknap'))).l('Fortryd',$base_root.request_uri(),array('attributes' => array('class' => 'annullerknap')));
+    
+   }
+		
+		
 		$response = elib_client()->makeLoan($isbn);
 		if($response->status->code == 120){
 		// else show cart
