@@ -83,7 +83,7 @@ function elib_get_isbn_from_object_id($oid){
     $eliburl = $object->record['dc:identifier']['dcterms:URI'][0];
     krumo($eliburl);
     $first = substr($eliburl,strpos($eliburl,'&id=')+4);
-    $isbn = substr($first,0,strpos($first,'&lib'));
+    $isbn = intval(substr($first,0,strpos($first,'&lib')));
     krumo($isbn);
   }
   catch (TingClientException $e) {
