@@ -83,7 +83,7 @@ function elib_user_block($op = 'list', $delta = 0) {
 if ($op == 'list') {
     return array(
       'account' => array(
-        'info' => t('My Loans'),
+        'info' => t('Mine lån'),
         'cache' => BLOCK_NO_CACHE,
         'status' => 1,
         //'region' => 'account',
@@ -123,7 +123,7 @@ if ($op == 'list') {
       $block['content'] = '<ul class="line">'.implode($out).'</ul>';
     
     
-    $block['subject'] = t('my loans');   
+    $block['subject'] = t('Mine lån');   
       
       //$block['content'] = theme('alma_user_status_block', $status)
 
