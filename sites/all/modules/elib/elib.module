@@ -67,7 +67,7 @@ function elib_form_alter(&$form, $form_state, $form_id) {
     case 'user_login':
     case 'user_login_block':
     	$form['name']['#prefix'] = '<h1>Velkommen til netlydbog.dk</h1><p>Vi kan se at du ikke er logget ind endnu.</p><p>Indtast derfor dit CPR nummer + din pinkode for at logge ind</p>';
-    	$form['name']['#title'] = 'CPR. nr.';
+    	$form['name']['#title'] = 'CPR-nr. / lånerkortnr.';
     	$form['pass']['#title'] = 'Pinkode';
     	unset($form['name']['#description']);
     	unset($form['pass']['#description']);
