@@ -197,6 +197,18 @@ body.front .pagewrap .top-area{
 	margin: 0 1em 1em 0.5em;
 }
 	
+/* FAQ */
+.page-faq .mainfaq {padding: 0 30px;}
+.page-faq .maina {margin: 0;}
+.page-faq h1 {font-family: "American Typewriter", "Courier New", serif;font-size: 22px;text-transform:uppercase;color: #999;margin-bottom:10px;}
+.page-faq .faq-ul-questions-top li { list-style-type: circle; margin:0; padding:0;margin-left: 20px; }
+.page-faq h5 { font-size: 16px;color:#999;}
+.page-faq .faq-question, .page-faq .faq-answer { margin:0;padding:0;}
+.page-faq .faq-question a {font-size: 18px;}
+.page-faq .faq-answer { margin-bottom: 20px;line-height:18px;}
+.page-faq .faq-answer p {margin-bottom:12px;}
+.page-faq .faq-ul-questions-top a { line-height:26px;color: #439EC1;}
+/* /FAQ */
 
 h2.pane-title{
 	font-family: "American Typewriter", "Courier New", serif;
