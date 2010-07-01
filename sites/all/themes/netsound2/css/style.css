@@ -199,6 +199,12 @@ body.front .pagewrap .top-area{
 .pane-latest-news-panel-pane-2 .title {
 font-size:18px;  
 }
+
+.page-node .maina {padding: 0 20px;}
+.page-node h1 {
+  font-family: "American Typewriter", "Courier New", serif;font-size: 22px;text-transform:uppercase;color: #999;margin-bottom:10px;
+}
+.page-node img {padding-right:10px;}
 /* FAQ */
 .page-faq .mainfaq {padding: 0 30px;}
 .page-faq .maina {margin: 0;}
@@ -330,13 +336,13 @@ h2.pane-title{
 	padding:5px;
 }
 .loanperiod.long{
-	background:green;
+	background:#9BC833;
 }
 .loanperiod.medium{
-	background:yellow;
+	background:#FFFF88;
 }
 .loanperiod.short{
-	background:red;
+	background:#CC0000;
 }
 
 
