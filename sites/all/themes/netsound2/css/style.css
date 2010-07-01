@@ -200,7 +200,7 @@ body.front .pagewrap .top-area{
 font-size:18px;  
 }
 
-.page-node .maina {padding: 0 20px;}
+.page-node .maina {padding: 0 20px;min-height:550px;}
 .page-node h1 {
   font-family: "American Typewriter", "Courier New", serif;font-size: 22px;text-transform:uppercase;color: #999;margin-bottom:10px;
 }
