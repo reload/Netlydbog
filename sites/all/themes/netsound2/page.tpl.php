@@ -84,7 +84,7 @@
 
     <div class="footer line">
 
-   <div class="unit size1of2"><a href="http://ting.dk"><img src="/sites/all/themes/netsound2/img/tinglogo.png" alt=""/></a><?php  print $footer; ?></div>
+   <div class="unit size1of2"><a href="http://ting.dk"><img src="/sites/all/themes/netsound2/img/empowered_logo.png" alt=""/></a><?php  print $footer; ?></div>
    <div class="unit size1of2">
    
    <h1>om Netlydbog.dk</h1>
