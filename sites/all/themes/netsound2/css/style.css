@@ -443,6 +443,9 @@ body.front .messageouter{
 .footer h4{
 	text-transform:uppercase;
 }
+.footer p, .footer ul{
+	margin-bottom:5px;
+}
 
 .footer div{
 	float:left;
