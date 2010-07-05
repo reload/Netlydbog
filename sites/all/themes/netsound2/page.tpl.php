@@ -82,15 +82,8 @@
       </div> -->
     </div>
 
-    <div class="footer line">
-
-   <div class="unit size1of2"><a href="http://ting.dk"><img src="/sites/all/themes/netsound2/img/empowered_logo.png" alt=""/></a><?php  print $footer; ?></div>
-   <div class="unit size1of2">
-   
-   <h1>om Netlydbog.dk</h1>
-   <p>Netlydbog.dk drives af et bibliotekskonsortium, der består af bibliotekerne i Gentofte, København, Frederiksberg og Århus. 93 biblioteker abonnerer på servicen. Konsortiet har indgået aftale med Publizon A/S om levering af indhold og drift af IT platform og udlånssystem. Konsortiet har ansvar for portalen.</p>
-   </div>
-      
+    <div class="footer line"><?php  print $footer; ?></div>
+       
 
       <?php # print $feed_icons; ?>
     </div>

@@ -436,10 +436,25 @@ body.front .messageouter{
 	border-top:1px solid #999999;
 	color : #999999;
 }
-.footer h1{
+.footer h3{
 	text-transform:uppercase;
 	font-weight:bold;
 }
+.footer h4{
+	text-transform:uppercase;
+}
+
+.footer div{
+	float:left;
+	width:49.99%;
+}
+.footer div div{
+  float:none;
+  width:auto;
+}
+
+
+
 
 
 

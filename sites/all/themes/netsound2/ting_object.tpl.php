@@ -80,6 +80,7 @@
             <?php } ?>
 
             <?php if (!empty($object->record['dc:contributor']['oss:dkind'])) { ?>
+              <?php var_dump( $object->record['dc:contributor']['oss:dkind']);?>
               <?php print theme('item_list', $object->record['dc:contributor']['oss:dkind'], t('Reader'), 'span', array('class' => 'contributor'));?>
             <?php } ?>
             <?php if (!empty($object->record['dc:contributor']['oss:act'])) { ?>
