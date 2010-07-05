@@ -439,6 +439,7 @@ body.front .messageouter{
 .footer h3{
 	text-transform:uppercase;
 	font-weight:bold;
+	margin-bottom:10px;
 }
 .footer h4{
 	text-transform:uppercase;
