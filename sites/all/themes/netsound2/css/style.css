@@ -311,12 +311,34 @@ h2.pane-title{
 .display-book.small .icons{
 	height:100px;
 }
+
 #ting-result .display-book{
 	margin:0;
 	width:auto;
 }
 #ting-result .display-book .picture{
 	height:auto;
+}
+
+.display-book.textright{
+	margin:0;
+	width:auto;
+}
+.display-book.textright{
+	text-align:right;
+}
+
+.display-book.textright .item-list .title{
+	display:block;
+	text-transform:uppercase;
+	font-weight:normal;
+	margin-top:15px;
+}
+.display-book.textright .picture{
+	padding-left:10px;
+	margin-right:10px;
+	float:right;
+	
 }
 
 
@@ -555,3 +577,12 @@ width:49.99%;
 	margin-top:10px;
 	border:1px solid #999999;
 }
+
+
+
+
+
+
+
+
+
