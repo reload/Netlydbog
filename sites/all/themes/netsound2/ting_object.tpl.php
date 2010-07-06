@@ -79,9 +79,13 @@
               <?php print theme('item_list', $object->record['dcterms:spatial'][''], NULL, 'span', array('class' => 'spatial')); ?>
             <?php } ?>
 
+            
+
             <?php if (!empty($object->record['dc:contributor']['oss:dkind'])) { ?>
-              <?php var_dump( $object->record['dc:contributor']['oss:dkind']);?>
-              <?php print theme('item_list', $object->record['dc:contributor']['oss:dkind'], t('Reader'), 'span', array('class' => 'contributor'));?>
+              <?php foreach($object->record['dc:contributor']['oss:dkind'] as $reader): ?>
+                <?php $readers[] = l($reader,'ting/search/'.$reader); ?>
+              <?php endforeach;?>
+              <?php print theme('item_list', $readers, t('Reader'), 'span', array('class' => 'contributor'));?>
             <?php } ?>
             <?php if (!empty($object->record['dc:contributor']['oss:act'])) { ?>
               <?php print theme('item_list', $object->record['dc:contributor']['oss:act'], t('Actor'), 'span', array('class' => 'contributor'));?>
@@ -161,10 +165,15 @@
 	  </div>
  </div>
  </div>
- <div class="line clear-block rulerafter">
+
+<?php $review = netsound_review_get_review_by_ting_object_id($object->id);?>
+
+<?php if($review): ?>
+<div class="line clear-block rulerafter">
 <div class="unit size1of4 review-title">Vores anmeldelse</div>
-<div class="unit lastUnit"><span style="color:#999999"> Afventer afklaring</span><?php print dummy_lorem(130); ?></div>
+<div class="unit lastUnit"><?php print $review->field_review_value;?></div>
 </div>
+<?php endif;?>
  <div class="line clear-block rulerafter">
 <div class="unit size1of4 review-title">Anmeldelser fra litteratursiden.dk</div>
 <div class="unit lastUnit"><span style="color:#999999"> Kommer i version 1.2</span><?php print dummy_lorem(130); ?></div>

@@ -351,6 +351,7 @@ function elib_displaybookNEW(TingClientObject $obj,$elib='',$displaysize=false){
 			$image_url = ting_covers_collection_url($obj, '70_x');
 			break;
 		case 'medium':
+		case 'textright':
 			$image_url = ting_covers_collection_url($obj, '170_x');			
 			break;
 	}
@@ -378,6 +379,19 @@ function elib_displaybookNEW(TingClientObject $obj,$elib='',$displaysize=false){
   	$part['icons'] = '<div class="iconsnoheight">' . l(theme('image', 'sites/all/themes/netsound/img/listen.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .'</div>';
   	$part['picture'] = '<div class="picture" style="height:170px;">' . l(theme('image', $image_url, '', '', null, false), $obj->url, array('html' => true)) . '</div>';
   	$displaysize = 'small';
+  }
+  if($displaysize == 'textright'){
+  	if (!empty($obj->record['dc:contributor']['oss:dkind'])) {
+      $extras = theme('item_list', $obj->record['dc:contributor']['oss:dkind'], t('Reader'), 'span', array('class' => 'contributor'));
+    }
+    if (!empty($obj->subjects)) {
+      $extras .= theme('item_list', $obj->subjects, t('Subjects'), 'span', array('class' => 'subject'));
+    }
+    if (!empty($obj->record['dcterms:extent'][''])) {
+      $extras .= theme('item_list', $obj->record['dcterms:extent'][''], t('Extent'), 'span', array('class' => 'version'));
+    }
+    
+  	return '<div class="display-book '.$displaysize.'">'.$part['picture'].$part['loginexpire'].$part['title'].$part['author'].$part['icons'].$part['text'].$extras.'</div>';
   }
   
   return '<div class="display-book '.$displaysize.'">'.$part['picture'].$part['loginexpire'].$part['title'].$part['author'].$part['icons'].$part['text'].'</div>';
