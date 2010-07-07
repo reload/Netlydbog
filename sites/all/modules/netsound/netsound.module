@@ -33,20 +33,50 @@ function netsound_block($op = 'list', $delta = 0, $edit = array()) {
            drupal_add_css(drupal_get_path('module', 'netsound') .'/styles.css');
       		$block['content'] = '<div class="keywords-slider"><div class="canvas">'.implode(" ",$linked).'</div></div>';
       	}
-      	
-      	
-      	
       	break;
       case 1:
-      	$block['subject'] = t('Categories');
-      	$block['content'] = 'dflksæfd';
+      	//$block['subject'] = t('Categories');
+      	//$block['content'] = 'dflksæfd';
       	break;
     }
-  	
-  	    return $block;
+  return $block;
   }
 }
 
+
+function netsound_get_genres_from_categories($tid){
+	$sql = '
+	
+	SELECT node.nid AS nid,
+   content_type_category_genre.field_amount_value AS amount,
+   node.type AS node_type,
+   node.vid AS node_vid,
+   content_type_category_genre.field_searchphrase_value AS searchphrase,
+   node.title AS node_title
+ FROM node node 
+ LEFT JOIN content_type_category_genre ON node.vid = content_type_category_genre.vid
+ 
+ inner JOIN term_node term_node ON node.vid = term_node.vid
+ 
+ WHERE term_node.tid = %s
+	';
+	
+	/*$sql = '
+	
+	SELECT *
+	FROM term_node
+	LEFT JOIN node ON node.vid = term_node.vid
+	WHERE term_node.tid = %s
+	
+	';*/
+	$rows = array();
+	
+	$res = db_query($sql,array('%s' => $tid));
+	while($row = db_fetch_array($res)){
+		$rows[] = $row;
+	}
+	return $rows;
+}
 
 
 
