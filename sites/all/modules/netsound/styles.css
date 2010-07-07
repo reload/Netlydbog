@@ -1,0 +1,32 @@
+.keywords-slider{
+	overflow-x:scroll;
+	width:100%;
+	border:1px solid #666;
+}
+.keywords-slider .canvas{
+	width:200%;
+	padding:5px;
+}
+
+.keywords-slider a{
+	display:block;
+	float:left;
+	margin:5px;
+}
+
+.genre_categories h2.pane-title{
+	margin:10px 5px;
+}
+.genre_categories .first h2.pane-title{
+	margin-left:0;
+}
+
+.genre_categories .last h2.pane-title{
+  margin-right:0;
+}
+.genre_categories ul{
+	margin: 0 5px;
+}
+.genre_categories .first ul{
+  margin-left:0;
+}

@@ -1,0 +1,5 @@
+name = Netsound Cart
+description = Cart for audiobooks, to listen later
+dependencies[] = netsound
+package = Ding!
+core = 6.x
