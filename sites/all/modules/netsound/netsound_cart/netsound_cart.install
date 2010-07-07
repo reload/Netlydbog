@@ -1,0 +1,49 @@
+<?php 
+/**
+ * Implementation of hook_install().
+ */
+function netsound_cart_install() {
+  drupal_install_schema('netsound_cart');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function netsound_cart_uninstall() {
+  drupal_uninstall_schema('netsound_cart');
+}
+
+/**
+ * Implementation of hook_schema().
+ */
+function netsound_cart_schema() {
+  $schema = array();
+
+  $schema['netsound_cart'] = array(
+    'description' => t('Cart entries'),
+    'fields' => array(
+      'tstamp' => array(
+        'description' => 'time of loan',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'uid' => array(
+        'description' => 'user id',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'ting_object_id' => array(
+        'description' => 'Ting Object ID',
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'tstamp' => array(
+        'description' => 'Timestamp of entry',
+        'type' => 'text',
+      ),
+    ),
+  );
+  return $schema;
+}
