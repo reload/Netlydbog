@@ -1,5 +1,6 @@
 body{
 	background: #b1af9a url(../img/background-gradient.gif) repeat-y center top;
+	color: #666666;
 	font-family: Helvetica, Arial, sans-serif;
   /*line-height:1.125em;*/
 	 font-size:15px;
@@ -7,7 +8,7 @@ body{
 }
 
 .rulerafter{
-	border-bottom:1px dashed #999999;
+	border-bottom:1px dashed #666666;
   margin:0.5em 0;
   padding:0 0 0.5em;
 }
@@ -161,7 +162,7 @@ body.front .pagewrap .top-area{
 } 
 .top-area ul li a {
   color: #ffffff;
-	background:#999999;
+	background:#666666;
 	display:block;
 	padding:5px 0;
 	overflow:hidden;
@@ -222,7 +223,7 @@ h2.pane-title{
 	font-family: "American Typewriter", "Courier New", serif;
 	font-weight:normal;
 	font-size:1.6em;
-	color:#999999;
+	color:#666666;
 	border-bottom: 1px dashed #999999;
 	padding: 0 0 0.5em 0;
 	margin: 0.5em 0;
@@ -455,8 +456,8 @@ body.front .messageouter{
 .footer{
 	background : #e9e7e4;
 	padding:20px;
-	border-top:1px solid #999999;
-	color : #999999;
+	border-top:1px solid #666666;
+	color : #666666;
 }
 .footer h3{
 	text-transform:uppercase;
