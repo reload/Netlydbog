@@ -1,0 +1,5 @@
+name = Netsound book review
+description = Project specific module that allows CCK content type review to be listed and connected through this modules function.
+dependencies[] = ting
+package = Ding!
+core = 6.x

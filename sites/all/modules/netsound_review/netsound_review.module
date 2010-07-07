@@ -1,0 +1,23 @@
+<?php 
+
+function netsound_review_get_review_by_ting_object_id($id){
+	$res = db_query('
+		SELECT *
+		FROM content_type_review
+		WHERE field_book_ting_object_id = "%s"',array('%s' => trim($id)));
+	
+	return db_fetch_object($res);
+	
+	
+}
+
+
+
+
+
+
+
+
+
+
+?>
