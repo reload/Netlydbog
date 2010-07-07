@@ -1,0 +1,53 @@
+<?php 
+
+function netsound_menu(){
+	$items = array();
+  $items['admin/settings/netsound'] = array(
+    'title'            => 'Netsound settings',
+    'description'      => 'settings for Netsound',
+    'access arguments' => array('access administration pages'),
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('netsound_settings_form'),
+    'file'             => 'netsound.admin.inc',
+  );
+	return $items;
+}
+function netsound_block($op = 'list', $delta = 0, $edit = array()) {
+  if ($op == 'list') {
+  	$blocks[0]['info'] = t('Genre: Keywords');
+    $blocks[1]['info'] = t('Genre: Categories');
+    return $blocks;
+  }
+  elseif ($op == 'view') {
+    switch($delta){
+      case 0:
+      	$block['subject'] = t('Keywords');
+        
+      	   	
+      	$keywords = explode(',',variable_get('netsound_keywords', ''));
+      	if(is_array($keywords)){
+      		foreach($keywords as $keyword){
+      			$keyword = trim($keyword);
+      			$linked[] = l($keyword,'ting/search/'.$keyword);
+      		}
+           drupal_add_css(drupal_get_path('module', 'netsound') .'/styles.css');
+      		$block['content'] = '<div class="keywords-slider"><div class="canvas">'.implode(" ",$linked).'</div></div>';
+      	}
+      	
+      	
+      	
+      	break;
+      case 1:
+      	$block['subject'] = t('Categories');
+      	$block['content'] = 'dflksæfd';
+      	break;
+    }
+  	
+  	    return $block;
+  }
+}
+
+
+
+
+?>
