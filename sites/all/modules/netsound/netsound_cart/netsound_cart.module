@@ -21,38 +21,26 @@ function netsound_cart_menu(){
 function netsound_cart_add($tingid){
   global $user;
 	
-	
 	if($user->uid != 0){
 		
 		module_load_include('client.inc', 'ting');		
 		$tingObj = ting_get_object_by_id($tingid);
-		
-		dsm($tingObj);
-		
+				
 		if(is_a($tingObj,'TingClientObject')){
-	/*		drupal_write_record('netsound_cart',array(
-	      'tstamp' => time(),
-	      'uid' => $user->uid,
-	      'ting_object_id' => $tingObj->id,
-	    ));*/
-	    drupal_set_message(t('%book er nu tilføjet din huskeliste',array('%book' => $tingObj->title)));	
-		}
-		
-			
+			$params = array(
+        'tstamp' => time(),
+        'uid' => $user->uid,
+        'ting_object_id' => $tingObj->id,
+      );
+			drupal_write_record('netsound_cart',$params);
+	    drupal_set_message(t('!book er nu tilføjet din huskeliste',array('!book' => l($tingObj->title,'ting/object/'.$tingObj->id))));
+	    drupal_goto();	
+		}		
 	}
-	
-	
+}
 
-	
-	//return $tingid;
-	
-	
-	
-	
-	
-	$content ='Display book here!';
-	
-	return $content;
+function netsound_cart_add_link($tingid){
+	return l(t('Tilføj til huskeliste'),'ting/object/'.$tingid.'/huskeliste',array('query' => drupal_get_destination(),'attributes' => array('class' => 'addtocart')));
 }
 
 

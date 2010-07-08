@@ -186,7 +186,7 @@ function elib_get_lydbog($tingObjectID,$format){
 			$content  = t('<h1>Max grænse for lån opnået</h1>');
 		  $content .= t("<p>Du har allerede lånt %books bøger og har derfor nået dit maximum</p><p>Læs mere om <a href='!link'>antal af lån</a> om måneden</p>",array('%books' => format_plural($nob, 'en bog', '@count bøger')));
 		  $content .= t('<p>Du kan låne en lydbog igen om %dage og %time</p>', array('%dage' => format_plural($days, 'en dag', '@count dage'),'%time' => format_plural($hours, 'en time', '@count timer')));
-		  $content .= t('<p>Der kommer en feature her hvor du kan tilføjge bogen til din huske liste!</p>');
+		  $content .= '<p>'.netsound_cart_add_link($tingObjectID).'</p>';
 		  
 		  //$content .= 	t('<p>Lån igen om %s dage</p>',);
 		//}	
