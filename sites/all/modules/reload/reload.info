@@ -1,0 +1,4 @@
+name = RELOAD! Base module
+description = Miscellaneous generic helper functions and base module for RELOAD! specific modules 
+package = RELOAD!
+core = 6.x
