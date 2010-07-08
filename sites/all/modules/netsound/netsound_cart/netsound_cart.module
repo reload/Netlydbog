@@ -3,7 +3,6 @@
 /*
  * implementation of hook_menu();
  */
-
 function netsound_cart_menu(){
 	$items = array();
 	
@@ -13,16 +12,16 @@ function netsound_cart_menu(){
     'page arguments' => array(2),
     'access arguments' => array('access content'),
 	);
-	
-	
 	return $items;
 }
 
+/*
+ * page callback used in hook_menu();
+ */
 function netsound_cart_add($tingid){
   global $user;
 	
 	if($user->uid != 0){
-		
 		module_load_include('client.inc', 'ting');		
 		$tingObj = ting_get_object_by_id($tingid);
 				
@@ -39,9 +38,47 @@ function netsound_cart_add($tingid){
 	}
 }
 
+/*
+ * sadd to cart link
+ */
 function netsound_cart_add_link($tingid){
 	return l(t('Tilføj til huskeliste'),'ting/object/'.$tingid.'/huskeliste',array('query' => drupal_get_destination(),'attributes' => array('class' => 'addtocart')));
 }
+
+/*
+ * Implementation of hook_block();
+ */
+function netsound_cart_block($op = 'list', $delta = 0, $edit = array()) {
+  if ($op == 'list') {
+    $blocks[0]['info'] = t('What\'s in my cart?');
+    return $blocks;
+  }
+  elseif ($op == 'view') {
+    switch($delta){
+      case 0:
+      	global $user;
+      	$rows = array();
+      	module_load_include('client.inc', 'ting');    
+      	
+      	
+        $block['subject'] = t('Min huske liste');
+        $res = db_query('SELECT DISTINCT ting_object_id, uid FROM {netsound_cart} WHERE uid = %d',array('%d' => $user->uid));
+        while($row = db_fetch_array($res)){
+        	$rows[] = elib_displaybookNEW(ting_get_object_by_id($row['ting_object_id']),'','small');
+        }
+        //var_dump($rows);
+        
+        
+        
+        $block['content'] = implode($rows);
+        
+        
+        break;
+    }
+  return $block;
+  }
+}
+
 
 
 
