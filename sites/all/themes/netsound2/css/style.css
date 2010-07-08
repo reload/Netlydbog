@@ -25,6 +25,30 @@ a{
 body.clean{
 	background:none;
 }
+body.clean p{
+	margin-bottom:10px;
+}
+body.clean h1{
+	margin-bottom:10px;
+}
+body.clean .timeleft{
+	padding:5px;
+	margin:0 auto;
+	border:1px solid #666;
+	width:200px;
+	text-align:center;
+	font-size:1.4em;
+}
+
+body.clean .addtocart{
+	display:block;
+	float:right;
+	background: #90C50F;
+	color:#fff;
+	font-weight:bold;
+	padding:10px;
+}
+
 
 .pagewrap{
 	width: 1006px;
