@@ -66,18 +66,22 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
         		$library = $lib;
         	}
         }
+        if(!$library){
+        	return;
+        }
         $out = '<p class="spacing-before">'.t('Velkommen! Som bruger i %library kan du låne %amount om måneden',array('%library' => $library,'%amount' => format_plural(elib_libraries_get_maxloans($u['lib']), 'en lydbog', '@count lydbøger'))).'</p>';
 
         elib_client()->setLoaner($u['cpr'],$u['pin'],$u['lib']);
         $loans = elib_client()->getLoans();
         $loans = $loans->orderitem;
+        $loanlimit = 100000000000;
         if($loans){
           $nob = sizeof($loans);
           if($nob >= elib_libraries_get_maxloans($u['lib'])){
           	
             foreach($loans as $obj){
       
-				      if($loanlimit > elib_str_to_time($obj->loanexpiredate,true)){
+            	if($loanlimit > elib_str_to_time($obj->loanexpiredate,true)){
 				        $loanlimit = elib_str_to_time($obj->loanexpiredate,true);
 				      }
             }
@@ -89,7 +93,7 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
       
             $hours = floor($rest/3600);
             
-            $out .= t('<p>Du kan låne en lydbog igen om</p><div class="timeleft"> %dage og %time</div>', array('%dage' => format_plural($days, 'en dag', '@count dage'),'%time' => format_plural($hours, 'en time', '@count timer')));
+            $out .= t('<p style="text-align:right;margin-top:10px;">Du kan låne en lydbog igen om %dage og %time</p>', array('%dage' => format_plural($days, 'en dag', '@count dage'),'%time' => format_plural($hours, 'en time', '@count timer')));
           }
         }
         
