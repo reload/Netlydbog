@@ -1,0 +1,12 @@
+<?php 
+
+function netsound_comments_form_alter(&$form, $form_state, $form_id) {
+		//var_dump($form_id);
+}
+
+
+
+
+
+
+?>

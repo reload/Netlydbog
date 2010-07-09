@@ -43,6 +43,11 @@ function elib_user_schema() {
         'type' => 'varchar',
         'length' => 50,
       ),
+      'elib_username' => array(
+        'description' => 'Brugernavn',
+        'type' => 'varchar',
+        'length' => 255,
+      ),
     ),
     'primary key' => array('uid'),
   );
