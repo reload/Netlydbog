@@ -24,7 +24,7 @@
 <?php foreach ($fields as $id => $field): ?>
 
 <?php if($field->class == 'name'):?>
-  <h2 class="pane-title"><?php print $field->raw?></h1>
+  <h2 class="pane-title"><?php print $field->raw?></h2>
 <?php endif;?>
 
 <?php if($field->class == 'tid'):?>

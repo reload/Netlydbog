@@ -45,30 +45,18 @@ function netsound_block($op = 'list', $delta = 0, $edit = array()) {
 
 
 function netsound_get_genres_from_categories($tid){
-	$sql = '
-	
-	SELECT node.nid AS nid,
-   content_type_category_genre.field_amount_value AS amount,
-   node.type AS node_type,
-   node.vid AS node_vid,
-   content_type_category_genre.field_searchphrase_value AS searchphrase,
-   node.title AS node_title
- FROM node node 
- LEFT JOIN content_type_category_genre ON node.vid = content_type_category_genre.vid
- 
- inner JOIN term_node term_node ON node.vid = term_node.vid
- 
- WHERE term_node.tid = %s
+  $sql = '
+    SELECT node.nid AS nid,
+      content_type_category_genre.field_amount_value AS amount,
+      node.type AS node_type,
+      node.vid AS node_vid,
+      content_type_category_genre.field_searchphrase_value AS searchphrase,
+      node.title AS node_title
+    FROM node node 
+    LEFT JOIN content_type_category_genre ON node.vid = content_type_category_genre.vid
+    INNER JOIN term_node term_node ON node.vid = term_node.vid
+    WHERE term_node.tid = %s
 	';
-	
-	/*$sql = '
-	
-	SELECT *
-	FROM term_node
-	LEFT JOIN node ON node.vid = term_node.vid
-	WHERE term_node.tid = %s
-	
-	';*/
 	$rows = array();
 	
 	$res = db_query($sql,array('%s' => $tid));

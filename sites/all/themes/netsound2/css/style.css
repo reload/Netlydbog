@@ -12,6 +12,11 @@ body{
   margin:0.5em 0;
   padding:0 0 0.5em;
 }
+
+.spacing-before{
+	margin-top:20px;
+}
+
 .review-title{
 	color:#90c50f;
 	text-transform:uppercase;

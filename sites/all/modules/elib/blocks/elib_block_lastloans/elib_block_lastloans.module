@@ -38,7 +38,7 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
     		   		
     		
 	    		foreach($response->data->toplistitem as $item){
-	    			dsm($item->ebookid.'<br/>');
+	    			
 	    			//print $item['ebookid'].'--';
 	    			if(ting_get_object_by_isbn(trim($item->ebookid))){
 	    				$out .= elib_displaybookNEW(ting_get_object_by_isbn(trim($item->ebookid)),'','small');
@@ -54,11 +54,47 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
     		$out = 'popular books';
     		$block['subject'] = t('populære bøger');
     		break;
-    	case 3:
-       
-    		$out = '<p>'.t('Velkommen! Som bruger på %library bibliotek kan du låne %amount om måneden').'</p>'; 
-    		        //$block['subject'] = t('Populære bøger');  
-        break;
+      case 3:
+        global $user;
+        if($user->uid == 0){return false;}    		
+        
+        $u = elib_user_get_cred();
+        $libs = elib_libraries_get_libraries();
+                
+        foreach ($libs as $key => $lib){
+        	if($key == $u['lib']){
+        		$library = $lib;
+        	}
+        }
+        $out = '<p class="spacing-before">'.t('Velkommen! Som bruger i %library kan du låne %amount om måneden',array('%library' => $library,'%amount' => format_plural(elib_libraries_get_maxloans($u['lib']), 'en lydbog', '@count lydbøger'))).'</p>';
+
+        elib_client()->setLoaner($u['cpr'],$u['pin'],$u['lib']);
+        $loans = elib_client()->getLoans();
+        $loans = $loans->orderitem;
+        if($loans){
+          $nob = sizeof($loans);
+          if($nob >= elib_libraries_get_maxloans($u['lib'])){
+          	
+            foreach($loans as $obj){
+      
+				      if($loanlimit > elib_str_to_time($obj->loanexpiredate,true)){
+				        $loanlimit = elib_str_to_time($obj->loanexpiredate,true);
+				      }
+            }
+          	
+            $diff = $loanlimit-time();
+            $days = floor($diff/86400);
+      
+            $rest = $diff % 86400;
+      
+            $hours = floor($rest/3600);
+            
+            $out .= t('<p>Du kan låne en lydbog igen om</p><div class="timeleft"> %dage og %time</div>', array('%dage' => format_plural($days, 'en dag', '@count dage'),'%time' => format_plural($hours, 'en time', '@count timer')));
+          }
+        }
+        
+        
+    		break;
     	case 5:
     		global $user;
     		$block['subject'] = t('Min profil');

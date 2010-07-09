@@ -72,7 +72,10 @@ function netsound_cart_block($op = 'list', $delta = 0, $edit = array()) {
         
         $block['content'] = implode($rows);
         
-        
+        if($block['content'] == ''){
+        	$block['content'] = t('Der er ingen bøger på din huskeliste');
+        }
+                
         break;
     }
   return $block;
