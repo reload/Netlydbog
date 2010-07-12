@@ -230,10 +230,10 @@ body.front .pagewrap .top-area{
 font-size:18px;  
 }
 
-.page-node .maina {padding: 0 20px;min-height:550px;}
-.page-node h1 {
+/*.page-node .maina {padding: 0 20px;min-height:550px;}*/
+/*.page-node h1 {
   font-family: "American Typewriter", "Courier New", serif;font-size: 22px;text-transform:uppercase;color: #999;margin-bottom:10px;
-}
+}*/
 .page-node img {padding-right:10px;}
 /* FAQ */
 .page-faq .mainfaq {padding: 0 30px;}
@@ -248,7 +248,7 @@ font-size:18px;
 .page-faq .faq-ul-questions-top a { line-height:26px;color: #439EC1;}
 /* /FAQ */
 
-h2.pane-title{
+h2.pane-title, h1.header{
 	font-family: "American Typewriter", "Courier New", serif;
 	font-weight:normal;
 	font-size:1.6em;

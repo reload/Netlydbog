@@ -65,15 +65,22 @@ function elib_check_credentials($cardno,$pin,$lib){
   }
 }
 
-function elib_user_get_cred(){
-	global $user;
+function elib_user_get_cred($uid = false){
+	if(!$uid){
+	  global $user;
+	  $uid = $user->uid;
+	}
 	
-	 $elibuser = db_fetch_array(db_query('SELECT * FROM {elib_user} WHERE uid = %d',$user->uid));
+	 $elibuser = db_fetch_array(db_query('SELECT * FROM {elib_user} WHERE uid = %d',$uid));
 	
+	 //$user->elib_username = 'fd'.$elibuser['elib_username'];
+	 
+	 
 	return array(
 	 'cpr' => $_SESSION['ssn'],
 	 'pin' => $_SESSION['pin'],
 	 'lib' => $elibuser['elib_library'],
+	 'user' => $elibuser['elib_username'],
 	 //'key' => elib_libraries_get_library_keycode($elibuser['elib_library'])
 	);
 

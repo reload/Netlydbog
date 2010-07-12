@@ -1,8 +1,32 @@
 <?php 
 
 function netsound_comments_form_alter(&$form, $form_state, $form_id) {
-		//var_dump($form_id);
+		if($form_id == 'comment_form'){
+
+			$u = elib_user_get_cred();
+			$form['elib_username']['#default_value'] = $u['user'];
+			
+			$form['elib_username']['#type'] = 'textfield';
+			$form['elib_username']['#title'] = $form['_author']['#title']; 
+		  $form['elib_username']['#required'] = true;
+			$form['elib_username']['#type'] = 'textfield';
+			$form['elib_username']['#weight'] = -2;
+
+			unset($form['preview']);
+			unset($form['_author']);
+					
+			$form['#submit'] = array('comment_form_submit','netsound_comments_savename');
+
+		}
 }
+
+function netsound_comments_savename($form,&$form_state){
+	global $user;
+	
+	$fields = array('elib_username' => $form_state['values']['elib_username'],'uid' => $user->uid);
+	drupal_write_record('elib_user',$fields, array('uid'));
+}
+
 
 
 

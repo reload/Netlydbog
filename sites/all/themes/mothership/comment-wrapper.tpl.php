@@ -14,6 +14,7 @@ if ($id_commentwrap) {
 }
 
 ?>
+<h2 class="pane-title">Kommentarer</h2>
 <!--comment-wrapper.tpl-->
 <?php if ($content) { ?>
 <div<?php print $id_commentwrap . $classes; ?>>

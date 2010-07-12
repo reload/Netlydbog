@@ -74,7 +74,7 @@ else{
 ?>
 <div<?php print $id_node . $classes; ?>>
   <?php if ($node->title) {  ?>
-    <h1><?php print $title;?></h1>
+    <h1 class="header"><?php print $title;?></h1>
   <?php } ?>
 
   <div class="meta">
