@@ -135,6 +135,7 @@ body.front .pagewrap .top-area{
 	position:relative;
   margin:0;
 	height:60px;
+	background:url(../img/formbg.png);
 }
 #ting-search-form .example{
 	display:none;
@@ -152,6 +153,9 @@ body.front .pagewrap .top-area{
 }
 #ting-search-form .form-button{
 	float:right;
+	background:red;
+	height:48px;
+	background:url(../img/formbtnbg.png);
 }
 #ting-search-form input{ 
   border:0;
@@ -163,8 +167,9 @@ body.front .pagewrap .top-area{
 }
 #ting-search-form input.form-submit{
 	padding:2px;
+	display:block;
 }
-#ting-search-form .form-item-textfield .ting-autocomplete{
+#ting-search-form .form-item-textfield .form-text{
   background: #e7e6e4;
 	color: #666666;
   width:422px;
