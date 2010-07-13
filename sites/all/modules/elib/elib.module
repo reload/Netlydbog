@@ -370,7 +370,7 @@ function elib_displaybookNEW(TingClientObject $obj,$elib='',$displaysize=false){
     $part['loginexpire'] = '<div class="loanperiod '.$loanperiod_class.'">'.t('Lånet udløber om <div>%days',array('%days' => format_plural($days, 'en dag', '@count dage'))).'</div></div>';
   }
   $part['title'] = '<h3 class="title">' . l($obj->title, $obj->url, array('attributes' => array('class' =>'title'))) . '</h3>';
-  $part['author'] = '<div class="author">' . t('By %creator_name%', array('%creator_name%' => $obj->creators_string)) . '</div>';
+  $part['author'] = '<div class="author">' . t('By !creator_name', array('!creator_name' => l($obj->creators_string,'ting/search/'.$obj->creators_string))) . '</div>';
   $part['icons'] = '<div class="icons">' . l(theme('image', 'sites/all/themes/netsound/img/listen.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .'</div>';
    
   if($displaysize == 'lorem'){
@@ -382,10 +382,16 @@ function elib_displaybookNEW(TingClientObject $obj,$elib='',$displaysize=false){
   }
   if($displaysize == 'textright'){
   	if (!empty($obj->record['dc:contributor']['oss:dkind'])) {
-      $extras = theme('item_list', $obj->record['dc:contributor']['oss:dkind'], t('Reader'), 'span', array('class' => 'contributor'));
+  	 foreach($obj->record['dc:contributor']['oss:dkind'] as $reader){
+        $readers[] = l($reader,'ting/search/'.$reader);
+      }
+      $extras = theme('item_list', $readers, t('Reader'), 'span', array('class' => 'contributor'));
     }
     if (!empty($obj->subjects)) {
-      $extras .= theme('item_list', $obj->subjects, t('Subjects'), 'span', array('class' => 'subject'));
+    	foreach($obj->subjects as $subject){
+        $subs[] = l($subject,'ting/search/'.$subject);
+      }
+      $extras .= theme('item_list', $subs, t('Subjects'), 'span', array('class' => 'subject'));
     }
     if (!empty($obj->record['dcterms:extent'][''])) {
       $extras .= theme('item_list', $obj->record['dcterms:extent'][''], t('Extent'), 'span', array('class' => 'version'));

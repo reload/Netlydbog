@@ -10,11 +10,17 @@
 
 //get lydbog in collection
 
+//krumo($collection);
+
+
 foreach ($collection->objects as $obj){
 	if($obj->type == 'Lydbog (online)'){
 		$lydbogObj = $obj;
+//		$lydbogObj = ting_get_object_by_id($obj->id);
 	}
 } 
+
+//krumo($lydbogObj);
 
 ?>
 
@@ -34,15 +40,29 @@ foreach ($collection->objects as $obj){
         <?php print l($collection->title, $lydbogObj->url, array('attributes' => array('class' =>'title'))) ;?> 
       </h3>
       <div class="author">
-        <?php echo l(t('By %creator_name%', array('%creator_name%' => $collection->creators_string)),'ting/search/'.$collection->creators_string,array('html' => true)); ?>
+        <?php echo t('By !creator_name', array('!creator_name' => l($collection->creators_string,'ting/search/'.$collection->creators_string,array('html' => true)))); ?>
       </div>
       <?php if (!empty($lydbogObj->record['dc:contributor']['oss:dkind'])): ?>
+      <?php 
+      
+      foreach($lydbogObj->record['dc:contributor']['oss:dkind'] as $reader){
+      	$readers[] = l($reader,'ting/search/'.$reader);
+      }
+      ?>
+      
         <div class="reader">
-        <?php print theme('item_list', $lydbogObj->record['dc:contributor']['oss:dkind'], t('Reader'), 'span', array('class' => 'contributor'));?>
+        <?php print theme('item_list', $readers, t('Reader'), 'span', array('class' => 'contributor'));?>
         </div>
       <?php endif; ?>
-      <?php if (!empty($lydbogObj->record['dc:subject']['oss:genre'])): ?>
-        <?php print theme('item_list', $lydbogObj->record['dc:subject']['oss:genre'], t('Genre'), 'span', array('class' => 'subject'));?>
+      <?php if (!empty($lydbogObj->subjects)): ?>
+      <?php 
+      
+      foreach($lydbogObj->subjects as $subject){
+      	$subs[] = l($subject,'ting/search/'.$subject);
+      }
+      
+      ?>
+        <?php print theme('item_list', $subs, t('Genre'), 'span', array('class' => 'subject'));?>
       <?php endif; ?>
        </div>
     </div>

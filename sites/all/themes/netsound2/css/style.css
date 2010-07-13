@@ -373,8 +373,13 @@ h2.pane-title, h1.header{
 	padding-left:10px;
 	margin-right:10px;
 	float:right;
-	
 }
+
+.display-book .item-list .title{
+	font-weight:normal;
+	margin-right:5px;
+}
+
 
 
 #lightboxFrame{
@@ -463,18 +468,18 @@ body.front .messageouter{
 /* news */
 .pane-latest-news-panel-pane-1 .title a{
 	font-weight:bold;
-	color:#000;
+	color:#666;
 	padding-bottom:0.5em;
 } 
  
 .view-latest-news .created{
 	float:left;
-	color:#999999;
+	color:#666;
 	margin-right:0.4em;
 	font-weight:bold;
 }
 .view-latest-news div {
-  border-bottom:1px dashed #999999;
+  border-bottom:1px dashed #666;
 	padding: 0.5em 0;
 }
 .view-latest-news div div{
