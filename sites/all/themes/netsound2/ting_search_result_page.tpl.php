@@ -21,8 +21,9 @@
 
   <div id="content-result" class="ui-tabs-hide">
     <div id="content-search-summary">
-      <?php print t('Showing !firstResult-!lastResult of !count results',
+      <?php print t('Your search for "!searchPhrase" returned !count results',
                     array(
+                      '!searchPhrase' => arg(2),
                       '!firstResult' => '<span class="firstResult"></span>',
                       '!lastResult' => '<span class="lastResult"></span>',
                       '!count' => '<span class="count"></span>',
