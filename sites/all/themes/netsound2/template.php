@@ -77,6 +77,8 @@ function netsound2_preprocess_page(&$vars, $hook) {
 
 function netsound2_preprocess_comment(&$variables) {
 	
+	//krumo($variables);
+	
 	$comment = $variables['comment'];
   $node = $variables['node'];
   
@@ -85,7 +87,7 @@ function netsound2_preprocess_comment(&$variables) {
   $variables['author']    = $uA['user'];//theme('username', $comment);
   $variables['content']   = $comment->comment;
   $variables['date']      = format_date($comment->timestamp);
-  $variables['links']     = isset($variables['links']) ? theme('links', $variables['links']) : '';
+ // $variables['links']     = isset($variables['links']) ? theme('links', $variables['links']) : '';
   $variables['new']       = $comment->new ? t('new') : '';
   $variables['picture']   = theme_get_setting('toggle_comment_user_picture') ? theme('user_picture', $comment) : '';
   $variables['signature'] = $comment->signature;

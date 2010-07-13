@@ -17,12 +17,13 @@
 if ($classes) {
   $classes = ' class="' . $classes . '"';
 }
+
 ?>
 <!--comment.tpl-->
 <div<?php print $classes; ?>>
-<div class="line ruler-after">
+<div class="ruler-after">
   
-  <div class="meta unit size1of5">
+  <div class="meta">
     <?php
       if($comment->picture){
         $image = theme('imagecache', 'user-thumbnail', $comment->picture); 
@@ -35,7 +36,7 @@ if ($classes) {
       <?php print $signature ?>
     <?php } ?>      
   </div>
-  <div class="comment-inner unit lastUnit">
+  <div class="comment-inner">
     
     <div class="comment-content"><?php print $content ?></div>
     <?php print $links ?>    

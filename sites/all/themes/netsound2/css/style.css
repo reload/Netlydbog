@@ -627,8 +627,16 @@ body.node-type-article .meta{
 
 body.node-type-article #comments .meta{
 	padding:0;
+	font-weight:bold;
 }
 
+.comment-inner ul{
+	height:15px;
+}
 
+.comment-inner li{
+	float:left;
+	margin-right:10px;
+}
 
 
