@@ -7,12 +7,6 @@
 $n = node_load($nid);
 ?>
 
-<?php  if ($n->field_image[0]['filepath']) { ?>
-  <div style="float:right;padding-left:10px;">
-    <?php print theme('image', $n->field_image[0]['filepath'], '', '', null, false); ?>
-  </div>
-<?php  } ?>
-
 
   <?php print $n->body ?>
 

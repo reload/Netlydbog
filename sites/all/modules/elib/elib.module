@@ -165,8 +165,12 @@ function elib_get_lydbog($tingObjectID,$format){
     
 	 	global $base_root;
     //krumo(request_uri());
+    
+	 	$loaned = $nob;
+	 	$max = elib_libraries_get_maxloans($userinfo['lib'])-$nob;
+	 	
  	
-    return '<h1 style="text-align:center;">Bekræft lån</h1><p style="text-align:center;">Bekræft at du gerne vil foretage et lån</p>'.l('Ok',$base_root.request_uri(),array('query'=> 'confirm=1','attributes' => array('class' => 'okknap'))).l('Fortryd',$base_root.request_uri(),array('attributes' => array('class' => 'annullerknap')));
+    return '<h1 style="text-align:center;">Lån denne lydbog?</h1><p style="text-align:center;">'.t('Du har %loaned og kan pt. låne %max.',array('%loaned' => format_plural($loaned,'en lånt lydbog','@count lånte lydbøger'),'%max' => format_plural($max,'en mere', '@count til'))).'</p>'.l('Ok',$base_root.request_uri(),array('query'=> 'confirm=1','attributes' => array('class' => 'okknap'))).l('Fortryd',$base_root.request_uri(),array('attributes' => array('class' => 'annullerknap')));
     
    }
 		
