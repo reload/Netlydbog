@@ -620,8 +620,14 @@ width:49.99%;
 
 
 
+body.node-type-article .meta{
+	padding:10px 0;
+	font-size:0.9em;
+}
 
-
+body.node-type-article #comments .meta{
+	padding:0;
+}
 
 
 
