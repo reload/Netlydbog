@@ -639,4 +639,17 @@ body.node-type-article #comments .meta{
 	margin-right:10px;
 }
 
+.view-faq div.inner{
+	border:1px solid #666;
+}
+.view-faq ul{
+	margin:10px 0;
+}
+.view-faq li{
+	list-style:outside disc;
+	margin-left:20px;	
+}
 
+.view-faq li div{
+	display:inline;
+}

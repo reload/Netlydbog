@@ -177,6 +177,16 @@
 <?php endif;?>
  <div class="line clear-block rulerafter">
 <div class="unit size1of4 review-title">Anmeldelser fra litteratursiden.dk</div>
+
+<?php 
+
+$data = file_get_contents('http://litteratursiden.dk/service/netlydbog?isbn='.$object->record['dc:identifier']['dkdcplus:ISBN'][0]);
+
+krumo($data);
+
+
+?>
+
 <div class="unit lastUnit"><span style="color:#999999"> Kommer i version 1.2</span><?php print dummy_lorem(130); ?></div>
 </div>
  <div class="line clear-block rulerafter">

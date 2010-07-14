@@ -98,6 +98,18 @@ jQuery(function($){
         });*/
     });
 
-	
+
+	 /*quirks */
+	 
+	 
+	 
+	 $('.view-faq .unit:even').before('<div class="line">').children('.inside2').css('padding-right','5px'); 
+	 $('.view-faq .unit:odd').after('</div">').children('.inside2').css('padding-left','5px');
+
+	 $('.view-faq .unit').each(function(){
+		 link = $(this).find('div.tid');
+		 $(this).find('div.tid').remove();
+		 $(this).children('.inside2').append(link[0]);
+	 });
 	
 });
