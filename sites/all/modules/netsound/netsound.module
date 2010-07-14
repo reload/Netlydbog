@@ -16,6 +16,7 @@ function netsound_block($op = 'list', $delta = 0, $edit = array()) {
   if ($op == 'list') {
   	$blocks[0]['info'] = t('Genre: Keywords');
     $blocks[1]['info'] = t('Genre: Categories');
+    $blocks[2]['info'] = t('FAQ BLOCK');
     return $blocks;
   }
   elseif ($op == 'view') {
@@ -37,6 +38,9 @@ function netsound_block($op = 'list', $delta = 0, $edit = array()) {
       case 1:
       	//$block['subject'] = t('Categories');
       	//$block['content'] = 'dflksæfd';
+      	break;
+      case 2:
+      	$block['content'] = faq_page(arg(1));
       	break;
     }
   return $block;
@@ -65,7 +69,17 @@ function netsound_get_genres_from_categories($tid){
 	}
 	return $rows;
 }
+function netsound_form_alter(&$form, $form_state, $form_id) {
+	 
+    if($form_id == 'contact_mail_page'){
 
+    	$form['mail']['#size'] = 29;    	
+      unset($form['name']);
+      unset($form['subject']);
+      unset($form['copy']);
+    	
+    }
+}
 
 
 ?>

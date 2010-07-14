@@ -459,7 +459,8 @@ body.front .messageouter{
 }
 .view-promoted-questions li{
 	list-style-type:disc;
-	list-style-position:inside;
+	list-style-position:outside;
+	margin-left:20px;
 }
 .view-promoted-questions li .title{
 	display:inline;
