@@ -182,8 +182,6 @@
 
 $data = file_get_contents('http://litteratursiden.dk/service/netlydbog?isbn='.$object->record['dc:identifier']['dkdcplus:ISBN'][0]);
 
-krumo($data);
-
 
 ?>
 

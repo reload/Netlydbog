@@ -38,6 +38,11 @@ p{
 body.clean{
 	background:none;
 }
+
+body.clean .loader{
+	background:url(../img/35-0.gif) no-repeat center center;
+	height:66px;
+}
 body.clean p{
 	margin-bottom:10px;
 }
@@ -441,7 +446,7 @@ body.clean h1{
 }
 .audioplayer-download{
   width:620px;
-  height:10px;
+  height:0;
   border:0;
 }
 body .messageouter{
@@ -603,7 +608,7 @@ width:49.99%;
 }
 
 
-.okknap, .annullerknap{
+.okknap, .annullerknap, .nextknap{
 	text-transform:uppercase;
   display:block;
 	margin:0 auto;
@@ -620,6 +625,16 @@ width:49.99%;
 	width:150px;
 	
 }
+.nextknap{
+  
+  font-size:2em;
+  padding:10px;
+  background:#90C50F;
+  color:#fff;
+  width:150px;
+  
+}
+
 .annullerknap{
 	width:75px;
 	padding:10px;

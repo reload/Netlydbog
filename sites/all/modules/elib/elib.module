@@ -98,7 +98,41 @@ function elib_get_isbn_from_object_id($oid){
 
 function elib_get_lydbog($tingObjectID,$format){
 	
-	
+	if($_GET['downloaded']){
+		
+		$out = t('<h1 style="text-align:center;">Hjælp til afspilning</h1>');
+	  
+		$sql = 'SELECT node.nid AS nid,
+   nodequeue_nodes_node.position AS nodequeue_nodes_node_position
+ FROM node node 
+ INNER JOIN nodequeue_nodes nodequeue_nodes_node ON node.nid = nodequeue_nodes_node.nid AND nodequeue_nodes_node.qid = 3
+ WHERE node.status <> 0
+   ORDER BY nodequeue_nodes_node_position ASC
+		';
+		
+		$res = db_query($sql);
+		
+		while($row = db_fetch_array($res)){
+			
+			$n = node_load($row['nid']);
+			
+			/* hmm */
+			$keys = array_keys($n->taxonomy);
+			$tid = $n->taxonomy[$keys[0]];
+			$tid = $tid->tid;
+			
+			$anchor = $tid.'n'.$n->nid;
+			
+			//var_dump($anchor);
+			
+			$items[] =  l($n->title,'faqlist/'.$tid, array("fragment" => $anchor,'attributes' => array('target' => '_top')));
+			
+		}
+		
+		$out .= theme('item_list',$items);
+		
+		return $out; 
+	}
 	
 	
 	
@@ -151,7 +185,8 @@ function elib_get_lydbog($tingObjectID,$format){
 		$src = $response->data->downloadurl;
 		if($format != 'stream'){
 			$src = (trim($response->data[1]->files[0]->file));
-			$pretext = '<h1 style="text-align:center;">Vi er ved at generere din lydbog.<br/> Vent venligst...</h1>';
+			global $base_root;
+			$pretext = '<h1 style="text-align:center;">Vi er ved at generere din lydbog.<br/> Vent venligst...</h1><div class="loader"></div><p>Vi er ved at pakke din lydbog til en fil</p><p>Når du har gemt filen, tryk næste</p>'.l('Næste',$base_root.request_uri(),array('query'=> 'downloaded=1','attributes' => array('class' => 'nextknap knap')));
 		}
 		//var_dump($response);
 		
@@ -197,13 +232,19 @@ function elib_get_lydbog($tingObjectID,$format){
 		
 		}
 		else{
+			
 			//var_dump($response);
 			if($response->status->code == 101){
 			 $src = $response->data->downloadurl;
+			 $pretext = '<h1 style="text-align:center;">Din lydbog afspilles nu nedenfor</h1>';
 			if($format != 'stream'){
        $src = (trim($response->data[1]->files[0]->file));
+       global $base_root;
+       $pretext = '<h1 style="text-align:center;">Vi er ved at generere din lydbog.<br/> Vent venligst...</h1><div class="loader"></div><p>Vi er ved at pakke din lydbog til en fil</p><p>Når du har gemt filen, tryk næste</p>'.l('Næste',$base_root.request_uri(),array('query'=> 'downloaded=1','attributes' => array('class' => 'nextknap knap')));
       }
-			 $content = '<iframe src="'.$src.'" class="audioplayer-'.$format.'" scrolling="no"></iframe>';
+      
+        $content = $pretext;
+			 $content .= '<iframe src="'.$src.'" class="audioplayer-'.$format.'" scrolling="no"></iframe>';
 			}
 			
 			
