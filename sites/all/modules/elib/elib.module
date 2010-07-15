@@ -129,6 +129,8 @@ function elib_get_lydbog($tingObjectID,$format){
 			
 		}
 		
+		$out .= '<p>'.l(t('Få mere hjælp'),'help',array('attributes' => array('target' => '_top'))).'</p>';
+		
 		$out .= theme('item_list',$items);
 		
 		return $out; 
