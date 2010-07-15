@@ -13,7 +13,7 @@
 <div class="unit size1of2">
 <div class="inside2">
   <?php if (!empty($title)) : ?>
-    <h2 class="pane-title"><?php print $title; ?></h3>
+    <h2 class="pane-title"><?php print $title; ?></h2>
   <?php endif; ?>
   <ul>
     <?php foreach ($rows as $id => $row): ?>

@@ -123,15 +123,13 @@ function elib_get_lydbog($tingObjectID,$format){
 			
 			$anchor = $tid.'n'.$n->nid;
 			
-			//var_dump($anchor);
-			
 			$items[] =  l($n->title,'faqlist/'.$tid, array("fragment" => $anchor,'attributes' => array('target' => '_top')));
 			
 		}
 		
-		$out .= '<p>'.l(t('Få mere hjælp'),'help',array('attributes' => array('target' => '_top'))).'</p>';
+		$out .= '<div class="ruler-after">'.theme('item_list',$items).'</div>';
 		
-		$out .= theme('item_list',$items);
+		$out .= '<p>'.l(t('Få mere hjælp'),'help',array('attributes' => array('target' => '_top '))).'</p>';
 		
 		return $out; 
 	}
