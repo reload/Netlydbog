@@ -40,7 +40,11 @@ function netsound_block($op = 'list', $delta = 0, $edit = array()) {
       	//$block['content'] = 'dflksæfd';
       	break;
       case 2:
-      	$block['content'] = faq_page(arg(1));
+      	
+      	
+      	$content .= faq_page(arg(1));
+      	
+      	$block['content'] = $content; 
       	break;
     }
   return $block;
@@ -81,5 +85,14 @@ function netsound_form_alter(&$form, $form_state, $form_id) {
     }
 }
 
-
+function netsound_show_videolink($tid){
+  $res = db_query('SELECT node.nid AS nid
+ FROM node node 
+ INNER JOIN term_node term_node ON node.vid = term_node.vid
+ WHERE (node.type in ("helpvideo")) AND (term_node.tid = '.$tid.')
+  ');
+	$row =  db_fetch_array($res);
+	return node_load($row['nid']);
+	
+}
 ?>
