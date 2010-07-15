@@ -1088,6 +1088,9 @@ function faq_term_path($term) {
  *   Link anchor to use in question links; for "questions top" layout.
  */
 function faq_view_question(&$data, $node, $path = NULL, $anchor = NULL) {
+	
+	//dsm($node->title);
+	
   $disable_node_links = variable_get('faq_disable_node_links', FALSE);
   $question = '';
 
@@ -1112,7 +1115,7 @@ function faq_view_question(&$data, $node, $path = NULL, $anchor = NULL) {
       $question = l($node->title, "node/$node->nid");
     }
     else {
-      $question = l($node->title, "node/$node->nid", array("attributes" => array("name" => "$anchor", "id" => "$anchor")));
+      $question = $node->title.l('', "node/$node->nid", array("attributes" => array("name" => "$anchor", "id" => "$anchor")));
     }
   }
 
@@ -1163,8 +1166,8 @@ function faq_view_answer(&$data, $node, $back_to_top, $teaser, $links) {
   if (!empty($back_to_top)) {
     $node->links['faq_back_to_top'] = $back_to_top;
   }
-
-  $content = drupal_render($node->content);
+  //dsm($node);
+  $content = $node->body;
   node_invoke_nodeapi($node, 'alter', $teaser, 0);
 
   // Unset unused $node text so that a bad theme can not open a security hole.

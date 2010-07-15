@@ -98,7 +98,7 @@ $depth = 0;
       <?php foreach ($nodes as $i => $node): ?>
 
         <div class="faq-question"><?php // Strong question label here? ?>
-        <?php print $node['question']; ?>
+       <h2 class="pane-title"><?php print $node['question']; ?></h2>
         </div> <!-- Close div: faq-question -->
 
         <div class="faq-answer">

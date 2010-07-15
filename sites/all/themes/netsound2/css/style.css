@@ -12,6 +12,11 @@ body{
   margin:0.5em 0;
   padding:0 0 0.5em;
 }
+strong{
+  font-weight:bold;
+}
+
+
 
 .spacing-before{
 	margin-top:20px;
@@ -25,6 +30,9 @@ body{
 a{
 	color: #439ec1;
 	text-decoration:none;
+}
+p{
+	margin-bottom:10px;
 }
 
 body.clean{
@@ -654,3 +662,11 @@ body.node-type-article #comments .meta{
 .view-faq li div{
 	display:inline;
 }
+
+.faq-question, .faq-answer{
+	padding:0;
+}
+
+
+
+
