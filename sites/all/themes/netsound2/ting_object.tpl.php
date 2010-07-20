@@ -166,30 +166,3 @@
 	  </div>
  </div>
  </div>
-
-<?php $review = netsound_review_get_review_by_ting_object_id($object->id);?>
-
-<?php if($review): ?>
-<div class="line clear-block rulerafter">
-<div class="unit size1of4 review-title">Vores anmeldelse</div>
-<div class="unit lastUnit"><?php print $review->field_review_value;?></div>
-</div>
-<?php endif;?>
- <div class="line clear-block rulerafter">
-<div class="unit size1of4 review-title">Anmeldelser fra litteratursiden.dk</div>
-
-<?php 
-
-$data = file_get_contents('http://litteratursiden.dk/service/netlydbog?isbn='.$object->record['dc:identifier']['dkdcplus:ISBN'][0]);
-
-
-?>
-
-<div class="unit lastUnit"><span style="color:#999999"> Kommer i version 1.2</span><?php print dummy_lorem(130); ?></div>
-</div>
- <div class="line clear-block rulerafter">
-<div class="unit size1of4 review-title">Bruger anmeldelser</div>
-<div class="unit lastUnit"><span style="color:#999999"> Kommer i version 1.1</span><?php print dummy_lorem(130); ?></div>
-</div>
-
- 

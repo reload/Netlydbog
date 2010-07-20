@@ -264,6 +264,15 @@ font-size:18px;
 .page-faq .faq-answer { margin-bottom: 20px;line-height:18px;}
 .page-faq .faq-answer p {margin-bottom:12px;}
 .page-faq .faq-ul-questions-top a { line-height:26px;color: #439EC1;}
+
+
+
+
+.faq-ul-questions-top a.active{
+	color : #439EC1;
+}
+
+
 /* /FAQ */
 
 h2.pane-title, h1.header{
@@ -694,3 +703,27 @@ body.node-type-article #comments .meta{
   margin-right:5px;
 }
 
+
+
+
+/* user reviews */
+
+
+.view-display-id-panel_pane_1 .views-field-uid, .view-display-id-panel_pane_1 .views-field-created{
+	float:left;
+	font-weight:bold;
+	margin-right:10px;
+}
+.view-display-id-panel_pane_1 .views-field-field-review-value{
+	padding:17px 0 8px 0;
+	
+}
+
+
+
+
+
+ul.pager li{
+	float:left;
+	margin:0 5px;
+}

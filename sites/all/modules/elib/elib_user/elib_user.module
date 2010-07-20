@@ -119,8 +119,14 @@ if ($op == 'list') {
   	      foreach($loans->orderitem as $book){  
   	        $object = ting_get_object_by_isbn(trim($book->book->attributes()->id));
   	        //krumo($object);
-  	        $bookdisplay = elib_displaybook($object,$book); 
-  	        $out[] = '<li class="unit size1of'.sizeof($loans->orderitem).'"><div class="display-book biglist">'.$bookdisplay.'</div></li>';
+  	        $bookdisplay = elib_displaybook($object,$book);
+  	        if(sizeof($loans->orderitem) > 4){
+  	        	$size = 4;
+  	        }
+  	        else{
+  	        	$size = sizeof($loans->orderitem);
+  	        }
+  	        $out[] = '<li class="unit size1of'.$size.'"><div class="display-book biglist">'.$bookdisplay.'</div></li>';
   	      }
 	      }
 	      else {

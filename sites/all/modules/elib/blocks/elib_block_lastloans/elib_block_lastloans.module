@@ -26,9 +26,9 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
 		    
 		    
 		    foreach($response as $isbn){
-		      $out .= elib_displaybookNEW(ting_get_object_by_isbn($isbn),'','lorem'); 
+		      $out .= elib_displaybookNEW(ting_get_object_by_isbn($isbn),'','small'); 
 		    }
-		    $block['subject'] = t('Seneste anmeldelser');	
+		    $block['subject'] = t('Seneste Lån');	
     		break;
     	case 1:
     		$response = elib_client()->getNewBooks();

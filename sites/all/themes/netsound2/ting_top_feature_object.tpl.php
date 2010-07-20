@@ -10,7 +10,15 @@
   <div class="inner display-book">
     
 
-      <?php $image_url = ting_covers_collection_url($collection->objects[0], '170_x'); ?>
+      <?php $image_url = ting_covers_collection_url($collection->objects[0], '170_x');
+      
+      //dsm($collection);
+      
+      $isbn = elib_get_isbn_from_object_id($collection->id);
+      
+      $image_url = 'http://www.elib.se/product_images/ISBN'.$isbn.'.jpg';
+      
+      ?>
 
       <?php if (strpos($image_url,'imagecache')): ?>
       <div class="picture">
@@ -18,6 +26,7 @@
       </div>
       <?php else: ?>
       <div class="picture nopicture">
+        <img src="<?php print $image_url?>" alt="" style="width:100%;height:100%"/>
       </div>
       <?php endif;?>
 
