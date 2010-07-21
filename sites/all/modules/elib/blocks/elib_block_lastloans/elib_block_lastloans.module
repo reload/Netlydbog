@@ -51,7 +51,18 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
     		$block['subject'] = t('Nyeste bøger');
     		break;
     	case 2:
-    		$out = 'popular books';
+    		$response = elib_client()->getPopularBooks();
+
+        foreach($response->data->toplistitem as $item){
+            
+            //print $item['ebookid'].'--';
+            if(ting_get_object_by_isbn(trim($item->ebookid))){
+              $out .= elib_displaybookNEW(ting_get_object_by_isbn(trim($item->ebookid)),array('popular' => 1),'small');
+            }
+            if($out == ''){
+              $out = t('???');
+            }
+          }
     		$block['subject'] = t('populære bøger');
     		break;
       case 3:

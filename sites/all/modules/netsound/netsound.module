@@ -1,5 +1,10 @@
 <?php 
 
+function netsound_menu_alter(&$items){
+	unset($items['user/password']);
+	unset($items['user/register']);
+}
+
 function netsound_menu(){
 	$items = array();
   $items['admin/settings/netsound'] = array(

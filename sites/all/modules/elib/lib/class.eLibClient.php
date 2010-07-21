@@ -84,6 +84,22 @@ class eLibClient{
   	return $xml;
   	
   }
+public function getPopularBooks(){
+    $params['top'] = 5;
+    $params['listtype'] = 2;
+    $params['fromdate'] = date('Y-m-d',time()-12592000);
+    $params['todate'] = date('Y-m-d');
+    
+    $response = $this->soapCall($this->base_url.'getlibrarylist.asmx?WSDL','GetTopList',$params);
+    
+    $xml = array();
+    if(simplexml_load_string($response->GetTopListResult->any)){
+      $xml = simplexml_load_string($response->GetTopListResult->any);
+    }
+    
+    return $xml;
+    
+  }
   public function getLatestLoans(){
     
   	$params['fromdate'] = date('Y-m-d',time()-2592000);

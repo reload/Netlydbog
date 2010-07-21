@@ -472,6 +472,14 @@ body.front .messageouter{
 	margin:0 1em;
 }
 
+.messages.status{
+	padding:1em;
+  margin:0 1em;
+	border:1px solid #b5a443;
+	background: #f9efb8;
+	
+}
+
 
 
 /* questions */
