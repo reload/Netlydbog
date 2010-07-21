@@ -1,6 +1,7 @@
 <div<?php print $id_node . $classes; ?>>
+<?php if($title):?>
   <h1 class="header"><?php print $title;?></h1>
-
+<?php endif;?>
 
 <?php
 

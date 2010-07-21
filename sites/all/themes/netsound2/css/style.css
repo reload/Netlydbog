@@ -661,7 +661,7 @@ width:49.99%;
 
 
 
-body.node-type-article .meta{
+/*body.node-type-article .meta{
 	padding:10px 0;
 	font-size:0.9em;
 }
@@ -669,7 +669,7 @@ body.node-type-article .meta{
 body.node-type-article #comments .meta{
 	padding:0;
 	font-weight:bold;
-}
+}*/
 
 .comment-inner ul{
 	height:15px;
@@ -717,12 +717,12 @@ body.node-type-article #comments .meta{
 /* user reviews */
 
 
-.view-display-id-panel_pane_1 .views-field-uid, .view-display-id-panel_pane_1 .views-field-created{
+.view-display-id-panel_pane_1 .views-field-uid, .view-display-id-panel_pane_1 .views-field-created, .pane-node-comments .meta div,  .pane-node-comments .meta span{
 	float:left;
 	font-weight:bold;
 	margin-right:10px;
 }
-.view-display-id-panel_pane_1 .views-field-field-review-value{
+.view-display-id-panel_pane_1 .views-field-field-review-value,  .pane-node-comments .comment-inner{
 	padding:17px 0 8px 0;
 	
 }

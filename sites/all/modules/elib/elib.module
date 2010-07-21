@@ -390,7 +390,10 @@ function elib_displaybook(TingClientObject $object,$elib_data = false){
     
 }
 
-function elib_displaybookNEW(TingClientObject $obj,$elib='',$displaysize=false){
+function elib_displaybookNEW($obj,$elib='',$displaysize=false){
+	if(!is_a($obj,'TingClientObject')){
+		return;
+	}
 	switch($displaysize){
 		case 'small':
 		case 'lorem':

@@ -31,7 +31,7 @@ if ($classes) {
       }
     ?>
     <div class="author"><?php print $author ?></div> 
-    <span class="date" style="display:none"><?php print $date ?></span>
+    <span class="date"><?php print $date ?></span>
     <?php if ($signature){ ?>
       <?php print $signature ?>
     <?php } ?>      
