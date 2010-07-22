@@ -275,7 +275,7 @@ font-size:18px;
 
 /* /FAQ */
 
-h2.pane-title, h1.header{
+h2.pane-title, h1.header, body.clean h1{
 	font-family: "American Typewriter", "Courier New", serif;
 	font-weight:normal;
 	font-size:1.6em;
@@ -443,11 +443,11 @@ body.clean #user-login .form-text{
 	width:99%;
 }
 
-body.clean h1{
+/*body.clean h1{
 	font-size:2em;
 	font-weight:bold;
 	
-}
+}*/
 .audioplayer-stream{
 	width:616px;
 	height:232px;
