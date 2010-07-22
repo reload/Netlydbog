@@ -1,6 +1,5 @@
 jQuery(function($){
 	
-	
 	$('.feature-tab:not(:first)').parent().hide();
 	$('a.tab:first').addClass('active');
 	readpictureheight(0);	
@@ -47,6 +46,18 @@ jQuery(function($){
 		window.parent.Lightbox.end();
 		return false;
 	});
+	
+	$('#user-login #edit-name').keyup(function(){
+		if($(this).val().length > 9){
+			jQuery.getJSON( '/getlibrary/'+$(this).val(),function(data){
+				if(data.elib_library){
+					$('#user-login #edit-library option[value='+data.elib_library+']').attr('selected','selected');
+				}
+			});
+		}
+	});
+	
+	
 	
 /*	pages = $('.top .pane-book');
 	$('.top').after('<ul class="top-pager"></ul>');

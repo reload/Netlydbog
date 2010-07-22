@@ -24,9 +24,8 @@ function elib_libraries_menu() {
   return $items;
 }
 function elib_libraries_findlib($cpr){
-	$res = db_query('SELECT * FROM {users} LEFT JOIN {elib_user} ON elib_user.uid = users.uid WHERE uid = %d',elib_user_elib_id($cpr));
-	
-	print json_encode(db_fetch_object($res));
+	$res = db_query('SELECT elib_library FROM {elib_user} WHERE elib_user.elib_id = "'.elib_user_elib_id($cpr).'"');
+	print json_encode(db_fetch_array($res));
 }
 
 function elib_libraries_form_alter(&$form, $form_state, $form_id) {
