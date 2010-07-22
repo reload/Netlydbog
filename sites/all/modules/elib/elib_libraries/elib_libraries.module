@@ -15,9 +15,19 @@ function elib_libraries_menu() {
     'type'             => MENU_LOCAL_TASK,
     'weight'           => 2,
   );
+  $items['getlibrary/%'] = array(
+    'title' => 'getlib',
+    'page callback' => 'elib_libraries_findlib',
+    'page arguments' => array(1),
+    'access arguments' => array('access content'),
+  );
   return $items;
 }
-
+function elib_libraries_findlib($cpr){
+	$res = db_query('SELECT * FROM {users} LEFT JOIN {elib_user} ON elib_user.uid = users.uid WHERE uid = %d',elib_user_elib_id($cpr));
+	
+	print json_encode(db_fetch_object($res));
+}
 
 function elib_libraries_form_alter(&$form, $form_state, $form_id) {
   switch ($form_id) {
