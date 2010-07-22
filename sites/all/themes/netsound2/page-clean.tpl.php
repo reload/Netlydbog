@@ -13,6 +13,7 @@
  * -------------------------------------
  * <?php print $base_path; ?>
  * <?php print $is_front ?>
+ * 
  */
 ?>
 
@@ -24,6 +25,7 @@
   <title><?php print $head_title; ?></title>
   <?php print $head; ?>
   <?php print $styles; ?>
+  <link type="text/css" rel="stylesheet" media="all" href="/sites/all/themes/netsound2/css/overlay.css" />
   <!--[if IE]>
   <link type="text/css" rel="stylesheet" media="all" href="/sites/all/themes/netsound2/css/ie.css" />
   <![endif]-->
@@ -32,7 +34,11 @@
 
 <body class="<?php print $body_classes;?> clean">
 
+
+<div class="audiobook-bookmark"> </div>
+
   <?php if (!empty($admin)) print $admin; ?>
+  
   <div class="clean">
       
       <?php if($messages): ?>

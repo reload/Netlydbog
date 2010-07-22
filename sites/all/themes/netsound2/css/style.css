@@ -36,7 +36,10 @@ p{
 }
 
 body.clean{
-	background:none;
+	background:#F7F2ED;
+	height:100%;
+	margin:0;
+	
 }
 
 body.clean .loader{
@@ -735,3 +738,15 @@ ul.pager li{
 	float:left;
 	margin:0 5px;
 }
+
+
+
+
+/*.audiobook-bookmark{
+	position:absolute;
+	top:-10px;
+	left:-10px;
+  background:url("../img/logo.png") no-repeat scroll 0 0 transparent;
+	width:71px;
+	height:134px;
+}*/

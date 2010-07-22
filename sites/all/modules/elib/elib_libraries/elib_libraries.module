@@ -27,9 +27,9 @@ function elib_libraries_form_alter(&$form, $form_state, $form_id) {
         '#type' => 'select',
         '#title' => t('Dit bibliotek'),
         //'#default_value' => variable_get('feed_item_length','teaser'),
-          '#options' => array(
+          '#options' => 
             elib_libraries_get_libraries()
-          ),
+          
         #'#description' => t('Choose the library with which you\'re connected inorder to loan the audio book'),
       );
       break;
@@ -47,6 +47,7 @@ function elib_libraries_get_libraries(){
 		 $p = explode('|',$library);
 		  $libs[trim($p[0])] = trim($p[2]);		
 	}
+	
 	return $libs;
 }
 function elib_libraries_get_library_keycode($lib){
