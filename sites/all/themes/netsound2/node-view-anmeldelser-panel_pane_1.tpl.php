@@ -12,7 +12,7 @@ $tingObj = ting_get_object_by_id($node->field_book[0]['ting_object_id']);
 
 </div>
 <div class="unit size1of2">
-<?php print truncate_utf8($node->field_review[0]['safe'],1000,true,true);?>
+<?php print truncate_utf8($node->field_review[0]['safe'],1000,true,true);?> <?php print l(t('læs mere'),$node->path)?>
 </div>
 </div>
 

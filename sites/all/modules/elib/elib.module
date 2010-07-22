@@ -69,6 +69,7 @@ function elib_form_alter(&$form, $form_state, $form_id) {
     	$form['name']['#prefix'] = '<h1>Velkommen til netlydbog.dk</h1><p>Vi kan se at du ikke er logget ind endnu.</p><p>Indtast derfor dit CPR nummer + din pinkode for at logge ind</p>';
     	$form['name']['#title'] = 'CPR-nr. / lånerkortnr.';
     	$form['pass']['#title'] = 'Pinkode';
+    	$form['name']['#type'] = 'password';
     	unset($form['name']['#description']);
     	unset($form['pass']['#description']);
     	//unset($form['name']['#description']);
@@ -254,8 +255,9 @@ function elib_get_lydbog($tingObjectID,$format){
 		//krumo($response );
 		// call create loan
 		// if loan show stream and create local
-		$status = $response->status->code;
+		//$status = $response->status->code.': '.$response->status->message;
 	}
+	$status = $response->status->code.': '.$response->status->message;
 	//krumo($response);
 	
 	// hvis ikke bogen er lånt, så CreateLoan og opret lokal kopi i tabel elib_loan

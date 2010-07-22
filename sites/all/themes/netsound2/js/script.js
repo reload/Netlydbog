@@ -47,14 +47,14 @@ jQuery(function($){
 		return false;
 	});
 	
-	$('#user-login #edit-name').keyup(function(){
-		if($(this).val().length > 9){
+	$('#user-login #edit-name').blur(function(){
+	//	if($(this).val().length > 9 && $(this).val().length < 11){
 			jQuery.getJSON( '/getlibrary/'+$(this).val(),function(data){
 				if(data.elib_library){
 					$('#user-login #edit-library option[value='+data.elib_library+']').attr('selected','selected');
 				}
 			});
-		}
+//		}
 	});
 	
 	

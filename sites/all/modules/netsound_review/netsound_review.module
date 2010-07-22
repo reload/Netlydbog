@@ -55,6 +55,12 @@ function netsound_review_userreview_form($form_state){
   
 	return $form;
 }
+function netsound_review_userreview_form_validate($form, &$form_state) {
+  if(strlen($form_state['values']['field_review']) < 140){
+    form_set_error('type', t('Anmeldelsen skal være mere end 140 tegn'));	
+  }  
+ }
+
 function netsound_review_userreview_form_submit($form, &$form_state) {
   global $user;
 	
