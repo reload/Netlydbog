@@ -262,8 +262,9 @@ function elib_get_lydbog($tingObjectID,$format){
 	// hvis ikke bogen er lånt, så CreateLoan og opret lokal kopi i tabel elib_loan
 	
 	// ellers så hent lokal URL
-	
-	$content .= '<div class="status" style="position:absolute;bottom:0;">ws status:'.$status.'</div>';
+	if($response-status->code != 101){
+		$content .= '<div class="status" style="position:absolute;bottom:0;">Fejl: '.$status.'</div>';
+	}
 	
 	return $content;
 }
