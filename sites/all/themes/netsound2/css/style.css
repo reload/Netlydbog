@@ -369,7 +369,7 @@ h2.pane-title, h1.header, body.clean h1{
 	margin-right:10px;
 }
 .display-book.small .icons{
-	height:100px;
+	/*height:100px;*/
 }
 
 #ting-result .display-book{
@@ -758,3 +758,44 @@ ul.pager li{
 	width:71px;
 	height:134px;
 }*/
+
+
+
+
+
+
+/* fivestar */
+
+.display-book.small .fivestar-static-form-item{
+	float:left;
+	margin-right:10px;
+}
+.display-book.small .icons .icons{
+	float:left;
+}
+.display-book.small .icons{
+	height:20px;
+}
+
+div.fivestar-widget div.on a {
+	background-position: 0 -32px;
+}
+div.fivestar-widget div.hover a {
+  background-position: 0 -16px;
+}
+
+#ting-object .fivestar-widget{
+	margin:5px 0;
+}
+
+.view-anmeldelser .display-book .fivestar-static-form-item{
+	float:right;
+	margin:10px 0 10px 80px;
+	height:20px;
+}
+.feature-tab .fivestar-static-form-item{
+	margin:0 0 5px 0;
+}
+#ting-search-result .fivestar-static-form-item{
+	margin: 0 0 5px 0;
+}

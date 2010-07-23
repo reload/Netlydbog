@@ -23,6 +23,7 @@ function netsound_block($op = 'list', $delta = 0, $edit = array()) {
     $blocks[1]['info'] = t('Genre: Categories');
     $blocks[2]['info'] = t('FAQ BLOCK');
     $blocks[3]['info'] = t('Zero Search top');
+    $blocks[4]['info'] = t('Højest ratede bøger');
     return $blocks;
   }
   elseif ($op == 'view') {
@@ -55,6 +56,9 @@ function netsound_block($op = 'list', $delta = 0, $edit = array()) {
       case 3:
       	
       	drupal_set_message('<p style="strong">'.t('Din søgning på <strong>!query</strong> gav ingen resultater. ',array('!query' => strip_tags(arg(1)))).'</p><p>'.t('Prøv evt din søgning på <a href="http://bibliotek.dk/vis.php?origin=sogning&field1=fritekst&term1=!query">bibliotek.dk</a>',array('!query' => strip_tags(arg(1)))).'</p>');
+      	
+      	break;
+      case 4:
       	
       	break;
     }

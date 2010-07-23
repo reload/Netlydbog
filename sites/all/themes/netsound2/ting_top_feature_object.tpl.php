@@ -34,6 +34,7 @@
       <div class="author">
         <?php echo t('By !creator_name', array('!creator_name' => l($collection->creators_string,'ting/search/'.$collection->creators_string))) ?>
       </div>
+      <?php print elib_get_rating($collection->id);?>
        <div class="icons">
        <?php print l(theme('image', 'sites/all/themes/netsound/img/listen.png', '', '', null, false), $collection->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))); ?>
        <?php print l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $collection->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))); ?>

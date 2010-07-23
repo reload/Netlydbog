@@ -32,6 +32,7 @@
  * this is so we can have a cleaner output - no reason to have an empty <div class="" id="">
  */
 
+
 if ($classes) {
   $classes = ' class="'. $classes . '"';
 }

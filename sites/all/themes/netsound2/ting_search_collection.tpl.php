@@ -42,7 +42,11 @@ foreach ($collection->objects as $obj){
       <div class="author">
         <?php echo t('By !creator_name', array('!creator_name' => l($collection->creators_string,'ting/search/'.$collection->creators_string,array('html' => true)))); ?>
       </div>
-      <?php if (!empty($lydbogObj->record['dc:contributor']['oss:dkind'])): ?>
+      
+      <?php print elib_get_rating($lydbogObj->id);?>
+      
+        
+        <?php if (!empty($lydbogObj->record['dc:contributor']['oss:dkind'])): ?>
       <?php 
       
       foreach($lydbogObj->record['dc:contributor']['oss:dkind'] as $reader){

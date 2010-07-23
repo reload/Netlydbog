@@ -13,10 +13,19 @@
 
 //dsm($response);
 
-dsm($object);
+
+/*logic for rating */
+
+if(!$n = node_load(array('title' => $object->id,'type' => 'bookrating'))){
+	$n = new stdClass();
+	$n->type = 'bookrating';
+	$n->title = $object->id;
+	node_save($n);
+}
+
+$n = node_build_content($n);
 
 
-//
 ?>
 <!-- ting_object.tpl -->
 <div id="ting-object" class="line rulerafter">
@@ -39,14 +48,8 @@ dsm($object);
   <div class="meta unit">
     <div class="inner">
       <h1 class="book-title"><?php print check_plain($object->record['dc:title'][''][0]); ?></h1>
-      <p class="author"><?php echo t('By %creator_name%', array('%creator_name%' => $object->creators_string)) ?></p>
-      <ul class="rating">
-        <li class="on">star</li>
-        <li class="on">star</li>
-        <li class="on">star</li>
-        <li class="off">star</li>
-        <li class="off">star</li>
-      </ul>
+      <div class="author"><?php echo t('By %creator_name%', array('%creator_name%' => $object->creators_string)) ?></div>
+      <?php print $n->content["fivestar_widget"]['#value']; ?>
          
             <?php print theme('item_list', array($object->type), t('Type'), 'span', array('class' => 'type')); ?>
             <?php if (!empty($object->record['dc:format'][''])) { ?>
