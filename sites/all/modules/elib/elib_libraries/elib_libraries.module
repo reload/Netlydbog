@@ -54,7 +54,7 @@ function elib_libraries_get_libraries(){
 	$libraries = explode("\n",$matrix);
 	foreach ($libraries as $library){
 		 $p = explode('|',$library);
-		  $libs[trim($p[0])] = trim($p[2]);		
+		  $libs[trim($p[0])] = trim($p[1]);		
 	}
 	
 	return $libs;
@@ -68,7 +68,7 @@ function elib_libraries_get_library_keycode($lib){
   foreach ($libraries as $library){
     $p = explode('|',$library);
     if($p[0] == $lib){
-     	return $p[1];
+     	return $p[2];
     }    
   }
 }
