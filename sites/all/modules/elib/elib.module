@@ -509,6 +509,7 @@ function elib_get_rating($objectid){
   }
 	
   $c = node_build_content($n,true);
+  
   return $c->content['fivestar_widget']['#value'];
 }
 

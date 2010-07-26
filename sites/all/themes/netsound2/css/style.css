@@ -384,9 +384,16 @@ h2.pane-title, h1.header, body.clean h1{
 	margin:0;
 	width:auto;
 }
+
+.display-book .fivestar-widget-static .star span{
+  text-align:left;
+}
+
 .display-book.textright{
 	text-align:right;
 }
+
+
 
 .display-book.textright .item-list .title{
 	display:block;
