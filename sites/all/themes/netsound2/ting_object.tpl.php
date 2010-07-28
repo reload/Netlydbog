@@ -33,11 +33,16 @@ $n = node_build_content($n);
   <div class="picture unit ">
   <?php $image_url = ting_covers_collection_url($object, '170_x'); ?>
   
-  <?php if ($image_url) { ?>
-    <div class="inner left">
-    <?php print theme('image', $image_url, '', '', null, false); ?>
+  <?php if (strpos($image_url,'imagecache')): ?>
+    <div class="inner left" style="margin-bottom:10px;">
+      <?php print theme('image', $image_url, $object->title, $object->title, null, false); ?>
     </div>
-  <?php } ?>
+  <?php else: ?>
+    <div class="inner left nopicture" style="height:270px;margin-bottom:10px;">
+      
+    </div>
+  <?php endif;?>
+  
   <div class="icons">
         <?php print l(theme('image', 'sites/all/themes/netsound2/img/listen.png', '', '', null, false), $object->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) ?>
         <?php print l(theme('image', 'sites/all/themes/netsound2/img/fetch.png', '', '', null, false), $object->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe')))?>
