@@ -1,10 +1,13 @@
 body{
-	background: #b1af9a url(../img/background-gradient.gif) repeat-y center top;
+
 	color: #666666;
 	font-family: Helvetica, Arial, sans-serif;
   /*line-height:1.125em;*/
 	 font-size:15px;
 
+}
+html{
+	 background: #b1af9a url(../img/background-gradient.gif) repeat-y center ;
 }
 
 .rulerafter{

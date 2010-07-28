@@ -33,7 +33,7 @@
 <body class="<?php print $body_classes;?>">
 
   <?php if (!empty($admin)) print $admin; ?>
-  <div class="pagewrap">
+  <div class="pagewrap clear-block">
   
     <div class="clear-block top-area">
       
