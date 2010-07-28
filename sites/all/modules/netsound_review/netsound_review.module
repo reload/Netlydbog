@@ -42,6 +42,7 @@ function netsound_review_userreview_form($form_state){
   $form['field_review']['#type'] = 'textarea';
   $form['field_review']['#title'] = t('Review');
   $form['field_review']['#required'] = 1;
+  $form['field_review']['#description'] = t('Du skal skrive minimum 140 tegn');
 
   $form['author']['#type'] = 'textfield';
   $form['author']['#title'] = t('Author');
