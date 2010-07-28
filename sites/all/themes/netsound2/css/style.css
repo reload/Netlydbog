@@ -294,6 +294,14 @@ h2.pane-title, h1.header, body.clean h1{
 	padding: 0 1em;
 }
 
+
+.feature-tab .nopicture a{
+	display:block;
+	width:170px;
+	height:270px;
+	text-indent:-999em;
+}
+
 .feature-tab .inner{
 	margin-bottom:1em;
 }
@@ -579,7 +587,9 @@ body.front .messageouter{
 	display:none;
 	
 }
-
+#ting-object .picture .inner{
+	min-height:100px;
+}
 
 
 

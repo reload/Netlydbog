@@ -31,7 +31,8 @@ $n = node_build_content($n);
 <div id="ting-object" class="line rulerafter">
 
   <div class="picture unit ">
-  <?php $image_url = ting_covers_collection_url($object, '160_x'); ?>
+  <?php $image_url = ting_covers_collection_url($object, '170_x'); ?>
+  
   <?php if ($image_url) { ?>
     <div class="inner left">
     <?php print theme('image', $image_url, '', '', null, false); ?>

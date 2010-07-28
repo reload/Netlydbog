@@ -394,7 +394,6 @@ function elib_displaybook(TingClientObject $object,$elib_data = false){
 }
 
 function elib_displaybookNEW($obj,$elib='',$displaysize=false){
-	
 	if(!is_a($obj,'TingClientObject')){
 		return;
 	}
@@ -406,10 +405,10 @@ function elib_displaybookNEW($obj,$elib='',$displaysize=false){
 			break;
 		case 'medium':
 		case 'textright':
-			$image_url = ting_covers_collection_url($obj, '170_x');			
+			$image_url = ting_covers_collection_url($obj, '170_x');
 			break;
 	}
-	$part['picture'] = '<div class="picture">' . l(theme('image', $image_url, '', '', null, false), $obj->url, array('html' => true)) . '</div>';
+	$part['picture'] = '<div class="picture">' . l(theme('image', $image_url, $obj->title, $obj->title, null, false), $obj->url, array('html' => true)) . '</div>';
   if($elib_data->loanexpiredate){
     $loanlimit = elib_str_to_time($elib_data->loanexpiredate,true);
     $diff = $loanlimit-time();
@@ -437,7 +436,7 @@ function elib_displaybookNEW($obj,$elib='',$displaysize=false){
   		$part['text'] = '<div class="spacing-before" style="text-transform:uppercase;">Anmelder</div><div>'.$u['user'].'</div><div class="text"  style="margin-left:80px;"><p class="spacing-before">'.truncate_utf8($elib[0],400,true,true).' '.l('læs mere',$obj->url).'</p>';
   	
   	$part['icons'] = '<div class="">' . l(theme('image', 'sites/all/themes/netsound/img/listen.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .'</div>';
-  	$part['picture'] = '<div class="picture">' . l(theme('image', $image_url, '', '', null, false), $obj->url, array('html' => true)) . '</div>';
+  	$part['picture'] = '<div class="picture">' . l(theme('image', $image_url, $obj->title, $obj->title, null, false), $obj->url, array('html' => true)) . '</div>';
   	$displaysize = 'small';
   }
   if($displaysize == 'textright'){

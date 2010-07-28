@@ -20,10 +20,11 @@
 
       <?php if (strpos($image_url,'imagecache')): ?>
       <div class="picture">
-        <?php print l(theme('image', $image_url, '', '', null, false), $collection->url, array('html' => true)); ?>
+        <?php print l(theme('image', $image_url, $collection->title, $collection->title, null, false), $collection->url, array('html' => true)); ?>
       </div>
       <?php else: ?>
       <div class="picture nopicture">
+      <?php print l('se bogen', $collection->url, array()); ?>
        </div>
       <?php endif;?>
 
@@ -36,8 +37,8 @@
       </div>
       <?php print elib_get_rating($collection->id);?>
        <div class="icons">
-       <?php print l(theme('image', 'sites/all/themes/netsound/img/listen.png', '', '', null, false), $collection->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))); ?>
-       <?php print l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $collection->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))); ?>
+       <?php print l(theme('image', 'sites/all/themes/netsound/img/listen.png', 'Lyt', 'Lyt', null, false), $collection->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))); ?>
+       <?php print l(theme('image', 'sites/all/themes/netsound/img/fetch.png', 'Hent', 'Hent', null, false), $collection->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))); ?>
       </div>
   </div>
 </li>
