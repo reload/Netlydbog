@@ -16,7 +16,11 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
     $block = array();
      
     
+    dsm(variable_get('elib_retailer_id', ''));
+    
     elib_client()->setLibrary(variable_get('elib_retailer_id', ''));
+    
+    
     module_load_include('client.inc', 'ting');
     
     switch($delta){
@@ -53,7 +57,7 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
     	case 2:
     		$response = elib_client()->getPopularBooks();
 
-    		var_dump($response);
+    		//var_dump($response);
     		
         foreach($response->data->toplistitem as $item){
             
