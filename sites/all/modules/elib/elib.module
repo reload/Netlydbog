@@ -145,7 +145,7 @@ function elib_get_lydbog($tingObjectID,$format){
   }
   $userinfo = elib_user_get_cred();
   
-  if(!$userinfo['user']){
+  if(!$userinfo['cpr']){
   	$out = '<h1 style="text-align:center;">Mangler eLIB tilknytning</h1>';
   	$out .= t('<p>Der er ikke knyttet nogle elib informationer til den bruger du er logget ind med. Det er højstsansyneligt fordi du er logget ind som redaktør eller administrator. Hvis dette ikke er tilfældet, kontakt !email</p>',array('!email' => l('info@netlydbog.dk','info@netlydbog.dk')));
   	
