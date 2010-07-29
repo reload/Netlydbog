@@ -40,9 +40,6 @@ class eLibClient{
 	public function setLibrary($lib){
 		$this->retailerid = $lib;
     $this->retailerkeycode = elib_libraries_get_library_keycode($lib);
-    dsm($this->retailerid);
-    dsm($this->retailerkeycode);
-    
 	}
 	
 	public function setLoaner($cardno,$pin,$lib){

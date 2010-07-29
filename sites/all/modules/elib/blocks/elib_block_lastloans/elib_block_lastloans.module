@@ -14,9 +14,6 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
   elseif ($op == 'view') {
     //global $user;
     $block = array();
-     
-    
-    dsm(variable_get('elib_retailer_id', ''));
     
     elib_client()->setLibrary(variable_get('elib_retailer_id', ''));
     
