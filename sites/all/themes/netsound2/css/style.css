@@ -46,7 +46,7 @@ body.clean{
 }
 
 body.clean .loader{
-	background:url(../img/35-0.gif) no-repeat center center;
+	background:url(../img/ajax-loader.gif) no-repeat center center;
 	height:66px;
 }
 body.clean p{
