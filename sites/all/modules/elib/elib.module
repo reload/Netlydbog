@@ -153,19 +153,25 @@ function elib_get_lydbog($tingObjectID,$format){
   
   // get all the books that are loaned!
   $loans = elib_client()->getLoans();
-	
-  $loans = $loans->orderitem;
+  
+  $loanlimit = time()+3600;
+  
+  if($loans->status->code == 101){
+  	$loanlimit = elib_str_to_time($loans->status->usersoundloansNexttime,true);
+  }
+  
+  $loans = $loans->data->orderitem;
   
   $alreadyloaned = false;
-  $loanlimit = 1000000000000;
+  /*$loanlimit = 1000000000000;*/
   if($loans){
     $nob = sizeof($loans);
 		foreach($loans as $obj){
 			
-      if($loanlimit > elib_str_to_time($obj->loanexpiredate,true)){
+  /*    if($loanlimit > elib_str_to_time($obj->loanexpiredate,true)){
         $loanlimit = elib_str_to_time($obj->loanexpiredate,true);
       }
-			 
+		*/	 
 			 
 			if(trim($obj->book['idtype']) == 'ISBN'){
 			  if(trim($obj->book['id']) == $isbn){
@@ -180,6 +186,10 @@ function elib_get_lydbog($tingObjectID,$format){
 			}
 		}
 	}
+	// There is no loans after all??!?
+	/*if($loanlimit == 1000000000000){
+		$loanlimit = 3600;
+	}*/
 	if($alreadyloaned){
 		
 		$pretext = '<h1 style="text-align:center;">Din lydbog afspilles nu nedenfor</h1>';

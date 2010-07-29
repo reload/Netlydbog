@@ -82,9 +82,6 @@ $n = node_build_content($n);
             <?php if (!empty($object->subjects)) { ?>
               <?php print theme('item_list', $object->subjects, t('Subjects'), 'span', array('class' => 'subject'));?>
             <?php } ?>
-            <?php if (!empty($object->record['dc:subject']['dkdcplus:DK5'])) { ?>
-              <?php print theme('item_list', $object->record['dc:subject']['dkdcplus:DK5'], t('Classification'), 'span', array('class' => 'subject'));?>
-            <?php } ?>
             <?php if (!empty($object->record['dcterms:spatial'][''])) { ?>
               <?php print theme('item_list', $object->record['dcterms:spatial'][''], NULL, 'span', array('class' => 'spatial')); ?>
             <?php } ?>
