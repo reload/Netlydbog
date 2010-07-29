@@ -210,7 +210,7 @@ function elib_get_lydbog($tingObjectID,$format){
 	
 		$content = $pretext;
 		
-    $content .= '<iframe src="'.$src.'" class="audioplayer-'.$format.'" scrolling="no"></iframe>';
+    $content .= '<iframe src="'.$src.'" class="audioplayer-'.$format.'" frameborder="0" scrolling="no"></iframe>';
 	}
 	else{
 		#
