@@ -25,7 +25,6 @@ if(!$n = node_load(array('title' => $object->id,'type' => 'bookrating'))){
 
 $n = node_build_content($n);
 
-
 ?>
 <!-- ting_object.tpl -->
 <div id="ting-object" class="line rulerafter">

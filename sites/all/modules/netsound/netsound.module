@@ -55,7 +55,7 @@ function netsound_block($op = 'list', $delta = 0, $edit = array()) {
       	break;
       case 3:
       	
-      	drupal_set_message('<p style="strong">'.t('Din søgning på <strong>!query</strong> gav ingen resultater. ',array('!query' => strip_tags(arg(1)))).'</p><p>'.t('Prøv evt din søgning på <a href="http://bibliotek.dk/vis.php?origin=sogning&field1=fritekst&term1=!query">bibliotek.dk</a>',array('!query' => strip_tags(arg(1)))).'</p>');
+      	drupal_set_message('<p style="strong">'.t('Din søgning på <strong>!query</strong> gav ingen resultater. ',array('!query' => strip_tags(arg(1)))).'</p><p>'.t('Prøv evt din søgning på <a href="http://bibliotek.dk/vis.php?origin=sogning&field1=fritekst&term1=!query&ma=lb">bibliotek.dk</a>',array('!query' => strip_tags(arg(1)))).'</p>');
       	
       	break;
       case 4:

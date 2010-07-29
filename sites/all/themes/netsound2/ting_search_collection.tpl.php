@@ -20,6 +20,11 @@ foreach ($collection->objects as $obj){
 	}
 } 
 
+//krumo::defines();
+
+
+krumo($collection);
+
 //krumo($lydbogObj);
 
 ?>
