@@ -164,12 +164,15 @@ function elib_get_lydbog($tingObjectID,$format){
   // get all the books that are loaned!
   $loans = elib_client()->getLoans();
   
-  $loanlimit = time()+3600;
-  
   if($loans->status->code == 101){
-  	$loanlimit = elib_str_to_time($loans->status->usersoundloansNexttime,true);
+  	if($loans->status->usersoundloansNexttime != ''){  		
+  		$loanlimit = elib_str_to_time($loans->status->usersoundloansNexttime,true);
+  	}
+  	else{
+  		$loanlimit = time()+3600+(3600*24*30);
+  	}
   }
-  
+    
   $loans = $loans->data->orderitem;
   
   $alreadyloaned = false;
@@ -177,11 +180,11 @@ function elib_get_lydbog($tingObjectID,$format){
   if($loans){
     $nob = sizeof($loans);
 		foreach($loans as $obj){
-			
-  /*    if($loanlimit > elib_str_to_time($obj->loanexpiredate,true)){
+
+			if($loanlimit > elib_str_to_time($obj->loanexpiredate,true)){
         $loanlimit = elib_str_to_time($obj->loanexpiredate,true);
       }
-		*/	 
+			 
 			 
 			if(trim($obj->book['idtype']) == 'ISBN'){
 			  if(trim($obj->book['id']) == $isbn){
@@ -215,14 +218,37 @@ function elib_get_lydbog($tingObjectID,$format){
     $content .= '<iframe src="'.$src.'" class="audioplayer-'.$format.'" frameborder="0" scrolling="no"></iframe>';
 	}
 	else{
-		#
-	 if(!$_GET['confirm']){
+		
+	  $loaned = $nob;
+    $max = elib_libraries_get_maxloans($userinfo['lib'])-$nob;
+		
+		if($max <= 0){
+			
+			$libmax = elib_libraries_get_maxloans($userinfo['lib']);
+    //if($nob >= $libmax){
+      $diff = $loanlimit-time();
+      $days = floor($diff/86400);
+      
+      $rest = $diff % 86400;
+      
+      $hours = floor($rest/3600);
+      
+      $content  = t('<h1>Max grænse for lån opnået</h1>');
+      $content .= t("<p>Du har allerede lånt %books og har derfor nået dit maximum</p><p>Læs mere om <a href='!link'>antal af lån</a> om måneden</p>",array('%books' => format_plural($nob, 'en bog', '@count bøger')));
+      $content .= t('<p>Du kan låne en lydbog igen om</p><div class="timeleft"> %dage og %time</div>', array('%dage' => format_plural($days, 'en dag', '@count dage'),'%time' => format_plural($hours, 'en time', '@count timer')));
+      $content .= '<p>'.netsound_cart_add_link($tingObjectID).'</p>';
+      
+			
+			return $content;
+			
+		}
+		
+	  if(!$_GET['confirm']){
     
 	 	global $base_root;
     //krumo(request_uri());
     
-	 	$loaned = $nob;
-	 	$max = elib_libraries_get_maxloans($userinfo['lib'])-$nob;
+
 	 	
 	 	$loaned = $loaned ? format_plural($loaned,'en lånt lydbog','@count lånte lydbøger'): t('ikke lånt nogen bøger');
  	
