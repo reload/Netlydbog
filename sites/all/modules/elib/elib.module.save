@@ -1,0 +1,604 @@
+<?php 
+
+function elib_menu() {
+  $path  = drupal_get_path('module', 'elib') . '/includes';
+  $items = array();
+  
+  $items['admin/settings/elib'] = array(
+    'title'            => 'eLib settings',
+    'description'      => 'settings for eLib SOAP webservice',
+    'access arguments' => array('access administration pages'),
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('ting_admin_settings_form_elib'),
+    'file'             => 'elib.admin.inc',
+    'file path'        => $path,
+  //  'type'             => MENU_LOCAL_TASK,
+    'weight'           => 2,
+  );
+  /*$items['user/elib_login'] = array(
+    //'title'            => 'eLib settings',
+    //'description'      => 'settings for eLib SOAP webservice',
+    'access arguments' => array('access content'),
+    'page callback'    => 'elib_loginform',
+    //'page arguments'   => array(''),
+    //'file'             => 'elib.admin.inc',
+    //'file path'        => $path,
+  //  'type'             => MENU_LOCAL_TASK,
+   // 'weight'           => 2,
+  );*/
+  $items['admin/settings/elib/main'] = array(
+    'title' => 'eLib',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  
+  $items['ting/object/%/stream'] = array(
+    'title' => 'stream',
+    'page callback' => 'elib_get_lydbog',
+    'page arguments' => array(2,3),
+    'access arguments' => array('access content'),
+  );
+  $items['ting/object/%/download'] = array(
+    'title' => 'wma',
+    'page callback' => 'elib_get_lydbog',
+    'page arguments' => array(2,3),
+    'access arguments' => array('access content'),
+    
+  );
+  return $items;
+}
+function elib_theme() {
+  return array(
+    'page' =>  array(
+      'template' => 'page-clean',
+      'arguments' => array(
+        'content' => NULL,
+        'show_blocks' => TRUE,
+        'show_messages' => TRUE,
+      ),
+   ),
+
+  );
+}
+
+
+
+function elib_form_alter(&$form, $form_state, $form_id) {
+  switch ($form_id) {
+    case '
+user_login':
+    case 'user_login_block':
+    	$form['name']['#prefix'] = '<h1>Velkommen til netlydbog.dk</h1><p>Vi kan se at du ikke er logget ind endnu.</p><p>Indtast derfor dit CPR nummer + din pinkode for at logge ind</p>';
+    	$form['name']['#title'] = 'CPR-nr. / lånerkortnr.';
+    	$form['pass']['#title'] = 'Pinkode';
+    	$form['name']['#type'] = 'password';
+    	unset($form['name']['#description']);
+    	unset($form['pass']['#description']);
+    	//unset($form['name']['#description']);
+    	array_unshift($form['#validate'], 'elib_login_validate');
+      //$form['#submit'][] = 'elib_login_submit';
+    //  var_dump($form);
+    	break;
+    	
+  }
+}
+
+function elib_get_isbn_from_object_id($oid){
+  module_load_include('client.inc', 'ting');
+  try {
+    $object = ting_get_object_by_id($oid);
+    $eliburl = $object->record['dc:identifier']['dcterms:URI'][0];
+    $first = substr($eliburl,strpos($eliburl,'&id=')+4);
+    $isbn = trim(substr($first,0,strpos($first,'&lib')));
+  }
+  catch (TingClientException $e) {
+    // If the specified object id does not exist, an exception is throw.
+  }
+  return $isbn;
+}
+
+
+
+function elib_get_lydbog($tingObjectID,$format){
+	
+	if($_GET['downloaded']){
+		
+		$out = t('<h1 style="text-align:center;">Hjælp til afspilning</h1>');
+	  
+		$sql = 'SELECT node.nid AS nid,
+   nodequeue_nodes_node.position AS nodequeue_nodes_node_position
+ FROM node node 
+ INNER JOIN nodequeue_nodes nodequeue_nodes_node ON node.nid = nodequeue_nodes_node.nid AND nodequeue_nodes_node.qid = 3
+ WHERE node.status <> 0
+   ORDER BY nodequeue_nodes_node_position ASC
+		';
+		
+		$res = db_query($sql);
+		
+		while($row = db_fetch_array($res)){
+			
+			$n = node_load($row['nid']);
+			
+			/* hmm */
+			$keys = array_keys($n->taxonomy);
+			$tid = $n->taxonomy[$keys[0]];
+			$tid = $tid->tid;
+			
+			$anchor = $tid.'n'.$n->nid;
+			
+			$items[] =  l($n->title,'faqlist/'.$tid, array("fragment" => $anchor,'attributes' => array('target' => '_top')));
+			
+		}
+		
+		$out .= '<div class="ruler-after">'.theme('item_list',$items).'</div>';
+		
+		$out .= '<p>'.l(t('Få mere hjælp'),'help',array('attributes' => array('target' => '_top '))).'</p>';
+		
+		return $out; 
+	}
+	
+	
+	
+  global $user;
+	//no user logged in
+  if(!$user->uid){
+    header('Location: /user/login/?'.drupal_get_destination().'&clean=1');
+    exit();
+  }
+  $userinfo = elib_user_get_cred();
+  
+  if(!$userinfo['user']){
+  	$out = '<h1 style="text-align:center;">Mangler eLIB tilknytning</h1>';
+  	$out .= t('<p>Der er ikke knyttet nogle elib informationer til den bruger du er logget ind med. Det er højstsansyneligt fordi du er logget ind som redaktør eller administrator. Hvis dette ikke er tilfældet, kontakt !email</p>',array('!email' => l('info@netlydbog.dk','info@netlydbog.dk')));
+  	
+  	return $out;
+  }
+	
+  $isbn = elib_get_isbn_from_object_id($tingObjectID);
+
+	// verify user
+  elib_client()->setLoaner($userinfo['cpr'],$userinfo['pin'],$userinfo['lib']);
+  
+  // kig om bogen allerede er lånt GetLibraryUserOrder
+  
+  // get all the books that are loaned!
+  $loans = elib_client()->getLoans();
+  
+  $loanlimit = time()+3600;
+  
+  if($loans->status->code == 101){
+  	$loanlimit = elib_str_to_time($loans->status->usersoundloansNexttime,true);
+  }
+  
+  $loans = $loans->data->orderitem;
+  
+  $alreadyloaned = false;
+  /*$loanlimit = 1000000000000;*/
+  if($loans){
+    $nob = sizeof($loans);
+		foreach($loans as $obj){
+			
+  /*    if($loanlimit > elib_str_to_time($obj->loanexpiredate,true)){
+        $loanlimit = elib_str_to_time($obj->loanexpiredate,true);
+      }
+		*/	 
+			 
+			if(trim($obj->book['idtype']) == 'ISBN'){
+			  if(trim($obj->book['id']) == $isbn){
+			  	
+			  	//krumo($obj);
+			  	
+			  	$response = elib_client()->GetUrl(intval($obj->retailerordernumber).'');
+			  	
+			  	// book is already loaned
+			  	$alreadyloaned = true;
+			  }	
+			}
+		}
+	}
+	// There is no loans after all??!?
+	/*if($loanlimit == 1000000000000){
+		$loanlimit = 3600;
+	}*/
+	if($alreadyloaned){
+		
+		$pretext = '<h1 style="text-align:center;">Din lydbog afspilles nu nedenfor</h1>';
+		$src = $response->data->downloadurl;
+		if($format != 'stream'){
+			$src = (trim($response->data[1]->files[0]->file));
+			global $base_root;
+			$pretext = '<h1 style="text-align:center;">Vi er ved at generere din lydbog.<br/> Vent venligst...</h1><div class="loader"></div><p>Vi er ved at pakke din lydbog til en fil</p><p>Når du har gemt filen, tryk næste</p>'.l('Næste',$base_root.request_uri(),array('query'=> 'downloaded=1','attributes' => array('class' => 'nextknap knap')));
+		}
+	
+		$content = $pretext;
+		
+    $content .= '<iframe src="'.$src.'" class="audioplayer-'.$format.'" frameborder="0" scrolling="no"></iframe>';
+	}
+	else{
+		#
+	 if(!$_GET['confirm']){
+    
+	 	global $base_root;
+    //krumo(request_uri());
+    
+	 	$loaned = $nob;
+	 	$max = elib_libraries_get_maxloans($userinfo['lib'])-$nob;
+	 	
+	 	$loaned = $loaned ? format_plural($loaned,'en lånt lydbog','@count lånte lydbøger'): t('ikke lånt nogen bøger');
+ 	
+    return '<h1 style="text-align:center;">Lån denne lydbog?</h1><p style="text-align:center;">'.t('Du har %loaned og kan pt. låne %max.',array('%loaned' => $loaned,'%max' => format_plural($max,'en mere', '@count til'))).'</p>'.l('Ok',$base_root.request_uri(),array('query'=> 'confirm=1','attributes' => array('class' => 'okknap'))).l('Fortryd',$base_root.request_uri(),array('attributes' => array('class' => 'annullerknap')));
+    
+   }
+		
+		
+		$response = elib_client()->makeLoan($isbn);
+		if($response->status->code == 120){
+		// else show cart
+		$libmax = elib_libraries_get_maxloans($userinfo['lib']);
+		//if($nob >= $libmax){
+			$diff = $loanlimit-time();
+			$days = floor($diff/86400);
+			
+			$rest = $diff % 86400;
+			
+			$hours = floor($rest/3600);
+			
+			$content  = t('<h1>Max grænse for lån opnået</h1>');
+		  $content .= t("<p>Du har allerede lånt %books og har derfor nået dit maximum</p><p>Læs mere om <a href='!link'>antal af lån</a> om måneden</p>",array('%books' => format_plural($nob, 'en bog', '@count bøger')));
+		  $content .= t('<p>Du kan låne en lydbog igen om</p><div class="timeleft"> %dage og %time</div>', array('%dage' => format_plural($days, 'en dag', '@count dage'),'%time' => format_plural($hours, 'en time', '@count timer')));
+		  $content .= '<p>'.netsound_cart_add_link($tingObjectID).'</p>';
+		  
+		  //$content .= 	t('<p>Lån igen om %s dage</p>',);
+		//}	
+		
+		}
+		else{
+			
+			//var_dump($response);
+			if($response->status->code == 101){
+			 $src = $response->data->downloadurl;
+			 $pretext = '<h1 style="text-align:center;">Din lydbog afspilles nu nedenfor</h1>';
+			if($format != 'stream'){
+       $src = (trim($response->data[1]->files[0]->file));
+       global $base_root;
+       $pretext = '<h1 style="text-align:center;">Vi er ved at generere din lydbog.<br/> Vent venligst...</h1><div class="loader"></div><p>Vi er ved at pakke din lydbog til en fil</p><p>Når du har gemt filen, tryk næste</p>'.l('Næste',$base_root.request_uri(),array('query'=> 'downloaded=1','attributes' => array('class' => 'nextknap knap')));
+      }
+      
+        $content = $pretext;
+			 $content .= '<iframe src="'.$src.'" class="audioplayer-'.$format.'" scrolling="no"></iframe>';
+			}
+			
+			
+		}
+		
+		//krumo($response );
+		// call create loan
+		// if loan show stream and create local
+		//$status = $response->status->code.': '.$response->status->message;
+	}
+	$status = $response->status->code.': '.$response->status->message;
+	//krumo($response);
+	
+	// hvis ikke bogen er lånt, så CreateLoan og opret lokal kopi i tabel elib_loan
+	
+	// ellers så hent lokal URL
+	if($response->status->code != 101){
+		$content .= '<div class="status" style="position:absolute;bottom:0;">Fejl: '.$status.'</div>';
+	}
+	
+	return $content;
+}
+
+function elib_str_to_time($str,$aststamp = false){
+	list($d,$t) = explode(" ",$str);
+	list($r['y'],$r['m'],$r['d']) = explode("-",$d);
+	list($r['h'],$r['i'],$r['s']) = explode(":",$t);
+	if($aststamp){
+		return mktime($r['h'],$r['i'],$r['s'],$r['m'],$r['d'],$r['y']);
+	}
+	return $r;
+}
+
+function elib_block($op = 'list', $delta = 0, $edit = array()) {
+  if ($op == 'list') {
+    return array(
+      'account' => array(
+        'info' => t('Login through eLib'),
+        'cache' => BLOCK_NO_CACHE,
+        'status' => 1,
+        'region' => 'account',
+      ),
+    );
+  }
+  elseif ($op == 'view' && $delta == 'account') {
+    global $user;
+    $block = array();
+
+    // If user is not logged in, display the login form.
+    if (!$user->uid) {
+      $block['content'] = drupal_get_form('user_login_block');
+    }
+    else {
+      $block['content'] = 'LOGIN HERE!';   
+    	
+      //$block['content'] = theme('alma_user_status_block', $status);
+    }
+
+    return $block;
+  }
+}
+
+
+
+/*init elib client as singleton */
+
+function elib_client(){
+	global $user;
+  static $client;
+  global $testuser;
+
+  if (!isset($client)) {
+    $path = drupal_get_path('module', 'elib');
+    include($path . '/lib/class.eLibClient.php');
+    $client = new eLibClient(variable_get('elib_language_code', ''));
+    $client->base_url = variable_get('elib_base_url_wsdl', '');
+  }
+  return $client;
+}
+
+function elib_login_validate($form, &$form_state) {
+  if (empty($form_state['values']['name']) || empty($form_state['values']['pass'])) {
+    // empty user name or password makes little sense to try and validate.
+    return;
+  }
+
+  // Remove everything from numbers from the “name” field to try and
+  // validate it as a library/borrower card.
+  $card = preg_replace('/\D+/', '', $form_state['values']['name']);
+
+  //var_dump($card);
+  //die();
+  
+  // Only try validation if we have 10 digits
+  if (strlen($card) == 10) {
+    $uid = elib_check_credentials($card, $form_state['values']['pass'],$form_state['values']['library']);
+
+    if ($uid && $account = user_load($uid)) {
+      global $user;
+      $user = $account;
+      user_authenticate_finalize($form_state['values']);
+
+      // If we have Alma credentials and a user was logged in, cache the
+      // credentials in our own cache bin.
+      //alma_user_cache_credentials($user, $form_state['values']['name'], $form_state['values']['pass']);
+    }
+  }
+}
+
+
+function elib_displaybook(TingClientObject $object,$elib_data = false){
+	
+	 $image_url = ting_covers_collection_url($object, '170_x');
+	
+	 $out[] = '<div class="picture">' . 
+      l(theme('image', $image_url, '', '', null, false), $object->url, array('html' => true)) .
+    '</div>';
+   if($elib_data->loanexpiredate){
+   	$loanlimit = elib_str_to_time($elib_data->loanexpiredate,true);
+   	$diff = $loanlimit-time();
+    $days = floor($diff/86400);
+    $loanperiod_class = 'long';
+    if($days < 14){
+    	$loanperiod_class = 'medium';
+    }
+    if($days < 7){
+      $loanperiod_class = 'short';
+    }
+    $out[] = '<div class="loanperiod '.$loanperiod_class.'">'.t('Lånet udløber om <div>%days',array('%days' => format_plural($days, 'en dag', '@count dage'))).'</div></div>';
+    
+   }
+	 $out[] = '<h3 class="title">' . 
+       l($object->title, $object->url, array('attributes' => array('class' =>'title'))) . 
+    '</h3>';
+   $out[] = '<div class="author">' .
+      t('By %creator_name%', array('%creator_name%' => $object->creators_string)) . 
+    '</div>';
+   $out[] = elib_get_rating($object->id);
+    $out[] = '<div class="icons">' .
+      l(theme('image', 'sites/all/themes/netsound/img/listen.png', '', '', null, false), $object->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.
+      l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $object->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .
+    '</div>';
+      
+  return implode($out);
+    
+}
+
+function elib_displaybookNEW($obj,$elib='',$displaysize=false){
+	if(!is_a($obj,'TingClientObject')){
+		return;
+	}
+	switch($displaysize){
+		case 'small':
+		case 'lorem':
+		case 'review':
+			$image_url = ting_covers_collection_url($obj, '70_x');
+			break;
+		case 'medium':
+		case 'textright':
+			$image_url = ting_covers_collection_url($obj, '170_x');
+			break;
+	}
+	$part['picture'] = '<div class="picture">' . l(theme('image', $image_url, $obj->title, $obj->title, null, false), $obj->url, array('html' => true)) . '</div>';
+  if($elib_data->loanexpiredate){
+    $loanlimit = elib_str_to_time($elib_data->loanexpiredate,true);
+    $diff = $loanlimit-time();
+    $days = floor($diff/86400);
+    $loanperiod_class = 'long';
+    if($days < 14){
+      $loanperiod_class = 'medium';
+    }
+    if($days < 7){
+      $loanperiod_class = 'short';
+    }
+    $part['loginexpire'] = '<div class="loanperiod '.$loanperiod_class.'">'.t('Lånet udløber om <div>%days',array('%days' => format_plural($days, 'en dag', '@count dage'))).'</div></div>';
+  }
+  
+  $part['rating'] = elib_get_rating($obj->id);
+  $part['title'] = '<h3 class="title">' . l($obj->title, $obj->url, array('attributes' => array('class' =>'title'))) . '</h3>';
+  $part['author'] = '<div class="author">' . t('By !creator_name', array('!creator_name' => l($obj->creators_string,'ting/search/'.$obj->creators_string))) . '</div>';
+  $part['icons'] = '<div class="icons">' . l(theme('image', 'sites/all/themes/netsound/img/listen.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .'</div>';
+   
+  if($displaysize == 'review'){
+  	
+  	$u = elib_user_get_cred($elib[1]);
+  	
+  	
+  		$part['text'] = '<div class="spacing-before" style="text-transform:uppercase;">Anmelder</div><div>'.$u['user'].'</div><div class="text"  style="margin-left:80px;"><p class="spacing-before">'.truncate_utf8($elib[0],400,true,true).' '.l('læs mere',$obj->url).'</p>';
+  	
+  	$part['icons'] = '<div class="">' . l(theme('image', 'sites/all/themes/netsound/img/listen.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .'</div>';
+  	$part['picture'] = '<div class="picture">' . l(theme('image', $image_url, $obj->title, $obj->title, null, false), $obj->url, array('html' => true)) . '</div>';
+  	$displaysize = 'small';
+  }
+  if($displaysize == 'textright'){
+  	if (!empty($obj->record['dc:contributor']['oss:dkind'])) {
+  	 foreach($obj->record['dc:contributor']['oss:dkind'] as $reader){
+        $readers[] = l($reader,'ting/search/'.$reader);
+      }
+      $extras = theme('item_list', $readers, t('Reader'), 'span', array('class' => 'contributor'));
+    }
+    if (!empty($obj->subjects)) {
+    	foreach($obj->subjects as $subject){
+        $subs[] = l($subject,'ting/search/'.$subject);
+      }
+      $extras .= theme('item_list', $subs, t('Subjects'), 'span', array('class' => 'subject'));
+    }
+    if (!empty($obj->record['dcterms:extent'][''])) {
+      $extras .= theme('item_list', $obj->record['dcterms:extent'][''], t('Extent'), 'span', array('class' => 'version'));
+    }
+    
+  	return '<div class="display-book '.$displaysize.' line">'.$part['picture'].$part['loginexpire'].$part['title'].$part['author'].$part['rating'].$part['icons'].$part['text'].$extras.'</div>';
+  }
+  if($elib['popular']){
+    if (!empty($obj->record['dc:contributor']['oss:dkind'])) {
+     foreach($obj->record['dc:contributor']['oss:dkind'] as $reader){
+        $readers[] = l($reader,'ting/search/'.$reader);
+      }
+      $extras = theme('item_list', $readers, t('Reader'), 'span', array('class' => 'contributor'));
+    }
+    if (!empty($obj->subjects)) {
+      foreach($obj->subjects as $subject){
+       $subs[] = l($subject,'ting/search/'.$subject);
+      }
+ //     $extras .= theme('item_list', $subs, t('Subjects'), 'span', array('class' => 'subject'));
+    }
+    if (!empty($obj->record['dcterms:extent'][''])) {
+      //$extras .= theme('item_list', $obj->record['dcterms:extent'][''], t('Extent'), 'span', array('class' => 'version'));
+    }
+        
+    $part['icons'] = '<div class="icons">' . l(theme('image', 'sites/all/themes/netsound/img/listen.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .'</div>';
+  }
+  $part['icons'] = '<div class="icons">'.$part['rating'].$part['icons'].'</div>';
+  return '<div class="display-book '.$displaysize.' line ruler-after">'.$part['picture'].$part['loginexpire'].$part['title'].$part['author'].$part['icons'].$part['text'].'<div style="margin-left:80px;">'.$extras.'</div></div>';
+  
+}
+function dummy_lorem($numberofwords=100){
+	$words = explode(' ','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam aliquet risus vitae purus rutrum tincidunt. Vivamus consectetur enim quam, ac viverra felis. Cras vitae urna id tortor suscipit rutrum quis vel metus. Nullam vulputate rhoncus diam, ultricies bibendum nulla aliquam sit amet.');
+  for($i=0;$i<$numberofwords;$i++){
+  	$new[] = $words[array_rand($words)];
+  }
+  return implode(' ',$new);
+	
+}
+
+function elib_display_error($error){
+	// singleton display error 
+	static $isset;
+	
+	if(!$isset){
+		drupal_set_message(t('Oops! We cound\'nt connect to the library').'<div class="spec" style="font-size:.7em">'.$error->getMessage().'</div>','error');
+		$isset = true;
+	}
+	
+}
+
+function elib_get_rating($objectid){
+	
+	/* if node dosent exist, there is no rating, skip this function */
+  if(!$n = node_load(array('title' => $objectid,'type' => 'bookrating'))){
+  	return;
+  }
+	
+  $c = node_build_content($n,true);
+  
+  return $c->content['fivestar_widget']['#value'];
+}
+
+function elib_displaybook2(TingClientObject $obj,$fields,$settings='',$displaysize=false){
+	$elib_data = $settings['elib'];
+  switch($displaysize){
+    case 'small':
+    case 'lorem':
+    case 'review':
+      $image_url = ting_covers_collection_url($obj, '70_x');
+      break;
+    case 'medium':
+    case 'textright':
+      $image_url = ting_covers_collection_url($obj, '170_x');     
+      break;
+  }
+  $part['picture'] = '<div class="picture">' . l(theme('image', $image_url, '', '', null, false), $obj->url, array('html' => true)) . '</div>';
+  if($elib_data->loanexpiredate){
+    $loanlimit = elib_str_to_time($elib_data->loanexpiredate,true);
+    $diff = $loanlimit-time();
+    $days = floor($diff/86400);
+    $loanperiod_class = 'long';
+    if($days < 15){
+      $loanperiod_class = 'medium';
+    }
+    if($days < 5){
+      $loanperiod_class = 'short';
+    }
+    $part['loginexpire'] = '<div class="loanperiod '.$loanperiod_class.'">'.t('Lånet udløber om <div>%days',array('%days' => format_plural($days, 'en dag', '@count dage'))).'</div></div>';
+  }
+
+  $part['title'] = '<h3 class="title">' . l($obj->title, $obj->url, array('attributes' => array('class' =>'title'))) . '</h3>';
+  $part['author'] = '<div class="author">' . t('By !creator_name', array('!creator_name' => l($obj->creators_string,'ting/search/'.$obj->creators_string))) . '</div>';
+  $part['icons'] = '<div class="icons">' . l(theme('image', 'sites/all/themes/netsound/img/listen.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .'</div>';
+   
+  if($displaysize == 'review'){
+    
+    $u = elib_user_get_cred($elib[1]);
+    
+    
+      $part['text'] = '<div class="spacing-before" style="text-transform:uppercase;">Anmelder</div><div>'.$u['user'].'</div><div class="text"  style="margin-left:80px;"><p class="spacing-before">'.truncate_utf8($elib[0],400,true,true).' '.l('læs mere',$obj->url).'</p>';
+    
+    $part['icons'] = '<div class="iconsnoheight">' . l(theme('image', 'sites/all/themes/netsound/img/listen.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .'</div>';
+    $part['picture'] = '<div class="picture">' . l(theme('image', $image_url, '', '', null, false), $obj->url, array('html' => true)) . '</div>';
+    $displaysize = 'small';
+  }
+  if($displaysize == 'textright'){
+    if (!empty($obj->record['dc:contributor']['oss:dkind'])) {
+     foreach($obj->record['dc:contributor']['oss:dkind'] as $reader){
+        $readers[] = l($reader,'ting/search/'.$reader);
+      }
+      $extras = theme('item_list', $readers, t('Reader'), 'span', array('class' => 'contributor'));
+    }
+    if (!empty($obj->subjects)) {
+      foreach($obj->subjects as $subject){
+        $subs[] = l($subject,'ting/search/'.$subject);
+      }
+      $extras .= theme('item_list', $subs, t('Subjects'), 'span', array('class' => 'subject'));
+    }
+    if (!empty($obj->record['dcterms:extent'][''])) {
+      $extras .= theme('item_list', $obj->record['dcterms:extent'][''], t('Extent'), 'span', array('class' => 'version'));
+    }
+    
+    return '<div class="display-book '.$displaysize.' line">'.$part['picture'].$part['loginexpire'].$part['title'].$part['author'].$part['icons'].$part['text'].$extras.'</div>';
+  }
+  
+  return '<div class="display-book '.$displaysize.' line ruler-after">'.$part['picture'].$part['loginexpire'].$part['title'].$part['author'].$part['icons'].$part['text'].'</div>';
+  
+}
+
+
+
+?>
