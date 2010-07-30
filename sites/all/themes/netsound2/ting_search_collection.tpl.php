@@ -23,7 +23,7 @@ foreach ($collection->objects as $obj){
 //krumo::defines();
 
 
-krumo($collection);
+//krumo($collection);
 
 //krumo($lydbogObj);
 
