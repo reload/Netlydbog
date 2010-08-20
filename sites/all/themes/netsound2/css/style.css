@@ -502,12 +502,15 @@ body.front .messageouter{
 	
 }
 
-
+.pane-latest-news-panel-pane-1 a{
+	text-transform:uppercase;
+}
 
 /* questions */
 
 .view-promoted-questions h3{
 	font-weight:bold;
+	text-transform:uppercase;
 }
 .view-promoted-questions li{
 	list-style-type:disc;
