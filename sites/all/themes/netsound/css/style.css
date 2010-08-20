@@ -264,9 +264,11 @@ ul li a.active:hover, ul li a:hover {
 #site-name a {
   color: #439ec1;
 }
-
-
-
 .clear-box {
   clear: both;
+}
+
+
+.size1of2{
+	width:49.99%;
 }
