@@ -5,6 +5,10 @@
  * @file
  * Template to render a Ting collection of books.
  */
+
+
+
+$alttext = t('@titel af @forfatter',array('@titel' => $collection->title, '@forfatter' => $collection->creators_string));
 ?>
 <li class="unit size1of5">
   <div class="inner display-book">
@@ -20,7 +24,7 @@
 
       <?php if (strpos($image_url,'imagecache')): ?>
       <div class="picture">
-        <?php print l(theme('image', $image_url, $collection->title, $collection->title, null, false), $collection->url, array('html' => true)); ?>
+        <?php print l(theme('image', $image_url, $alttext, $alttext , null, false), $collection->url, array('html' => true)); ?>
       </div>
       <?php else: ?>
       <div class="picture nopicture">

@@ -27,6 +27,8 @@ foreach ($collection->objects as $obj){
 
 //krumo($lydbogObj);
 
+$alttext = t('@titel af @forfatter',array('@titel' => $lydbogObj->title, '@forfatter' => $lydbogObj->creators_string));
+
 ?>
 
 
@@ -35,7 +37,7 @@ foreach ($collection->objects as $obj){
       <?php $image_url = ting_covers_collection_url($lydbogObj, '80_x'); ?>
       <?php if ($image_url) { ?>
         <div class="inner left">
-        <?php print l(theme('image', $image_url, $lydbogObj->title, $lydbogObj->title, null, false), $lydbogObj->url, array('html' => true)); ?>
+        <?php print l(theme('image', $image_url, $alttext, $alttext, null, false), $lydbogObj->url, array('html' => true)); ?>
         </div>
       <?php } ?>
     </div>
