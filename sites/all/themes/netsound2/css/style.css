@@ -288,7 +288,7 @@ h2.pane-title, h1.header, body.clean h1{
 	font-size:1.6em;
 	color:#666666;
 	border-bottom: 1px dashed #999999;
-	padding: 0 0 0.5em 0;
+	padding: 0 0 0.2em 0;
 	margin: 0.5em 0;
 	text-transform:uppercase;
 }
@@ -827,4 +827,12 @@ div.fivestar-widget div.hover a {
 
 .size1of2{
 	width:49.99%;
+}
+.page-ting #ting-search-results{
+	margin-top:20px;
+}
+
+.page-ting #ting-search-results #ting-search-summary{
+	font-weight:bold;
+	text-transform:uppercase;
 }

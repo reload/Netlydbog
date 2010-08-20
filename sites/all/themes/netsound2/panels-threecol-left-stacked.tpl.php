@@ -34,7 +34,7 @@
   <?php endif; ?>
 
 <?php if (!empty($content['top']) || !empty($content['left']) || !empty($content['middle']) || !empty($content['bottom'])): ?>
-  <div class="left-wrapper">
+  <div class="left-wrapper clear-block">
 
     <?php if (!empty($content['left'])): ?>
       <div class="panel-col left">

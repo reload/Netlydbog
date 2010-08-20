@@ -7,3 +7,11 @@ body.page-frontpage{
 #ting-search-form input.form-submit{
 	padding:1px;
 }
+
+
+.display-book .title a{
+	font-weight:bold;
+}
+h2.pane-title, h1.header, body.clean h1 {
+	font-weight:bold;
+}
