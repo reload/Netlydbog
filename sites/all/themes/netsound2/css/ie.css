@@ -15,3 +15,7 @@ body.page-frontpage{
 h2.pane-title, h1.header, body.clean h1 {
 	font-weight:bold;
 }
+
+#ting-search-summary .count{
+	padding-right:5px;
+}

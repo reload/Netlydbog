@@ -790,6 +790,10 @@ ul.pager li{
 
 /* fivestar */
 
+.fivestar-static-form-item{
+	margin-bottom:5px;
+}
+
 .display-book.small .fivestar-static-form-item{
 	float:left;
 	margin-right:10px;

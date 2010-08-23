@@ -382,11 +382,18 @@ function elib_login_validate($form, &$form_state) {
   // validate it as a library/borrower card.
   $card = preg_replace('/\D+/', '', $form_state['values']['name']);
 
-  //var_dump($card);
-  //die();
+  // if local user exists and no elibuser things exists then ask elib
+  
+  $account = user_authenticate($form_state['values']);
+  $elib = elib_user_get_cred($account->uid); 
+  $localuser = false;
+  
+  if($account && !($elib['user'])){
+  	$localuser = true;
+  }
   
   // Only try validation if we have 10 digits
-  if (strlen($card) == 10) {
+  if (!$localuser) {
     $uid = elib_check_credentials($card, $form_state['values']['pass'],$form_state['values']['library']);
 
     if ($uid && $account = user_load($uid)) {

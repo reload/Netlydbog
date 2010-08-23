@@ -1,5 +1,23 @@
 jQuery(function($){
 	
+	//$('.view-faq .unit:even').before('<span style="margin:5px;background:red" class="clear-block">');//.children('.inside2').css('padding-right','5px'); 
+	//$('.view-faq .unit:odd').after('</span>');//.children('.inside2').css('padding-left','5px');
+
+	$('.view-faq .unit').each(function(i){
+		//if(console){
+			//console.log(i%2);
+		//}
+		if(!(i%2)){
+			$('.view-faq .view-content').append('<div class="line clear-block"></div>');
+			$(this).children('.inside2').css('padding-right','5px'); 
+		}
+		else{
+			$(this).children('.inside2').css('padding-left','5px');
+		}
+		$('.view-faq .view-content div.line:last').append($(this));
+	});
+	
+	
 	$('.feature-tab:not(:first)').parent().hide();
 	$('a.tab:first').addClass('active');
 	readpictureheight(0);	
@@ -111,12 +129,7 @@ jQuery(function($){
 
 
 	 /*quirks */
-	 
-	 
-	 
-	 $('.view-faq .unit:even').before('<div class="line">').children('.inside2').css('padding-right','5px'); 
-	 $('.view-faq .unit:odd').after('</div">').children('.inside2').css('padding-left','5px');
-
+	 	 
 	 $('.view-faq .unit').each(function(){
 		 link = $(this).find('div.tid');
 		 $(this).find('div.tid').remove();

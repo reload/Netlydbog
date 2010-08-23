@@ -45,9 +45,9 @@ class eLibClient{
 	public function setLoaner($cardno,$pin,$lib){
 		$this->retailerid = $lib;
 		$this->retailerkeycode = elib_libraries_get_library_keycode($lib);
-		if(strlen($cardno)>9){
+		//if(strlen($cardno)>9){
 		  $this->elibUsr = new loaner($cardno,$pin);	
-		}
+		//}
 	}
 	
 	public function validateUser(){

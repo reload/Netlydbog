@@ -45,7 +45,11 @@ $n = node_build_content($n);
   <div class="icons">
         <?php print l(theme('image', 'sites/all/themes/netsound2/img/listen.png', '', '', null, false), $object->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) ?>
         <?php print l(theme('image', 'sites/all/themes/netsound2/img/fetch.png', '', '', null, false), $object->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe')))?>
-        <?php print l(theme('image', 'sites/all/themes/netsound2/img/husk.png', '', '', null, false), $object->url.'/huskeliste?'.drupal_get_destination(), array('html' => true))?>
+        <?php 
+        if($user->uid){
+        	print l(theme('image', 'sites/all/themes/netsound2/img/husk.png', '', '', null, false), $object->url.'/huskeliste?'.drupal_get_destination(), array('html' => true));
+        }
+        ?>
       </div>
   
   
