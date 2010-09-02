@@ -120,8 +120,10 @@ if ($op == 'list') {
       
       $out = array();
       module_load_include('client.inc', 'ting');
-	$loans = $loans->data;      
-
+	    $loans = $loans->data;
+	    elib_user_cleanuploans($loans->orderitem);
+	    
+	
         if ($loans->orderitem) {
   	      foreach($loans->orderitem as $book){  
   	        $object = ting_get_object_by_isbn(trim($book->book->attributes()->id));
@@ -150,5 +152,16 @@ if ($op == 'list') {
     return $block;
   }
 	
-} 
+}
+
+function elib_user_cleanuploans(&$loans){
+	$count = sizeof($loans);
+	for($i = $count-1 ; $i >= 0; $i--){
+  	$id = $loans[$i]->orderstatus['id'];
+  	$expiredate = $loans[$i]->loanexpiredate;
+  	if((intval($id) != 1) || (strtotime($expiredate) < time())){
+  		unset($loans[$i]);
+  	}
+  }
+}
 ?>
