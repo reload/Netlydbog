@@ -102,9 +102,7 @@ function isbn13to10($str){
   else if ($checksum == 11)
     $isbn10 += "0k";
   else
-    $isbn10 .= $checksum;
-  print $isbn10;
-  
+    $isbn10 .= $checksum; 
   return $isbn10;
 }
 
