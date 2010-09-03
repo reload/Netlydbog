@@ -83,13 +83,44 @@ function elib_form_alter(&$form, $form_state, $form_id) {
   }
 }
 
+function isbn13to10($str){
+	$isbn13 = $str;
+  $isbn13 = trim($isbn13);
+  $isbn13 = str_replace("-","",$isbn13);
+  $isbn13 = str_replace(" ","",$isbn13);
+  $isbn10 = substr($isbn13,3,9);
+  $checksum = 0;
+  $weight = 10;
+  $isbnCharArray = str_split($isbn10);
+  foreach($isbnCharArray as $char) {
+  $checksum += $char * $weight;
+  $weight--;
+  }
+  $checksum = 11-($checksum % 11);
+  if ($checksum == 10)
+    $isbn10 += "X";
+  else if ($checksum == 11)
+    $isbn10 += "0k";
+  else
+    $isbn10 .= $checksum;
+  print $isbn10;
+  
+  return $isbn10;
+}
+
+
 function elib_get_isbn_from_object_id($oid){
   module_load_include('client.inc', 'ting');
   try {
     $object = ting_get_object_by_id($oid);
-    $eliburl = $object->record['dc:identifier']['dcterms:URI'][0];
+    
+    //var_dump($object);
+    
+    $isbn = isbn13to10($object->record['dc:identifier']['dkdcplus:ISBN'][0]);
+    
+    /*$eliburl = $object->record['dc:identifier']['dcterms:URI'][0];
     $first = substr($eliburl,strpos($eliburl,'&id=')+4);
-    $isbn = trim(substr($first,0,strpos($first,'&lib')));
+    $isbn = trim(substr($first,0,strpos($first,'&lib')));*/
   }
   catch (TingClientException $e) {
     // If the specified object id does not exist, an exception is throw.
@@ -178,6 +209,9 @@ function elib_get_lydbog($tingObjectID,$format){
   
   $alreadyloaned = false;
   /*$loanlimit = 1000000000000;*/
+  
+ // var_dump($loans);
+  
   if($loans){
     $nob = sizeof($loans);
 		foreach($loans as $obj){
@@ -189,8 +223,6 @@ function elib_get_lydbog($tingObjectID,$format){
 			 
 			if(trim($obj->book['idtype']) == 'ISBN'){
 			  if(trim($obj->book['id']) == $isbn){
-			  	
-			  	//krumo($obj);
 			  	
 			  	$response = elib_client()->GetUrl(intval($obj->retailerordernumber).'');
 			  	
