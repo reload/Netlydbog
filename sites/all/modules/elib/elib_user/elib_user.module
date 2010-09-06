@@ -122,13 +122,11 @@ if ($op == 'list') {
       module_load_include('client.inc', 'ting');
 	    $loans = $loans->data;
 	    elib_user_cleanuploans($loans->orderitem);
-	    
 	
         if ($loans->orderitem) {
   	      foreach($loans->orderitem as $book){  
   	        $object = ting_get_object_by_isbn(trim($book->book->attributes()->id));
-  	        //krumo($object);
-  	        $bookdisplay = elib_displaybook($object,$book);
+ 	          $bookdisplay = elib_displaybook($object,$book);
   	        if(sizeof($loans->orderitem) > 4){
   	        	$size = 4;
   	        }
