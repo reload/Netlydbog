@@ -128,7 +128,7 @@ function netsound_review_block($op = 'list', $delta = 0) {
       
       	
       	if($review = cache_get('litteratursiden_'.$tingid)){
-      		$review = $review->data;
+			$review = $review->data;
       	}
       	else{
       	
@@ -138,15 +138,20 @@ function netsound_review_block($op = 'list', $delta = 0) {
 	      	$str = 'http://litteratursiden.dk/service/netlydbog?author='.urlencode(trim($obj->creators_string)).'&title='.urlencode(trim($obj->title));
 	        
 	      	//dsm($str);
-	      	
-	      	$json = @file_get_contents($str);
-	      	
-	      	//var_dump($json);
-	      	
-	      	$review = json_decode($json,true);
-	      	
+	      	//$json = @file_get_contents($str); // removed as it's unsecure and not allowed on the production server
 	      
-       	  cache_set('litteratursiden_'.$tingid, $review, 'cache',time()+(86400*30));
+			$request = drupal_http_request($str);
+			$json = $request->data;
+     		
+			if(!empty($json)) {
+				$review = json_decode($json,true);
+			}
+	      	
+			if(is_array($review))
+			{
+       	  		cache_set('litteratursiden_'.$tingid, $review, 'cache',time()+(86400*30));				
+			}
+
       	}
       	
          if($review['error']){
