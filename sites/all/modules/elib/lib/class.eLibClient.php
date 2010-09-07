@@ -134,7 +134,8 @@ public function getPopularBooks(){
 	  	$params['ebookid'] = $ebookid;
 	  	$params['format'] = '230';
 	  	$params['mobipocketid'] = '';
-	  		  	
+
+		//watchdog('elib', 'eLib SOAP (makeLoan): “@message”', array('@message' => var_export($params,true), WATCHDOG_DEBUG));
 	  	$response = $this->soapCall($this->base_url.'createloan.asmx?WSDL','CreateLoan',$params);
 	  	 	 	
 	  	$xml = simplexml_load_string($response->CreateLoanResult->any);
@@ -195,12 +196,14 @@ public function getPopularBooks(){
     }
     try{
       $request = @new SoapClient($wsdl,$this->sc_params);
-      return ($request->$func($params));
+      $response = $request->$func($params);
+	//	var_dump($request->__getLastRequest());
+		return $response;
     }
     catch(Exception $e){
       elib_display_error($e);
-    	//	print ('Der er sket en fejl i forbindelsen med eLib: '. $e->getMessage());
-     // watchdog('elib', 'eLib SOAP: “@message”', array('@message' => $e->getMessage(), WATCHDOG_ERROR));
+    	//print ('Der er sket en fejl i forbindelsen med eLib: '. $e->getMessage());
+     	//watchdog('elib', 'eLib SOAP: “@message”', array('@message' => $e->getMessage(), WATCHDOG_ERROR));
     }
   }
 }
