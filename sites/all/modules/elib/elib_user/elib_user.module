@@ -153,13 +153,15 @@ if ($op == 'list') {
 }
 
 function elib_user_cleanuploans(&$loans){
-	$count = sizeof($loans);
-	for($i = $count-1 ; $i >= 0; $i--){
-  	$id = $loans[$i]->orderstatus['id'];
-  	$expiredate = $loans[$i]->loanexpiredate;
-  	if((intval($id) != 1) || (strtotime($expiredate) < time())){
-  		unset($loans[$i]);
-  	}
-  }
+    if($loans instanceof SimpleXMLElement) {
+    	$count = sizeof($loans);
+    	for($i = $count-1 ; $i >= 0; $i--){
+          	$id = $loans[$i]->orderstatus['id'];
+          	$expiredate = $loans[$i]->loanexpiredate;
+          	if((intval($id) != 1) || (strtotime($expiredate) < time())){
+          		unset($loans[$i]);
+          	}
+        }
+    }
 }
 ?>
