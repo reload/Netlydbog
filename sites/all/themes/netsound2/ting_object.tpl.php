@@ -38,7 +38,7 @@ $n = node_build_content($n);
     </div>
   <?php else: ?>
     <div class="inner left nopicture" style="height:270px;margin-bottom:10px;">
-      
+      <?php print theme('image', $image_url, $object->title, $object->title, null, false); ?>
     </div>
   <?php endif;?>
   
