@@ -40,16 +40,27 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
     		
 	    		foreach($response->data->toplistitem as $item){
 	    			
-	    			//print $item['ebookid'].'--';
-	    			if(ting_get_object_by_isbn(trim($item->ebookid))){
-	    				$out .= elib_displaybookNEW(ting_get_object_by_isbn(trim($item->ebookid)),'','small');
-	    			}
-	    			if($out == ''){
-	    				$out = t('Der er ingen nye bøger');
-	    			}
+	    		  $isbn = trim($item->ebookid);
+	    		  
+	    		  
+	    		  $title = (trim($item->title));
+	    		  
+	    		  //krumo(array($isbn,$title));
+	    		  
+	    		  if(ting_get_object_by_isbn($isbn)){
+	    		    $toplist[] = $isbn;
+	    		    krumo('hurray'.$isbn);
+	    		  }
+	    		  if(sizeof($toplist) == 5){
+	    		    break;
+	    		  }
 	    		}
-    		 
-    		$block['subject'] = t('Nyeste bøger');
+	    		if(is_array($toplist)){  
+  	    		foreach($toplist as $isbn){
+  	    		 	$out .= elib_displaybookNEW(ting_get_object_by_isbn($isbn),'','small'); 
+  	    		}
+	    		}
+    		  $block['subject'] = t('Nyeste bøger');
     		break;
     	case 2:
     		$response = elib_client()->getPopularBooks();

@@ -70,10 +70,10 @@ class eLibClient{
 		}
   }
   public function getNewBooks(){
-  	$params['top'] = 5;
+  	$params['top'] = 100;
   	$params['listtype'] = 1;
-  	$params['fromdate'] = date('Y-m-d',time()-12592000);
-  	
+  	$params['fromdate'] = date('Y-m-d',time()-22592000);
+
   	$response = $this->soapCall($this->base_url.'getlibrarylist.asmx?WSDL','GetNewBooks',$params);
   	
   	$xml = array();
@@ -194,6 +194,8 @@ public function getPopularBooks(){
     if(is_array($ext_params)){
       $params = array_merge($params,$ext_params);
     }
+    //krumo($params);
+    
     try{
       $request = @new SoapClient($wsdl,$this->sc_params);
       $response = $request->$func($params);
