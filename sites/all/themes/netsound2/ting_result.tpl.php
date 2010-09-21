@@ -7,6 +7,19 @@
                       '!count' => '<span class="count"></span>',
                     )); ?>
 </div>
+
+<div id="ting-sort-by">
+
+<?php print t('Sorter efter ')?>
+<select class="sort-by-selector">
+  <option value=""><?php print t('Relevans')?></option>
+  <option value="title_ascending"><?php print t('Titel')?></option>
+  <option value="creator_ascending"><?php print t('Forfatter')?></option>
+  <option value="date_descending"><?php print t('Udgivelses år')?></option>
+</select>
+
+</div>
+
 <div id="ting-search-result">
   <ul>
   </ul>
