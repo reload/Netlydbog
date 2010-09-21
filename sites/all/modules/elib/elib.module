@@ -460,6 +460,7 @@ function elib_displaybookNEW($obj,$elib='',$displaysize=false){
 	}
 	switch($displaysize){
 		case 'small':
+		case 'small_rm':
 		case 'lorem':
 		case 'review':
 			$image_url = ting_covers_collection_url($obj, '70_x');
@@ -468,7 +469,7 @@ function elib_displaybookNEW($obj,$elib='',$displaysize=false){
 		case 'textright':
 			$image_url = ting_covers_collection_url($obj, '170_x');
 			break;
-	}
+	}	
 	//dsm($obj);
 	$alttext = t('@titel af @forfatter',array('@titel' => $obj->title, '@forfatter' => $obj->creators_string));
 	$part['picture'] = '<div class="picture">' . l(theme('image', $image_url, $alttext, $alttext, null, false), $obj->url, array('html' => true)) . '</div>';
@@ -517,7 +518,7 @@ function elib_displaybookNEW($obj,$elib='',$displaysize=false){
     }
     if (!empty($obj->record['dcterms:extent'][''])) {
       $extras .= theme('item_list', $obj->record['dcterms:extent'][''], t('Extent'), 'span', array('class' => 'version'));
-    }
+    }    
     
   	return '<div class="display-book '.$displaysize.' line">'.$part['picture'].$part['loginexpire'].$part['title'].$part['author'].$part['rating'].$part['icons'].$part['text'].$extras.'</div>';
   }
@@ -539,6 +540,11 @@ function elib_displaybookNEW($obj,$elib='',$displaysize=false){
     }
         
     $part['icons'] = '<div class="icons">' . l(theme('image', 'sites/all/themes/netsound/img/listen.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .'</div>';
+  }
+  if($displaysize == 'small_rm'){
+    $displaysize = 'small';
+    $part['icons'] = '<div class="">' . l(theme('image', 'sites/all/themes/netsound/img/listen.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.l(theme('image', 'sites/all/themes/netsound2/img/remove.png', '', '', null, false), $obj->url.'/huskeliste/fjern?'.drupal_get_destination(), array('html' => true)) .'</div>';
+    
   }
   $part['icons'] = '<div class="icons">'.$part['rating'].$part['icons'].'</div>';
   return '<div class="display-book '.$displaysize.' line ruler-after">'.$part['picture'].$part['loginexpire'].$part['title'].$part['author'].$part['icons'].$part['text'].'<div style="margin-left:80px;">'.$extras.'</div></div>';

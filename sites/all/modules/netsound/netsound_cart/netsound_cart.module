@@ -8,17 +8,24 @@ function netsound_cart_menu(){
 	
 	$items['ting/object/%/huskeliste'] = array(
 	 'title' => t('Tilføj til huskeliste'),
-    'page callback' => 'netsound_cart_add',
-    'page arguments' => array(2),
+    'page callback' => 'netsound_cart_modify',
+    'page arguments' => array(2,'add'),
     'access arguments' => array('access content'),
 	);
+	$items['ting/object/%/huskeliste/fjern'] = array(
+	 'title' => t('Fjern fra huskeliste'),
+    'page callback' => 'netsound_cart_modify',
+    'page arguments' => array(2,'rm'),
+    'access arguments' => array('access content'),
+	);
+	
 	return $items;
 }
 
 /*
  * page callback used in hook_menu();
  */
-function netsound_cart_add($tingid){
+function netsound_cart_modify($tingid,$mode){
   global $user;
 	
 	if($user->uid != 0){
@@ -31,8 +38,17 @@ function netsound_cart_add($tingid){
         'uid' => $user->uid,
         'ting_object_id' => $tingObj->id,
       );
-			drupal_write_record('netsound_cart',$params);
-	    drupal_set_message(t('!book er nu tilføjet din huskeliste',array('!book' => l($tingObj->title,'ting/object/'.$tingObj->id))));
+      switch($mode){
+        case 'add':
+          drupal_write_record('netsound_cart',$params);
+    	    drupal_set_message(t('!book er nu tilføjet din huskeliste',array('!book' => l($tingObj->title,'ting/object/'.$tingObj->id))));
+    	    break;
+        case 'rm':
+          unset($params['tstamp']);
+          db_query('DELETE from {netsound_cart} WHERE uid = %s AND ting_object_id = "%s"',$user->uid,$tingObj->id);
+    	    drupal_set_message(t('!book er nu fjernet fra din huskeliste',array('!book' => l($tingObj->title,'ting/object/'.$tingObj->id))));
+          break;  
+      }
 	    drupal_goto();	
 		}		
 	}
@@ -64,7 +80,7 @@ function netsound_cart_block($op = 'list', $delta = 0, $edit = array()) {
         $block['subject'] = t('Min huske liste');
         $res = db_query('SELECT DISTINCT ting_object_id, uid FROM {netsound_cart} WHERE uid = %d',array('%d' => $user->uid));
         while($row = db_fetch_array($res)){
-        	$rows[] = elib_displaybookNEW(ting_get_object_by_id($row['ting_object_id']),'','small');
+        	$rows[] = elib_displaybookNEW(ting_get_object_by_id($row['ting_object_id']),'','small_rm');
         }
         //var_dump($rows);
         
