@@ -306,7 +306,7 @@ function elib_get_lydbog($tingObjectID,$format){
 		// if loan show stream and create local
 		//$status = $response->status->code.': '.$response->status->message;
 	}
-	$status = $response->status->code.': '.$response->status->message;
+	$status = t($response->status->code.': '.$response->status->message);
 	//krumo($response);
 	
 	// hvis ikke bogen er lånt, så CreateLoan og opret lokal kopi i tabel elib_loan
@@ -558,7 +558,7 @@ function elib_display_error($error){
 	static $isset;
 	
 	if(!$isset){
-		drupal_set_message(t('Oops! We cound\'nt connect to the library').'<div class="spec" style="font-size:.7em">'.$error->getMessage().'</div>','error');
+		drupal_set_message(t('Oops! We cound\'nt connect to the library').'<div class="spec" style="font-size:.7em">'.t($error->getMessage()).'</div>','error');
 		$isset = true;
 	}
 	
