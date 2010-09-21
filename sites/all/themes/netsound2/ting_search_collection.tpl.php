@@ -79,7 +79,7 @@ $alttext = t('@titel af @forfatter',array('@titel' => $lydbogObj->title, '@forfa
     </div>
     <div class="moreinfo unit lastUnit">
       <div class="inner right">
-    <?php if ($collection->abstract) : ?>
+    
       <div class="abstract">
         <?php print check_plain($collection->abstract); ?>
       </div>
@@ -90,5 +90,5 @@ $alttext = t('@titel af @forfatter',array('@titel' => $lydbogObj->title, '@forfa
    
       </div>
     </div>
-    <?php endif; ?>
+    
   </li>
