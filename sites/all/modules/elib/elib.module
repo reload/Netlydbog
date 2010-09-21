@@ -177,7 +177,9 @@ function elib_get_lydbog($tingObjectID,$format){
   }
     
   $loans = $loans->data->orderitem;
-  elib_user_cleanuploans($loans);
+  if(sizeof($loans)){
+    elib_user_cleanuploans($loans);
+  }
   
   $alreadyloaned = false;
   /*$loanlimit = 1000000000000;*/
@@ -238,7 +240,7 @@ function elib_get_lydbog($tingObjectID,$format){
       $hours = floor($rest/3600);
       
       $content  = t('<h1>Max grænse for lån opnået</h1>');
-      $content .= t("<p>Du har allerede lånt %books og har derfor nået dit maximum</p><p>Læs mere om <a href='!link'>antal af lån</a> om måneden</p>",array('%books' => format_plural($nob, 'en bog', '@count bøger')));
+      $content .= t("<p>Du har allerede lånt %books og har derfor nået dit maximum</p><p>Læs mere om <a href='!link' target='_top'>antal af lån</a> om måneden</p>",array('%books' => format_plural($nob, 'en bog', '@count bøger'),'!link' => '/node/5175'));
       $content .= t('<p>Du kan låne en lydbog igen om</p><div class="timeleft"> %dage og %time</div>', array('%dage' => format_plural($days, 'en dag', '@count dage'),'%time' => format_plural($hours, 'en time', '@count timer')));
       $content .= '<p>'.netsound_cart_add_link($tingObjectID).'</p>';
       
