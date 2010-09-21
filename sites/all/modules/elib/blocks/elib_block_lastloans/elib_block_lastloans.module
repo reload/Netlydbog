@@ -41,15 +41,13 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
 	    		foreach($response->data->toplistitem as $item){
 	    			
 	    		  $isbn = trim($item->ebookid);
-	    		  
-	    		  
 	    		  $title = (trim($item->title));
 	    		  
 	    		  //krumo(array($isbn,$title));
 	    		  
 	    		  if(ting_get_object_by_isbn($isbn)){
 	    		    $toplist[] = $isbn;
-	    		    krumo('hurray'.$isbn);
+	    		  //  krumo('hurray'.$isbn);
 	    		  }
 	    		  if(sizeof($toplist) == 5){
 	    		    break;

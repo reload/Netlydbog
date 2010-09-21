@@ -194,7 +194,6 @@ public function getPopularBooks(){
     if(is_array($ext_params)){
       $params = array_merge($params,$ext_params);
     }
-    //krumo($params);
     
     try{
       $request = @new SoapClient($wsdl,$this->sc_params);

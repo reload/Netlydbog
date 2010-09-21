@@ -31,9 +31,9 @@ function elib_check_credentials($cardno,$pin,$lib){
   $elibid = elib_user_elib_id($cardno);
   
 // Check if user exists.
-  $uid = db_result(db_query("SELECT uid FROM {elib_user} WHERE elib_id = '%s';", $elibid));
+  $uid = db_result(db_query("SELECT uid FROM {elib_user} WHERE elib_id='%s';", $elibid));
   if ($uid) {
-  	db_query("UPDATE {elib_user} SET elib_library = %d WHERE elib_id = '%s' ;",$lib,$elibid);
+  	db_query("UPDATE {elib_user} SET elib_library = %d WHERE elib_id='%s';",$lib,$elibid);
   	
   	
     //$account = user_load($uid);
@@ -106,7 +106,6 @@ if ($op == 'list') {
   elseif ($op == 'view' && $delta == 'account') {
     //global $user;
     $block = array();
-     
     
     $userinfo = elib_user_get_cred();
       // verify user
@@ -124,7 +123,7 @@ if ($op == 'list') {
 	    elib_user_cleanuploans($loans->orderitem);
 	
         if ($loans->orderitem) {
-  	      foreach($loans->orderitem as $book){  
+  	      foreach($loans->orderitem as $book){
   	        $object = ting_get_object_by_isbn(trim($book->book->attributes()->id));
  	          $bookdisplay = elib_displaybook($object,$book);
   	        if(sizeof($loans->orderitem) > 4){
