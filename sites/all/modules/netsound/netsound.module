@@ -25,6 +25,8 @@ function netsound_block($op = 'list', $delta = 0, $edit = array()) {
     $blocks[2]['info'] = t('FAQ BLOCK');
     $blocks[3]['info'] = t('Zero Search top');
     $blocks[4]['info'] = t('Shortcut menu');
+    $blocks[5]['info'] = t('Contact ELIB');
+    $blocks[6]['info'] = t('Contact NETLYD');
     return $blocks;
   }
   elseif ($op == 'view') {
@@ -60,14 +62,129 @@ function netsound_block($op = 'list', $delta = 0, $edit = array()) {
          
         break;
       case 4:
-
         $block['content'] = drupal_get_form('netsound_shortcutmenu_form');
-         
+        break;
+      case 5:
+        $block['content'] = drupal_get_form('netsound_contact_elib_form');
+        break;
+      case 6:
+        $block['content'] = drupal_get_form('netsound_contact_netlyd_form');
         break;
     }
     return $block;
   }
 }
+
+function netsound_contact_netlyd_form($form_state){
+  $form = array();
+   $form['contact_name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Navn'),
+  );
+ 
+  $form['contact_mail'] = array(
+    '#type' => 'textfield',
+    '#title' => t('E-mail'),
+    '#required' => true
+  );
+  $form['contact_library'] = array(
+    '#type' => 'select',
+    '#title' => t('Vælg dit bibliotek'),
+    '#options' => elib_libraries_get_libraries(),
+  	'#required' => true
+  );
+  $form['problem'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Kommentar')
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Send besked')
+  );
+  $form['#submit'][] = 'netsound_contact_form_submit';
+  
+  return $form;
+  
+}
+
+
+function netsound_contact_elib_form($form_state){
+  $form = array();
+  
+  $form['contact_name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Navn'),
+  );
+  $form['contact_ssn'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Lånerkortnr./CPR'),
+  );  
+  $form['contact_mail'] = array(
+    '#type' => 'textfield',
+    '#title' => t('E-mail'),
+    '#required' => true
+  );
+  $form['contact_library'] = array(
+    '#type' => 'select',
+    '#title' => t('Vælg dit bibliotek'),
+    '#options' => elib_libraries_get_libraries(),
+  	'#required' => true
+  );
+  $form['book_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Bogtitel'),
+  );
+  $form['mp3player'] = array(
+    '#type' => 'textfield',
+    '#title' => t('MP3 Afspiller'),
+  );
+  $form['wmp_version'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Version af Windows Media Player'),
+  );
+  $form['os'] = array(
+    '#type' => 'select',
+    '#title' => t('Mit styresystem er'),
+    '#options' => array(
+      'win7' => 'Windows 7',
+      'vista' => 'Windows Vista',
+      'winxp' => 'Windows XP',
+      'win2k' => 'Windows 2000',
+      'winnt' => 'Windows NT',
+      'win98' => 'Windows 98',
+      'osx' => 'MacOS 10 eller nyere',
+      'os9' => 'MACOS 9 eller ældre',
+      'linux' => 'Linux'
+    ),
+  );
+  $form['browser'] = array(
+    '#type' => 'select',
+    '#title' => t('Mit internetprogram er'),
+    '#options' => array(
+      'ie8' => 'Internet Explorer 8',
+      'ie7' => 'Internet Explorer 7',
+      'ie6' => 'Internet Explorer 6 eller ældre',
+      'ff' => 'Mozilla Firefox',
+      'safari' => 'Safari',
+      'chrome' => 'Google Chrome',
+      'opera' => 'Opera',
+      'netscape' => 'Netscape',
+    ),
+  );
+  $form['problem'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Problem beskrivelse')
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Send besked')
+  );
+  $form['#submit'][] = 'netsound_contact_form_submit';
+  
+  return $form;
+}
+
+
 function netsound_shortcutmenu_form($form_state){
   $form  = array();
   
@@ -91,6 +208,44 @@ function netsound_shortcutmenu_form($form_state){
   );
   $form['#submit'][] = 'netsound_shortcutmenu_form_submit';
   return $form;
+}
+
+function netsound_contact_form_submit($form, &$form_state){
+  
+  $header = array('Form Key', 'Value');
+  $rows = array();
+  
+  foreach($form_state['values'] as $key => $value){
+    $rows[] = array(
+      array(
+      	'data' => t('mailkey_'.$key),
+      ),
+      array(
+      	'data' => $value,
+      )
+    );
+  }
+  array_pop($rows);
+  array_pop($rows);
+  array_pop($rows);
+  array_pop($rows);
+  array_pop($rows);
+  
+  $out = theme('table', $header, $rows, $table_attributes);
+  
+  $params['subject'] = t('Support besked fra netlydbog.dk');
+  $params['body'] = $out;
+  
+  $mail = 'troels+elib@reload.dk';
+  if($form_state['values']['form_id'] == 'netsound_contact_netlyd_form'){
+    $mail = 'troels+netlydbog@reload.dk';
+  }
+  
+  
+  drupal_mail('netsound','somekey',$mail,language_default(),$params,$form_state['values']['contact_mail'],true);
+  
+  drupal_set_message(t('Tak for din henvendelse. Vi stræber på at behandle den hurtigst muligt.'));
+  drupal_goto(); // frontpage
 }
 
 function netsound_shortcutmenu_form_submit($form, &$form_state){
@@ -148,4 +303,22 @@ function netsound_show_videolink($tid){
   return node_load($row['nid']);
 
 }
+
+function netsound_mail($key, &$message, $params) {
+
+  $headers = array(
+    'MIME-Version' => '1.0',
+    'Content-Type' => 'text/html; charset=UTF-8; format=flowed',
+    'Content-Transfer-Encoding' => '8Bit',
+    'X-Mailer' => 'Drupal'
+  );
+
+  foreach ($headers as $key => $value) {
+    $message['headers'][$key] = $value;
+  }
+
+  $message['subject'] = $params['subject'];
+  $message['body'] = $params['body'];
+}
+
 ?>
