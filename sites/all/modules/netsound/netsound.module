@@ -87,12 +87,19 @@ function netsound_contact_netlyd_form($form_state){
     '#title' => t('E-mail'),
     '#required' => true
   );
+  
   $form['contact_library'] = array(
     '#type' => 'select',
     '#title' => t('Vælg dit bibliotek'),
     '#options' => elib_libraries_get_libraries(),
-  	'#required' => true
+  	'#required' => true,
   );
+  global $user;
+  $userinfo = elib_user_get_cred($user->uid); 
+  if($userinfo['lib']){
+    $form['contact_library']['#default_value'] = $userinfo['lib'];
+    $form['contact_library']['#disabled'] = true;
+  }
   $form['problem'] = array(
     '#type' => 'textarea',
     '#title' => t('Kommentar')
@@ -130,6 +137,12 @@ function netsound_contact_elib_form($form_state){
     '#options' => elib_libraries_get_libraries(),
   	'#required' => true
   );
+  global $user;
+  $userinfo = elib_user_get_cred($user->uid); 
+  if($userinfo['lib']){
+    $form['contact_library']['#default_value'] = $userinfo['lib'];
+    $form['contact_library']['#disabled'] = true;
+  }
   $form['book_title'] = array(
     '#type' => 'textfield',
     '#title' => t('Bogtitel'),
@@ -229,16 +242,16 @@ function netsound_contact_form_submit($form, &$form_state){
   array_pop($rows);
   array_pop($rows);
   array_pop($rows);
-  array_pop($rows);
+  array_pop($rows);  
   
   $out = theme('table', $header, $rows, $table_attributes);
   
   $params['subject'] = t('Support besked fra netlydbog.dk');
   $params['body'] = $out;
   
-  $mail = 'troels+elib@reload.dk';
+  $mail = variable_get('netsound_elibmail', '');
   if($form_state['values']['form_id'] == 'netsound_contact_netlyd_form'){
-    $mail = 'troels+netlydbog@reload.dk';
+    $mail = variable_get('netsound_supportmail', '');
   }
   
   
