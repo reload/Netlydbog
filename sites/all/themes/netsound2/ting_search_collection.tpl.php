@@ -19,14 +19,6 @@ foreach ($collection->objects as $obj){
 //		$lydbogObj = ting_get_object_by_id($obj->id);
 	}
 } 
-
-//krumo::defines();
-
-
-//krumo($collection);
-
-//krumo($lydbogObj);
-
 $alttext = t('@titel af @forfatter',array('@titel' => $lydbogObj->title, '@forfatter' => $lydbogObj->creators_string));
 
 ?>
@@ -63,6 +55,9 @@ $alttext = t('@titel af @forfatter',array('@titel' => $lydbogObj->title, '@forfa
       
         <div class="reader">
         <?php print theme('item_list', $readers, t('Reader'), 'span', array('class' => 'contributor'));?>
+        </div>
+         <div>
+        <?php print theme('item_list', array($lydbogObj->date), t('Udgivelses år'), 'span', array('class' => 'year'));?>
         </div>
       <?php endif; ?>
       <?php if (!empty($lydbogObj->subjects)): ?>

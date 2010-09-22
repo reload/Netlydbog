@@ -13,9 +13,12 @@
 <?php print t('Sorter efter ')?>
 <select class="sort-by-selector">
   <option value=""><?php print t('Relevans')?></option>
-  <option value="title_ascending"><?php print t('Titel')?></option>
-  <option value="creator_ascending"><?php print t('Forfatter')?></option>
-  <option value="date_descending"><?php print t('Udgivelses år')?></option>
+  <option value="title_ascending"><?php print t('Titel A → Å')?></option>
+  <option value="title_descending"><?php print t('Titel Å → A')?></option>
+  <option value="creator_ascending"><?php print t('Forfatter A → Å')?></option>
+  <option value="creator_descending"><?php print t('Forfatter Å → A')?></option>
+  <option value="date_descending"><?php print t('Udgivelses år - Nyeste først')?></option>
+  <option value="date_ascending"><?php print t('Udgivelses år - Ældste først')?></option>
 </select>
 
 </div>
