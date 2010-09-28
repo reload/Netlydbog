@@ -189,6 +189,7 @@ function netsound_contact_elib_form($form_state){
     '#title' => t('Problem beskrivelse')
   );
   $form['submit'] = array(
+    '#prefix' => '<p>'.t('OBS tekst!').'</p>',
     '#type' => 'submit',
     '#value' => t('Send besked')
   );
@@ -211,8 +212,8 @@ function netsound_shortcutmenu_form($form_state){
   
   $form['shortcut'] = array(
 		'#type' => 'radios',
-		'#title' => t('Drejer din henvendelse sig om et af de følgende punkter?'),
-    '#description' => t('Hvis du vælger et af disse punkter istedet for at skrive direkte til os vil ekspeditionstiden være væsentlig kortere. På forhånd tak.'),
+		'#prefix' => '<strong><p>'.t('Drejer din henvendelse sig om et af de følgende punkter?').'</p></strong><p>'.t('Hvis du vælger et af disse punkter istedet for at skrive direkte til os vil ekspeditionstiden være væsentlig kortere. På forhånd tak.').'</p>',
+    #'#description' => ,
     '#options' => $options,
   );
   $form['submit'] = array(
