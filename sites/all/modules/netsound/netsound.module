@@ -246,7 +246,7 @@ function netsound_contact_form_submit($form, &$form_state){
   array_pop($rows);
   array_pop($rows);
   array_pop($rows);
-  array_pop($rows);  
+  //array_pop($rows);  
   
   $out = theme('table', $header, $rows, $table_attributes);
   
