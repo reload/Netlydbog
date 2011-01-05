@@ -41,7 +41,7 @@ $alttext = t('@titel af @forfatter',array('@titel' => $collection->title, '@forf
       </div>
       <?php print elib_get_rating($collection->id);?>
        <div class="icons">
-       <?php print l(theme('image', 'sites/all/themes/netsound/img/listen.png', 'Lyt', 'Lyt', null, false), $collection->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))); ?>
+       <?php print l(theme('image', 'sites/all/themes/netsound/img/stream.png', 'Lyt', 'Lyt', null, false), $collection->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))); ?>
        <?php print l(theme('image', 'sites/all/themes/netsound/img/fetch.png', 'Hent', 'Hent', null, false), $collection->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))); ?>
       </div>
   </div>
