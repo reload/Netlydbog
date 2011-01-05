@@ -39,6 +39,15 @@ function ting_admin_settings_form_elib($form_state) {
     '#required'      => FALSE,
     '#default_value' => variable_get('elib_language_code', ''),
   );
+
+  $form['elib']['elib_proxy_settings'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Proxy settings'),
+    '#description'   => t('If you need to proxy the SOAP request, then add the proxy host and port in the format "host:port" ex "localhost:8080" - without the quotes.<br />Note that proxy username and password is not currently supported.'),
+    '#required'      => FALSE,
+    '#default_value' => variable_get('elib_proxy_settings', ''),
+  );
+
   
   return system_settings_form($form);
 }
