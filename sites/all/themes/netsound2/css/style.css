@@ -844,3 +844,8 @@ div.fivestar-widget div.hover a {
 #ting-sort-by{
   text-align:right;
 }
+
+#ting-object h4 {
+  color: #90C50F;
+  margin: 10px 0 2px 0;
+}
