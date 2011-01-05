@@ -22,11 +22,20 @@ class eLibClient{
 		$this->languagecode = $languagecode;
 		$this->sc_params = array(
 	    'trace' => true, 
-      'cache_wsdl' => WSDL_CACHE_NONE, 
-      #'proxy_host' => 'localhost', 
-      #'proxy_port' => 8080
-	  );	
+      'cache_wsdl' => WSDL_CACHE_NONE,
+#      'connection_timeout' => 10
+	  );
+
+    // support for proxy settings via admin
+    // @see: http://domain.tld/admin/settings/elib
+    $proxy = variable_get('elib_proxy_settings', '');
+    if (preg_match('/^[a-z0-9\.-]+:[0-9]{2,5}$/i', $proxy)) {
+      list($host, $port) = explode(':', $proxy);
+      $this->sc_params['proxy_host'] = $host;
+      $this->sc_params['proxy_port'] = $port;
+    }
 	}
+  
 	public function GetUrl($retailerorderid){
 		$params['retailerorderid'] = $retailerorderid;
 		$params['md5checksum'] = md5($this->retailerid.$retailerorderid.$this->retailerkeycode);
@@ -69,10 +78,13 @@ class eLibClient{
 			throw new Exception('No user instance: '.__FUNCTION__);
 		}
   }
+
   public function getNewBooks(){
+
   	$params['top'] = 100;
   	$params['listtype'] = 1;
-  	$params['fromdate'] = date('Y-m-d',time()-22592000);
+  	#$params['fromdate'] = date('Y-m-d',time()-22592000);
+  	$params['fromdate'] = date('Y-m-d', strtotime('-1 month'));
 
   	$response = $this->soapCall($this->base_url.'getlibrarylist.asmx?WSDL','GetNewBooks',$params);
   	
@@ -84,10 +96,11 @@ class eLibClient{
   	return $xml;
   	
   }
-public function getPopularBooks(){
+
+  public function getPopularBooks(){
     $params['top'] = 5;
     $params['listtype'] = 2;
-    $params['fromdate'] = date('Y-m-d',time()-12592000);
+    $params['fromdate'] = date('Y-m-d', strtotime('-1 month'));
     $params['todate'] = date('Y-m-d');
     
     $response = $this->soapCall($this->base_url.'getlibrarylist.asmx?WSDL','GetTopList',$params);
@@ -100,6 +113,7 @@ public function getPopularBooks(){
     return $xml;
     
   }
+
   public function getLatestLoans(){
     
   	$params['fromdate'] = date('Y-m-d',time()-2592000);
@@ -122,11 +136,8 @@ public function getPopularBooks(){
   //	var_dump($ids);
   	
   	return array_slice(array_reverse($ids),0,5);
-  
-  	
-  	
-  	
   }
+
   public function makeLoan($ebookid){
   	if(is_a($this->elibUsr,'loaner')){
 	  	
@@ -155,6 +166,7 @@ public function getPopularBooks(){
     return $xml->data->orderitem;
     
   }
+
   public function getLoans(){
   	
   	if(is_a($this->elibUsr,'loaner')){
@@ -181,6 +193,7 @@ public function getPopularBooks(){
     	throw new Exception('the isbn need to be int');
     }
   }
+
   public function getBooks($fromdate){
     return $this->soapCall($this->base_url.'getproductlist.asmx?wsdl','GetProductList',array('countrycode'=> 'dk','fromdate' => $fromdate));
   }
@@ -194,12 +207,12 @@ public function getPopularBooks(){
     if(is_array($ext_params)){
       $params = array_merge($params,$ext_params);
     }
-    
+
     try{
-      $request = @new SoapClient($wsdl,$this->sc_params);
+      $request = new SoapClient($wsdl,$this->sc_params);
       $response = $request->$func($params);
-	//	var_dump($request->__getLastRequest());
-		return $response;
+      // var_dump($request->__getLastRequest());
+      return $response;
     }
     catch(Exception $e){
       elib_display_error($e);
@@ -221,6 +234,7 @@ class loaner{
 		$this->pin = $pin;
 		$this->cpr = $cpr;
 	}
+
 	public function getId(){
 		if($this->cardno == ''){
 			return $this->cpr;
@@ -229,9 +243,11 @@ class loaner{
 			return $this->cardno;
 		}
 	}
+
 	public function getPin(){
 		return $this->pin;
 	}
+  
 	public function loginParams(){
 		return array(
 		  'cardnumber' => $this->getId(),
