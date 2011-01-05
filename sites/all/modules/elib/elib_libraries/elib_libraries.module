@@ -64,6 +64,7 @@ function elib_libraries_get_library_keycode($lib){
   if($matrix == ''){
     return false;
   }
+  
   $libraries = explode("\n",$matrix);
   foreach ($libraries as $library){
     $p = explode('|',$library);
