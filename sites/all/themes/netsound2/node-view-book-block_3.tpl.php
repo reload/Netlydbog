@@ -11,7 +11,7 @@
     
     <div class="rating">
       <?php echo $node->field_rating[0]['view'] ?>
-      <img style="float:left;padding-left:10px;" src="/sites/all/themes/netsound/img/listen.png" />
+      <img style="float:left;padding-left:10px;" src="/sites/all/themes/netsound/img/stream.png" />
       <img style="float:left;padding-left:10px;" src="/sites/all/themes/netsound/img/fetch.png" />
     </div>
 

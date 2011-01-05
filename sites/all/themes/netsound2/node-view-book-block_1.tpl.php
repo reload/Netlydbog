@@ -5,7 +5,7 @@
   <div class="rating"><?php echo $node->field_rating[0]['view'] ?></div>
   <div class="clear-box"></div>
   <div class="icons">
-    <img src="/sites/all/themes/netsound/img/listen.png" />
+    <img src="/sites/all/themes/netsound/img/stream.png" />
     <img src="/sites/all/themes/netsound/img/fetch.png" />
   </div>
 </div>

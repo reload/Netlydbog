@@ -5,7 +5,7 @@
     <?php echo theme('imagecache', 'book_cover_detailed_page', $node->field_book_cover[0]['filepath']); ?>
     </div>
     <div style="text-align:center;margin:20px 0;">
-      <img src="/sites/all/themes/netsound/img/listen.png" />
+      <img src="/sites/all/themes/netsound/img/stream.png" />
       <img src="/sites/all/themes/netsound/img/fetch.png" />
     </div>
   </div>

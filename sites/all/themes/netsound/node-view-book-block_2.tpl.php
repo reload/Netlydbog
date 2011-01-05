@@ -8,7 +8,7 @@
     
     <div class="rating right"><?php echo $node->field_rating[0]['view'] ?></div>
     <div class="icons clear-box">
-      <img src="/sites/all/themes/netsound/img/listen.png" />
+      <img src="/sites/all/themes/netsound/img/stream.png" />
       <img src="/sites/all/themes/netsound/img/fetch.png" />
     </div>
     
