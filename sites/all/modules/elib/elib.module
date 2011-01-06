@@ -652,5 +652,51 @@ function elib_displaybook2(TingClientObject $obj,$fields,$settings='',$displaysi
 }
 
 
+/**
+ * added book teaser to object
+ *
+ * @see http://wpaudioplayer.com/standalone
+ * @param TingClientObject $object
+ * @return string
+ */
+function elib_book_teaser(TingClientObject $object) {
+  module_load_include('isbn_static_func.inc', 'elib');
+  $isbn = convertFromIsbn13ToIsbn10($object->record['dc:identifier']['dkdcplus:ISBN'][0]);
 
-?>
+  $c = elib_client();
+  $c->setLibrary(variable_get('elib_retailer_id', ''));
+  try {
+    $book = $c->getBook((int) $isbn);
+  }
+  catch (Exception $e) {
+    error_log(__FILE__ . ' +' . __LINE__ . ' ' . print_r($e, 1));
+    return;
+  }
+
+  if (!empty($book->data->product->teaser->link)) {
+    drupal_add_js('sites/all/themes/netsound2/js/audio-player/audio-player.js');
+    drupal_add_js('
+      AudioPlayer.setup("' . url(drupal_get_path('theme', 'netsound2') . '/js/audio-player/player.swf', array('absolute' => TRUE)) .'", {
+        width: 290,
+        leftbg: "7DAFC3",
+        rightbg: "BECE8C",
+        leftbghover: "ADCBD7",
+        rightbghover: "C4D296",
+        loader: "C4D296",
+        transparentpagebg: "yes"
+      });
+    ', 'inline');
+
+    return '
+      <h4>Hør smagsprøve</h4>
+      <div id="audio-player">Da din browser ikke understøtter flash kan vi ikke afspille smagsprøven for dig, men du kan downloade det ' .l('her', $book->data->product->teaser->link) . ' og selv afspille det på din computer.</div>
+      <script type="text/javascript">
+        AudioPlayer.embed("audio-player", {
+          soundFile: "' . $book->data->product->teaser->link . '",
+          titles: "' . $book->data->product->title . '",
+          artists: "' . $book->data->product->contributors->contributor[0]->first_name . ' ' . $book->data->product->contributors->contributor[0]->family_name . '"
+        });
+      </script>
+    ';
+  }
+}
