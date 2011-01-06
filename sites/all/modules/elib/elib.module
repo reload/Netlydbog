@@ -700,3 +700,33 @@ function elib_book_teaser(TingClientObject $object) {
     ';
   }
 }
+
+
+/**
+ * ensure that covers are fetched from elib rather than dbc
+ *
+ * @param TingClientObject $object
+ * @return boolean
+ */
+function elib_book_cover(TingClientObject $object) {
+  
+  $path = ting_covers_collection_path($object->id);
+  $filename = file_directory_path() . '/' . $path;
+
+  if (file_exists($filename)) {
+    return;
+  }
+
+  module_load_include('isbn_static_func.inc', 'elib');
+  module_load_include('pages.inc', 'ting_covers');
+
+  // DEBUG
+//  $c = elib_client();
+//  $c->setLibrary(variable_get('elib_retailer_id', ''));
+//  $book = $c->getBook((int) convertFromIsbn13ToIsbn10($object->record['dc:identifier']['dkdcplus:ISBN'][0]));
+//  error_log(__FILE__ . ' +' . __LINE__ . ' ' . print_r(convertFromIsbn13ToIsbn10($object->record['dc:identifier']['dkdcplus:ISBN'][0]), 1));
+//  error_log(__FILE__ . ' +' . __LINE__ . ' ' . print_r($book, 1));
+
+  $image_url = 'http://www.elib.se/cover_images/' . convertFromIsbn13ToIsbn10($object->record['dc:identifier']['dkdcplus:ISBN'][0]) . '.jpg';
+  return (boolean) _ting_covers_pages_fetch_image($filename, $image_url);
+}

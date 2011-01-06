@@ -15,6 +15,7 @@
 
 
 /*logic for rating */
+elib_book_cover($object);
 
 if(!$n = node_load(array('title' => $object->id,'type' => 'bookrating'))){
 	$n = new stdClass();

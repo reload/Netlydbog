@@ -12,6 +12,8 @@ foreach ($collection->objects as $obj){
 //		$lydbogObj = ting_get_object_by_id($obj->id);
 	}
 } 
+
+elib_book_cover($collection->objects[0]);
 $alttext = t('@titel af @forfatter',array('@titel' => $lydbogObj->title, '@forfatter' => $lydbogObj->creators_string));
 
 ?>
