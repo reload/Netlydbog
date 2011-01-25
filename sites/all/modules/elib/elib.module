@@ -667,8 +667,14 @@ function elib_book_teaser(TingClientObject $object) {
   $c->setLibrary(variable_get('elib_retailer_id', ''));
   try {
     $book = $c->getBook((int) $isbn);
+    if ($_SERVER['REMOTE_ADDR'] == '90.185.183.84') {
+      mail('un@bellcom.dk', 'test data', print_r($book, 1));
+    }
   }
   catch (Exception $e) {
+    if ($_SERVER['REMOTE_ADDR'] == '90.185.183.84') {
+      mail('un@bellcom.dk', 'test data', print_r($e, 1));
+    }
     error_log(__FILE__ . ' +' . __LINE__ . ' ' . print_r($e, 1));
     return;
   }
