@@ -59,8 +59,8 @@ class eLibClient{
 		//}
 	}
 	
-	public function validateUser(){
-		if(is_a($this->elibUsr,'loaner')){
+	public function validateUser() {
+		if(is_a($this->elibUsr, 'loaner')) {
 			$params = $this->elibUsr->loginParams();
 			$response = $this->soapCall($this->base_url.'validatelibraryuser.asmx?WSDL','ValidateLibraryUser',$params);
 			
@@ -70,7 +70,8 @@ class eLibClient{
 			if($xml->status->code == '101'){
 				return true;
 			}
-			else{
+			else {
+        watchdog('elib', 'eLib login: “@message”', array('@message' => $xml->status->message, WATCHDOG_DEBUG));
 				return false;
 			}
 		}
@@ -239,9 +240,7 @@ class loaner{
 		if($this->cardno == ''){
 			return $this->cpr;
 		}
-		else{
-			return $this->cardno;
-		}
+    return $this->cardno;
 	}
 
 	public function getPin(){
