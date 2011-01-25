@@ -185,14 +185,8 @@ class eLibClient{
    * @return SimpleXMLElement
    */
   public function getBook($isbn){
-if (defined('UN_WAS_HERE')) {
-  mail('un@bellcom.dk', 'test data: ' . __METHOD__, print_r(debug_backtrace(), 1));
-}
-    if(is_int($isbn)){
+    if(preg_match('/^[0-9]+$/', $isbn)){
       $response = $this->soapCall($this->base_url.'getproduct.asmx?WSDL','GetProduct',array('ebookid' => $isbn));
-if (defined('UN_WAS_HERE')) {
-  mail('un@bellcom.dk', 'test data: ' . __METHOD__, print_r($response, 1));
-}
       return simplexml_load_string($response->GetProductResult->any);
     }
     else{
@@ -213,10 +207,6 @@ if (defined('UN_WAS_HERE')) {
     if(is_array($ext_params)){
       $params = array_merge($params,$ext_params);
     }
-
-if (defined('UN_WAS_HERE')) {
-  mail('un@bellcom.dk', 'test data: ' . __METHOD__, print_r($params, 1));
-}
 
     try{
       $request = new SoapClient($wsdl,$this->sc_params);
