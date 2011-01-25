@@ -208,6 +208,10 @@ class eLibClient{
       $params = array_merge($params,$ext_params);
     }
 
+if (defined('UN_WAS_HERE')) {
+  mail('un@bellcom.dk', 'test data: ' . __METHOD__, print_r($params, 1));
+}
+
     try{
       $request = new SoapClient($wsdl,$this->sc_params);
       $response = $request->$func($params);
