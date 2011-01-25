@@ -65,7 +65,7 @@ class eLibClient{
 			$response = $this->soapCall($this->base_url.'validatelibraryuser.asmx?WSDL','ValidateLibraryUser',$params);
 			
 			$xml = simplexml_load_string($response->ValidateLibraryUserResult->any);
-			
+
 			// if user credentials are valid 101 is returned in xml according to eLib
 			if($xml->status->code == '101'){
 				return true;
@@ -187,6 +187,9 @@ class eLibClient{
   public function getBook($isbn){
     if(is_int($isbn)){
       $response = $this->soapCall($this->base_url.'getproduct.asmx?WSDL','GetProduct',array('ebookid' => $isbn));
+if (defined('UN_WAS_HERE')) {
+  mail('un@bellcom.dk', 'test data: ' . __METHOD__, print_r($response, 1));
+}
       return simplexml_load_string($response->GetProductResult->any);
     }
     else{
@@ -208,9 +211,9 @@ class eLibClient{
       $params = array_merge($params,$ext_params);
     }
 
-    if ($func == 'GetProduct' && $_SERVER['REMOTE_ADDR'] == '90.185.183.84') {
-      mail('un@bellcom.dk', 'test data', print_r($params, 1));
-    }
+if (defined('UN_WAS_HERE')) {
+  mail('un@bellcom.dk', 'test data: ' . __METHOD__, print_r($params, 1));
+}
 
     try{
       $request = new SoapClient($wsdl,$this->sc_params);
