@@ -208,6 +208,10 @@ class eLibClient{
       $params = array_merge($params,$ext_params);
     }
 
+    if ($func == 'GetProduct' && $_SERVER['REMOTE_ADDR'] == '90.185.183.84') {
+      mail('un@bellcom.dk', 'test data', print_r($params, 1));
+    }
+
     try{
       $request = new SoapClient($wsdl,$this->sc_params);
       $response = $request->$func($params);
