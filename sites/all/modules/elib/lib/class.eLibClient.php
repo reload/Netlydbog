@@ -186,7 +186,7 @@ class eLibClient{
    */
   public function getBook($isbn){
 if (defined('UN_WAS_HERE')) {
-  mail('un@bellcom.dk', 'test data: ' . __METHOD__, print_r($isbn, 1));
+  mail('un@bellcom.dk', 'test data: ' . __METHOD__, print_r(debug_backtrace(), 1));
 }
     if(is_int($isbn)){
       $response = $this->soapCall($this->base_url.'getproduct.asmx?WSDL','GetProduct',array('ebookid' => $isbn));
