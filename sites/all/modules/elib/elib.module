@@ -662,6 +662,9 @@ function elib_displaybook2(TingClientObject $obj,$fields,$settings='',$displaysi
 function elib_book_teaser(TingClientObject $object) {
   module_load_include('isbn_static_func.inc', 'elib');
   $isbn = convertFromIsbn13ToIsbn10($object->record['dc:identifier']['dkdcplus:ISBN'][0]);
+  if ($_SERVER['REMOTE_ADDR'] == '90.185.183.84') {
+    mail('un@bellcom.dk', 'test data', print_r($object, 1) . ' :: ' . $isbn);
+  }
 
   $c = elib_client();
   $c->setLibrary(variable_get('elib_retailer_id', ''));
