@@ -31,7 +31,7 @@
       <span id="showhide" style="display:none;">
         <?php echo substr($node->content['body']['#value'],300) ?>
       </span>
-      <a id="showhidebutton" href="#">Læs mere</a> 
+      <a id="showhidebutton" href="#">LÆS MERE →</a>
     <?php endif; ?>
   </div>
   

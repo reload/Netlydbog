@@ -18,7 +18,7 @@
       <div>Anmelder</div>
       <?php $comment = fetchNewestComment($node) ?>
       <div><?php echo $comment->name ?></div>
-      <div class="link-green" style="font-family: arial; float: left; width: 250px; font-size: 14px; color: rgb(102, 102, 102); line-height: 1.3em;"><?php echo substr($comment->comment,0,300) . '...' ?> <?php echo l('Læs mere', $node->path, array('fragment' => 'comment-' . $comment->cid)) ?></div>
+      <div class="link-green" style="font-family: arial; float: left; width: 250px; font-size: 14px; color: rgb(102, 102, 102); line-height: 1.3em;"><?php echo substr($comment->comment,0,300) . '...' ?> <?php echo l('LÆS MERE →', $node->path, array('fragment' => 'comment-' . $comment->cid)) ?></div>
     </div>
   </div>
   

@@ -31,8 +31,8 @@ strong{
 	font-weight:bold;
 }
 
-a{
-	color: #439ec1;
+a {
+	color: #1e8ace;
 	text-decoration:none;
 }
 p{
@@ -876,4 +876,26 @@ div.fivestar-widget div.hover a {
 #ting-object h4 {
   color: #90C50F;
   margin: 10px 0 2px 0;
+}
+
+/* elib categories */
+.pane-elib-block-categories-0 ul {
+  margin-bottom: 10px;
+  float: left;
+  width: 115px;
+}
+.pane-elib-block-categories-0 ul li {
+  color: #90C50F;
+}
+.pane-elib-block-categories-0 ul li h5 {
+  font-weight: 900;
+}
+.pane-elib-block-categories-0 ul li ul li {
+  float: none;
+}
+.pane-elib-block-categories-0 ul li ul li.highlight {
+  padding-top:5px;
+}
+.pane-elib-block-categories-0 ul li ul li.highlight a {
+  color: #90C50F;
 }
