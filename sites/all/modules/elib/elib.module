@@ -468,7 +468,6 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
 	if(!is_a($obj,'TingClientObject')){
 		return;
 	}
-
   // fetch cover from elib
   elib_book_cover($obj);
   
@@ -516,7 +515,7 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
   if($displaysize == 'review'){
   	
   	$u = elib_user_get_cred($elib[1]);
-  	$part['text'] = '<div class="spacing-before" style="text-transform:uppercase;">Anmelder</div><div>'.$u['user'].'</div><div class="text"  style="margin-left:80px;"><p class="spacing-before">'.truncate_utf8($elib[0],400,true,true).' '.l('læs mere',$obj->url).'</p>';
+  	$part['text'] = '<div class="spacing-before" style="text-transform:uppercase;">Anmelder</div><div>'.$u['user'].'</div><div class="text"  style="margin-left:80px;"><p class="spacing-before">'.truncate_utf8($elib[0],400,true,true).' '.l('LÆS MERE →',$obj->url).'</p>';
   	
   	$part['icons'] = '
       <div class="icons">' .
@@ -696,7 +695,7 @@ function elib_displaybook2(TingClientObject $obj,$fields,$settings='',$displaysi
     
     $u = elib_user_get_cred($elib[1]);
     
-    $part['text'] = '<div class="spacing-before" style="text-transform:uppercase;">Anmelder</div><div>'.$u['user'].'</div><div class="text"  style="margin-left:80px;"><p class="spacing-before">'.truncate_utf8($elib[0],400,true,true).' '.l('læs mere',$obj->url).'</p>';
+    $part['text'] = '<div class="spacing-before" style="text-transform:uppercase;">Anmelder</div><div>'.$u['user'].'</div><div class="text"  style="margin-left:80px;"><p class="spacing-before">'.truncate_utf8($elib[0],400,true,true).' '.l('LÆS MERE →',$obj->url).'</p>';
     $part['icons'] = '
       <div class="iconsnoheight">' .
         l(theme('image', 'sites/all/themes/netsound/img/stream.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.
