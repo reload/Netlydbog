@@ -1,0 +1,6 @@
+; $Id$
+name = eLIB categories
+description = Provides a menulike block containing eLIB category searches
+package = Ding!
+core = 6.x
+dependencies[] = elib

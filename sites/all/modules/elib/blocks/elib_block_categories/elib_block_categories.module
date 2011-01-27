@@ -1,0 +1,133 @@
+<?php
+
+
+/**
+ * hook_menu implementation
+ *
+ * @return array
+ */
+function elib_block_categories_menu() {
+  return array(
+    'admin/settings/elib/elib_block_categories' => array(
+      'title' => 'eLIB block categories settings',
+      'description' => '.',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('elib_block_categories_admin'),
+      'access arguments' => array('access administration pages'),
+      'type' => MENU_LOCAL_TASK,
+    ),
+  );
+}
+
+
+/**
+ * hook_admin implementation
+ *
+ * @return array
+ */
+function elib_block_categories_admin() {
+  $form = array();
+  $form['elib_block_categories']['elib_block_categories_all_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Link text'),
+    '#description' => t('The lable for the "All Titles" link'),
+    '#default_value' => variable_get('elib_block_categories_all_title', ''),
+  );
+  $form['elib_block_categories']['elib_block_categories_all_url'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Link to "All Titles" page'),
+    '#description' => t('The url to the "All Titles" page'),
+    '#default_value' => variable_get('elib_block_categories_all_url', ''),
+  );
+
+  $form['elib_block_categories']['elib_block_categories_inspiration_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Link text'),
+    '#description' => t('The lable for the "All Inspiration" link'),
+    '#default_value' => variable_get('elib_block_categories_inspiration_title', ''),
+  );
+  $form['elib_block_categories']['elib_block_categories_inspiration_url'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Link to "Inspiration" page'),
+    '#description' => t('The url to the "Inspiration" page'),
+    '#default_value' => variable_get('elib_block_categories_inspiration_url', ''),
+  );
+
+  return system_settings_form($form);
+}
+
+
+/**
+ * hook_block implementation
+ *
+ * @param string $op
+ * @param mixed $delta
+ * @return string
+ */
+function elib_block_categories_block($op = 'list', $delta = 0) {
+  $block = array();
+  if ($op == 'list') {
+    $block[0]["info"] = t('eLIB categories');
+  }
+  elseif ($op == 'view') {
+
+    $cache_name = 'elib_block_categories_cache' . $delta;
+    $cache = cache_get($cache_name, 'cache_page');
+
+    if (isset($cache->data)) {
+      $data = $cache->data;
+    }
+    else {
+      $menu = menu_tree_page_data('menu-elib-categories');
+
+      $data = '';
+      $addon = '';
+      
+      $all_text = variable_get('elib_block_categories_all_title', '');
+      $all_url = variable_get('elib_block_categories_all_url', '');
+
+      if ($all_text && $all_url) {
+        $addon .= '<li class="highlight"><a href="'.url($all_url).'">'.$all_text.'</a></li>';
+      }
+
+      $cat_text = variable_get('elib_block_categories_inspiration_title', '');
+      $cat_url = variable_get('elib_block_categories_inspiration_url', '');
+
+      if ($cat_text && $cat_url) {
+        $addon .= '<li class="highlight"><a href="'.url($cat_url).'">'.$cat_text.'</a></li>';
+      }
+
+      $count = 0;
+      foreach ($menu as $x => $item) {
+        $data .= '
+          <ul>
+            <li>
+              <h5>' . $item['link']['title'] . '</h5>
+              <ul>
+        ';
+        foreach ($item['below'] as $y => $link) {
+          $data .= '
+                <li><a href="' . url($link['link']['link_path']) . '">' . $link['link']['link_title'] . '</a></li>
+          ';
+        }
+
+        if ($count == 1) {
+          $data .= $addon;
+        }
+
+        $data .= '
+              </ul>
+            </li>
+          </ul>
+        ';
+        $count++;
+      }
+      
+      cache_set($cache_name, $data, 'cache_page', CACHE_TEMPORARY);
+    }
+
+    $block['subject'] = t('eLIB categories');
+    $block['content'] = $data;
+  }
+  return $block;
+}
