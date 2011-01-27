@@ -44,6 +44,13 @@ function elib_menu() {
     'access arguments' => array('access content'),
     
   );
+  $items['ting/object/%/sample'] = array(
+    'title' => 'wma',
+    'page callback' => 'elib_get_sample',
+    'page arguments' => array(2,3),
+    'access arguments' => array('access content'),
+
+  );
   return $items;
 }
 function elib_theme() {
@@ -449,29 +456,35 @@ function elib_displaybook(TingClientObject $object,$elib_data = false){
    $out[] = elib_get_rating($object->id);
     $out[] = '<div class="icons">' .
       l(theme('image', 'sites/all/themes/netsound/img/stream.png', '', '', null, false), $object->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.
-      l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $object->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .
+      l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $object->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . ' ' .
+      l(theme('image', 'sites/all/themes/netsound/img/sample.png', '', '', null, false), $object->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) .
     '</div>';
       
   return implode($out);
     
 }
 
-function elib_displaybookNEW($obj,$elib='',$displaysize=false){
+function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1){
 	if(!is_a($obj,'TingClientObject')){
 		return;
 	}
+
+  // fetch cover from elib
+  elib_book_cover($object);
+  
 	switch($displaysize){
 		case 'small':
 		case 'small_rm':
 		case 'lorem':
 		case 'review':
-			$image_url = ting_covers_collection_url($obj, '70_x');
+			$image_url = ting_covers_collection_url($obj, '65_x');
 			break;
 		case 'medium':
 		case 'textright':
 			$image_url = ting_covers_collection_url($obj, '170_x');
 			break;
-	}	
+	}
+
 	//dsm($obj);
 	$alttext = t('@titel af @forfatter',array('@titel' => $obj->title, '@forfatter' => $obj->creators_string));
 	$part['picture'] = '<div class="picture">' . l(theme('image', $image_url, $alttext, $alttext, null, false), $obj->url, array('html' => true)) . '</div>';
@@ -491,21 +504,36 @@ function elib_displaybookNEW($obj,$elib='',$displaysize=false){
   
   $part['rating'] = elib_get_rating($obj->id);
   $part['title'] = '<h3 class="title">' . l($obj->title, $obj->url, array('attributes' => array('class' =>'title'))) . '</h3>';
-  $part['author'] = '<div class="author">' . t('By !creator_name', array('!creator_name' => l($obj->creators_string,'ting/search/'.$obj->creators_string))) . '</div>';
-  $part['icons'] = '<div class="icons">' . l(theme('image', 'sites/all/themes/netsound/img/stream.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .'</div>';
+  $part['author'] = '<div class="author">' . t('!creator_name', array('!creator_name' => l($obj->creators_string,'ting/search/'.$obj->creators_string))) . '</div>';
+  $part['icons'] = '
+    <div class="icons">' .
+      l(theme('image', 'sites/all/themes/netsound/img/stream.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.
+      l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .
+      l(theme('image', 'sites/all/themes/netsound/img/sample.png', '', '', null, false), $obj->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) .
+    '</div>
+  ';
    
   if($displaysize == 'review'){
   	
   	$u = elib_user_get_cred($elib[1]);
+  	$part['text'] = '<div class="spacing-before" style="text-transform:uppercase;">Anmelder</div><div>'.$u['user'].'</div><div class="text"  style="margin-left:80px;"><p class="spacing-before">'.truncate_utf8($elib[0],400,true,true).' '.l('læs mere',$obj->url).'</p>';
   	
-  	
-  		$part['text'] = '<div class="spacing-before" style="text-transform:uppercase;">Anmelder</div><div>'.$u['user'].'</div><div class="text"  style="margin-left:80px;"><p class="spacing-before">'.truncate_utf8($elib[0],400,true,true).' '.l('læs mere',$obj->url).'</p>';
-  	
-  	$part['icons'] = '<div class="">' . l(theme('image', 'sites/all/themes/netsound/img/stream.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .'</div>';
+  	$part['icons'] = '
+      <div class="icons">' .
+        l(theme('image', 'sites/all/themes/netsound/img/stream.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . ' ' .
+        l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . ' ' .
+        l(theme('image', 'sites/all/themes/netsound/img/sample.png', '', '', null, false), $obj->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) . '
+      </div>
+    ';
   	$part['picture'] = '<div class="picture">' . l(theme('image', $image_url, $alttext, $alttext, null, false), $obj->url, array('html' => true)) . '</div>';
   	$displaysize = 'small';
   }
+
   if($displaysize == 'textright'){
+    #error_log(__FILE__ . ' +' . __LINE__ . ' ' . print_r($obj->record, 1));
+    $part['picture'] = '<div class="picture main size1of2">' . l(theme('image', $image_url, $alttext, $alttext, null, false), $obj->url, array('html' => true)) . '</div>';
+    $part['author'] = '<div class="author">' . t('By !creator_name', array('!creator_name' => l($obj->creators_string,'ting/search/'.$obj->creators_string))) . '</div>';
+
   	if (!empty($obj->record['dc:contributor']['oss:dkind'])) {
   	 foreach($obj->record['dc:contributor']['oss:dkind'] as $reader){
         $readers[] = l($reader,'ting/search/'.$reader);
@@ -518,12 +546,31 @@ function elib_displaybookNEW($obj,$elib='',$displaysize=false){
       }
       $extras .= theme('item_list', $subs, t('Subjects'), 'span', array('class' => 'subject'));
     }
+    if (!empty($obj->record['dc:date'][''])) {
+      $link = l($obj->record['dc:date'][''][0],'ting/search/'.$obj->record['dc:date'][''][0]);
+      $extras .= theme('item_list', array($link), t('Published'), 'span', array('class' => 'published'));
+    }    
     if (!empty($obj->record['dcterms:extent'][''])) {
       $extras .= theme('item_list', $obj->record['dcterms:extent'][''], t('Extent'), 'span', array('class' => 'version'));
-    }    
+    }
     
-  	return '<div class="display-book '.$displaysize.' line">'.$part['picture'].$part['loginexpire'].$part['title'].$part['author'].$part['rating'].$part['icons'].$part['text'].$extras.'</div>';
+  	return '
+      <div class="display-book '.$displaysize.' line">'.
+        $part['picture'].
+        '<div class="main size1of2">'.
+        $part['loginexpire'].
+        $part['title'].
+        $part['author'].
+        $part['rating'].
+        $part['icons'].
+        $part['text'].
+        $extras.
+        '</div>
+      </div>
+    ';
   }
+
+
   if($elib['popular']){
     if (!empty($obj->record['dc:contributor']['oss:dkind'])) {
      foreach($obj->record['dc:contributor']['oss:dkind'] as $reader){
@@ -541,15 +588,38 @@ function elib_displaybookNEW($obj,$elib='',$displaysize=false){
       //$extras .= theme('item_list', $obj->record['dcterms:extent'][''], t('Extent'), 'span', array('class' => 'version'));
     }
         
-    $part['icons'] = '<div class="icons">' . l(theme('image', 'sites/all/themes/netsound/img/stream.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .'</div>';
+    $part['icons'] = '
+      <div class="icons">' .
+        l(theme('image', 'sites/all/themes/netsound/img/stream.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . ' '.
+        l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . ' '.
+        l(theme('image', 'sites/all/themes/netsound/img/sample.png', '', '', null, false), $obj->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) . '
+      </div>
+    ';
   }
+
   if($displaysize == 'small_rm'){
     $displaysize = 'small';
-    $part['icons'] = '<div class="">' . l(theme('image', 'sites/all/themes/netsound/img/stream.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.l(theme('image', 'sites/all/themes/netsound2/img/remove.png', '', '', null, false), $obj->url.'/huskeliste/fjern?'.drupal_get_destination(), array('html' => true)) .'</div>';
+    $part['icons'] = '
+      <div class="">' .
+        l(theme('image', 'sites/all/themes/netsound/img/stream.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.
+        l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.
+        l(theme('image', 'sites/all/themes/netsound/img/sample.png', '', '', null, false), $obj->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) .' '.
+        l(theme('image', 'sites/all/themes/netsound2/img/remove.png', '', '', null, false), $obj->url.'/huskeliste/fjern?'.drupal_get_destination(), array('html' => true)) .'
+      </div>
+    ';
     
   }
+
   $part['icons'] = '<div class="icons">'.$part['rating'].$part['icons'].'</div>';
-  return '<div class="display-book '.$displaysize.' line ruler-after">'.$part['picture'].$part['loginexpire'].$part['title'].$part['author'].$part['icons'].$part['text'].'<div style="margin-left:80px;">'.$extras.'</div></div>';
+  return '<div class="display-book '.$displaysize.' line ruler-after index-' . $block_index . '">'.
+    $part['picture'].
+    $part['loginexpire'].
+    $part['title'].
+    $part['author'].
+    $part['icons'].
+    $part['text'].
+    '<div style="margin-left:80px;">'.$extras.'</div>
+  </div>';
   
 }
 function dummy_lorem($numberofwords=100){
@@ -614,16 +684,26 @@ function elib_displaybook2(TingClientObject $obj,$fields,$settings='',$displaysi
 
   $part['title'] = '<h3 class="title">' . l($obj->title, $obj->url, array('attributes' => array('class' =>'title'))) . '</h3>';
   $part['author'] = '<div class="author">' . t('By !creator_name', array('!creator_name' => l($obj->creators_string,'ting/search/'.$obj->creators_string))) . '</div>';
-  $part['icons'] = '<div class="icons">' . l(theme('image', 'sites/all/themes/netsound/img/stream.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .'</div>';
+  $part['icons'] = '
+    <div class="icons">' .
+      l(theme('image', 'sites/all/themes/netsound/img/stream.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' ' .
+      l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' ' .
+      l(theme('image', 'sites/all/themes/netsound/img/sample.png', '', '', null, false), $obj->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) .'
+    </div>
+  ';
    
   if($displaysize == 'review'){
     
     $u = elib_user_get_cred($elib[1]);
     
-    
-      $part['text'] = '<div class="spacing-before" style="text-transform:uppercase;">Anmelder</div><div>'.$u['user'].'</div><div class="text"  style="margin-left:80px;"><p class="spacing-before">'.truncate_utf8($elib[0],400,true,true).' '.l('læs mere',$obj->url).'</p>';
-    
-    $part['icons'] = '<div class="iconsnoheight">' . l(theme('image', 'sites/all/themes/netsound/img/stream.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .'</div>';
+    $part['text'] = '<div class="spacing-before" style="text-transform:uppercase;">Anmelder</div><div>'.$u['user'].'</div><div class="text"  style="margin-left:80px;"><p class="spacing-before">'.truncate_utf8($elib[0],400,true,true).' '.l('læs mere',$obj->url).'</p>';
+    $part['icons'] = '
+      <div class="iconsnoheight">' .
+        l(theme('image', 'sites/all/themes/netsound/img/stream.png', '', '', null, false), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.
+        l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' ' .
+        l(theme('image', 'sites/all/themes/netsound/img/sample.png', '', '', null, false), $obj->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) .'
+      </div>
+    ';
     $part['picture'] = '<div class="picture">' . l(theme('image', $image_url, '', '', null, false), $obj->url, array('html' => true)) . '</div>';
     $displaysize = 'small';
   }
@@ -652,6 +732,12 @@ function elib_displaybook2(TingClientObject $obj,$fields,$settings='',$displaysi
 }
 
 
+
+function elib_get_sample($tingObjectID) {
+  module_load_include('client.inc', 'ting');
+  module_load_include('isbn_static_func.inc', 'elib');
+  return elib_book_teaser(ting_get_object_by_id($tingObjectID), true);
+}
 /**
  * added book teaser to object
  *
@@ -659,7 +745,7 @@ function elib_displaybook2(TingClientObject $obj,$fields,$settings='',$displaysi
  * @param TingClientObject $object
  * @return string
  */
-function elib_book_teaser(TingClientObject $object) {
+function elib_book_teaser(TingClientObject $object, $is_ajax = false) {
   module_load_include('isbn_static_func.inc', 'elib');
   $isbn = trim(convertFromIsbn13ToIsbn10($object->record['dc:identifier']['dkdcplus:ISBN'][0]));
 
@@ -674,8 +760,8 @@ function elib_book_teaser(TingClientObject $object) {
   }
 
   if (!empty($book->data->product->teaser->link)) {
-    drupal_add_js('sites/all/themes/netsound2/js/audio-player/audio-player.js');
-    drupal_add_js('
+
+    $javascript = '
       AudioPlayer.setup("' . url(drupal_get_path('theme', 'netsound2') . '/js/audio-player/player.swf', array('absolute' => TRUE)) .'", {
         width: 290,
         leftbg: "7DAFC3",
@@ -683,12 +769,14 @@ function elib_book_teaser(TingClientObject $object) {
         leftbghover: "ADCBD7",
         rightbghover: "C4D296",
         loader: "C4D296",
-        transparentpagebg: "yes"
+        transparentpagebg: "yes",
+        autostart: "' . ($is_ajax ? 'yes' : 'no') . '"
       });
-    ', 'inline');
+    ';
 
-    return '
-      <h4>Hør smagsprøve</h4>
+    $title = $is_ajax ? 'Du lytter nu til en smagsprøve på bogen:<br />- ' . $book->data->product->title : 'Hør smagsprøve';
+    $html = '
+      <h4>'.$title.'</h4>
       <div id="audio-player">Da din browser ikke understøtter flash kan vi ikke afspille smagsprøven for dig, men du kan downloade det ' .l('her', $book->data->product->teaser->link) . ' og selv afspille det på din computer.</div>
       <script type="text/javascript">
         AudioPlayer.embed("audio-player", {
@@ -698,6 +786,22 @@ function elib_book_teaser(TingClientObject $object) {
         });
       </script>
     ';
+
+    if ($is_ajax) {
+      $out = '
+        <script type="text/javascript" src="/sites/all/themes/netsound2/js/audio-player/audio-player.js"></script>
+        <script type="text/javascript">
+        ' . $javascript . '
+        </script>
+        ' . $html . ''
+      ;
+      die($out);
+    }
+
+    drupal_add_js('sites/all/themes/netsound2/js/audio-player/audio-player.js');
+    drupal_add_js($javascript, 'inline');
+
+    return $html;
   }
 }
 

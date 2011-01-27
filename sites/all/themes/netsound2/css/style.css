@@ -272,19 +272,19 @@ font-size:18px;
 .page-faq .faq-answer p {margin-bottom:12px;}
 .page-faq .faq-ul-questions-top a { line-height:26px;color: #439EC1;}
 
-
-
-
 .faq-ul-questions-top a.active{
 	color : #439EC1;
 }
 
+h3.title {
+  font-weight: 900;
+}
 
 /* /FAQ */
 
 h2.pane-title, h1.header, body.clean h1{
 	font-family: "American Typewriter", "Courier New", serif;
-	font-weight:normal;
+	font-weight: bold;
 	font-size:1.6em;
 	color:#666666;
 	border-bottom: 1px dashed #999999;
@@ -371,12 +371,12 @@ h2.pane-title, h1.header, body.clean h1{
 .display-book .picture img{
 	display:block;
 }
-.display-book.small{
+.display-book.small {
 	margin:0;
 	width:auto;
 }
 .display-book.small .picture{
-	height:120px;
+	height:100px;
 	float:left;
 	margin-right:10px;
 }
@@ -392,39 +392,75 @@ h2.pane-title, h1.header, body.clean h1{
 	height:auto;
 }
 
-.display-book.textright{
-	margin:0;
-	width:auto;
+.pane-elib-block-lastloans-2 .display-book.small {
+  padding-left: 38px;
 }
 
 .display-book .fivestar-widget-static .star span{
   text-align:left;
 }
 
-.display-book.textright{
-	text-align:right;
+.display-book.textright {
+	margin: 0;
+	width: auto;
 }
-
-
 
 .display-book.textright .item-list .title{
-	display:block;
-	text-transform:uppercase;
-	font-weight:normal;
-	margin-top:15px;
+	display: block;
+	text-transform: uppercase;
+	font-weight: normal;
+	margin-top: 5px;
 }
 .display-book.textright .picture{
-	padding-left:10px;
-	margin-right:10px;
-	float:right;
+	float: left;
 }
 
 .display-book .item-list .title{
-	font-weight:normal;
-	margin-right:5px;
+	font-weight: normal;
+	margin-right: 5px;
+}
+.display-book.textright .item-list  {
+	margin-bottom: 10px;
+}
+.display-book.textright .item-list .item-list {
+	text-transform: uppercase;
 }
 
 
+.pane-elib-block-lastloans-2 .display-book.small {
+  background-position: 1px 10px;
+  background-repeat: no-repeat;
+}
+.pane-elib-block-lastloans-2 .display-book.index-1 {
+  background-image: url(../img/index-1.png);
+}
+.pane-elib-block-lastloans-2 .display-book.index-2 {
+  background-image: url(../img/index-2.png);
+}
+.pane-elib-block-lastloans-2 .display-book.index-3 {
+  background-image: url(../img/index-3.png);
+}
+.pane-elib-block-lastloans-2 .display-book.index-4 {
+  background-image: url(../img/index-4.png);
+}
+.pane-elib-block-lastloans-2 .display-book.index-5 {
+  background-image: url(../img/index-5.png);
+}
+.pane-elib-block-lastloans-2 .display-book.index-6 {
+  background-image: url(../img/index-6.png);
+}
+.pane-elib-block-lastloans-2 .display-book.index-7 {
+  background-image: url(../img/index-7.png);
+}
+.pane-elib-block-lastloans-2 .display-book.index-8 {
+  background-image: url(../img/index-8.png);
+}
+.pane-elib-block-lastloans-2 .display-book.index-9 {
+  background-image: url(../img/index-9.png);
+}
+.pane-elib-block-lastloans-2 .display-book.index-10 {
+  background-image: url(../img/index-10.png);
+}
 
 #lightboxFrame{
 	border:0 none;
@@ -529,10 +565,9 @@ body.front .messageouter{
 } 
  
 .view-latest-news .created{
-	float:left;
-	color:#666;
 	margin-right:0.4em;
-	font-weight:bold;
+	font-style: italic;
+  padding-bottom: 10px;
 }
 .view-latest-news div {
   border-bottom:1px dashed #666;
@@ -633,19 +668,6 @@ width:49.99%;
 }
 
 
-.view-latest-news .created{
-	display:none;
-} 
-
-
-
-
-
-
-
-
-
-
 
 .biglogoutbutton{
 	color:#90C50F;
@@ -743,6 +765,13 @@ body.node-type-article #comments .meta{
 
 /* user reviews */
 
+.view-anmeldelser .display-book .icons a {
+  display: block;
+}
+
+.table-cell {
+  display: table-cell;
+}
 
 .view-display-id-panel_pane_1 .views-field-uid, .view-display-id-panel_pane_1 .views-field-created, .pane-node-comments .meta div,  .pane-node-comments .meta span{
 	float:left;
@@ -791,7 +820,7 @@ ul.pager li{
 /* fivestar */
 
 .fivestar-static-form-item{
-	margin-bottom:5px;
+	margin: 3px 0 8px 0;
 }
 
 .display-book.small .fivestar-static-form-item{
@@ -800,9 +829,10 @@ ul.pager li{
 }
 .display-book.small .icons .icons{
 	float:left;
+  height: 16px;
 }
-.display-book.small .icons{
-	height:20px;
+.display-book.small .icons {
+  height: 47px;
 }
 
 div.fivestar-widget div.on a {
@@ -817,8 +847,6 @@ div.fivestar-widget div.hover a {
 }
 
 .view-anmeldelser .display-book .fivestar-static-form-item{
-	float:right;
-	margin:10px 0 10px 80px;
 	height:20px;
 }
 .feature-tab .fivestar-static-form-item{

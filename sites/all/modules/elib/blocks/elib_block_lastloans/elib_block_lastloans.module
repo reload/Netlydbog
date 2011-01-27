@@ -64,12 +64,13 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
     		$response = elib_client()->getPopularBooks();
 
     		//var_dump($response);
-    		
+    		$index = 1;
         foreach($response->data->toplistitem as $item){
             
             //print $item['ebookid'].'--';
             if(ting_get_object_by_isbn(trim($item->ebookid))){
-              $out .= elib_displaybookNEW(ting_get_object_by_isbn(trim($item->ebookid)),array('popular' => 1),'small');
+              $out .= elib_displaybookNEW(ting_get_object_by_isbn(trim($item->ebookid)), array('popular' => 1), 'small', $index);
+              $index++;
             }
           }
           if($out == ''){
