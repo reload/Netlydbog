@@ -470,7 +470,7 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
 	}
 
   // fetch cover from elib
-  elib_book_cover($object);
+  elib_book_cover($obj);
   
 	switch($displaysize){
 		case 'small':
