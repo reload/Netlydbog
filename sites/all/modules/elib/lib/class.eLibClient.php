@@ -71,7 +71,10 @@ class eLibClient{
 				return true;
 			}
 			else {
-        watchdog('elib', 'eLib login: “@message”', array('@message' => $xml->status->message, WATCHDOG_DEBUG));
+        watchdog('elib', 'eLib login: “@message” (code: @code)', array(
+          '@message' => (string) $xml->status->message,
+          '@code' => (string) $xml->status->code
+        ), WATCHDOG_ERROR);
 				return false;
 			}
 		}
@@ -99,7 +102,7 @@ class eLibClient{
   }
 
   public function getPopularBooks(){
-    $params['top'] = 5;
+    $params['top'] = 10;
     $params['listtype'] = 2;
     $params['fromdate'] = date('Y-m-d', strtotime('-1 month'));
     $params['todate'] = date('Y-m-d');
