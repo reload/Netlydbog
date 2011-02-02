@@ -490,7 +490,7 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
   if($elib_data->loanexpiredate){
     $loanlimit = elib_str_to_time($elib_data->loanexpiredate,true);
     $diff = $loanlimit-time();
-    $days = floor($diff/86400);
+    $days = floor($diff / 86400);
     $loanperiod_class = 'long';
     if($days < 14){
       $loanperiod_class = 'medium';
@@ -533,25 +533,26 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
     $part['picture'] = '<div class="picture main size1of2">' . l(theme('image', $image_url, $alttext, $alttext, null, false), $obj->url, array('html' => true)) . '</div>';
     $part['author'] = '<div class="author">' . t('By !creator_name', array('!creator_name' => l($obj->creators_string,'ting/search/'.$obj->creators_string))) . '</div>';
 
-  	if (!empty($obj->record['dc:contributor']['oss:dkind'])) {
-  	 foreach($obj->record['dc:contributor']['oss:dkind'] as $reader){
-        $readers[] = l($reader,'ting/search/'.$reader);
-      }
-      $extras = theme('item_list', $readers, t('Reader'), 'span', array('class' => 'contributor'));
-    }
-    if (!empty($obj->subjects)) {
-    	foreach($obj->subjects as $subject){
-        $subs[] = l($subject,'ting/search/'.$subject);
-      }
-      $extras .= theme('item_list', $subs, t('Subjects'), 'span', array('class' => 'subject'));
-    }
-    if (!empty($obj->record['dc:date'][''])) {
-      $link = l($obj->record['dc:date'][''][0],'ting/search/'.$obj->record['dc:date'][''][0]);
-      $extras .= theme('item_list', array($link), t('Published'), 'span', array('class' => 'published'));
-    }    
-    if (!empty($obj->record['dcterms:extent'][''])) {
-      $extras .= theme('item_list', $obj->record['dcterms:extent'][''], t('Extent'), 'span', array('class' => 'version'));
-    }
+// removet pr. ticket: #165
+//  	if (!empty($obj->record['dc:contributor']['oss:dkind'])) {
+//  	 foreach($obj->record['dc:contributor']['oss:dkind'] as $reader){
+//        $readers[] = l($reader,'ting/search/'.$reader);
+//      }
+//      $extras = theme('item_list', $readers, t('Reader'), 'span', array('class' => 'contributor'));
+//    }
+//    if (!empty($obj->subjects)) {
+//    	foreach($obj->subjects as $subject){
+//        $subs[] = l($subject,'ting/search/'.$subject);
+//      }
+//      $extras .= theme('item_list', $subs, t('Subjects'), 'span', array('class' => 'subject'));
+//    }
+//    if (!empty($obj->record['dc:date'][''])) {
+//      $link = l($obj->record['dc:date'][''][0],'ting/search/'.$obj->record['dc:date'][''][0]);
+//      $extras .= theme('item_list', array($link), t('Published'), 'span', array('class' => 'published'));
+//    }
+//    if (!empty($obj->record['dcterms:extent'][''])) {
+//      $extras .= theme('item_list', $obj->record['dcterms:extent'][''], t('Extent'), 'span', array('class' => 'version'));
+//    }
     
   	return '
       <div class="display-book '.$displaysize.' line">'.
@@ -746,7 +747,8 @@ function elib_get_sample($tingObjectID) {
  */
 function elib_book_teaser(TingClientObject $object, $is_ajax = false) {
   module_load_include('isbn_static_func.inc', 'elib');
-  $isbn = trim(convertFromIsbn13ToIsbn10($object->record['dc:identifier']['dkdcplus:ISBN'][0]));
+  $isbn = preg_replace('/[^0-9]+/', '', $object->record['dc:identifier']['dkdcplus:ISBN'][0]);
+  $isbn = convertFromIsbn13ToIsbn10($isbn);
 
   $c = elib_client();
   $c->setLibrary(variable_get('elib_retailer_id', ''));

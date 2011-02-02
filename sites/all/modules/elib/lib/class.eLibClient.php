@@ -83,12 +83,22 @@ class eLibClient{
 		}
   }
 
-  public function getNewBooks(){
+  /**
+   *
+   * @param int $limit number of records to fetch
+   * @param int $fromdate from date as unix timestamp
+   * @return simpleml object
+   */
+  public function getNewBooks($limit = 100, $fromdate = null) {
 
-  	$params['top'] = 100;
+    if (is_null($fromdate)) {
+      $fromdate = strtotime('-1 month');
+    }
+
+  	$params['top'] = $limit;
   	$params['listtype'] = 1;
   	#$params['fromdate'] = date('Y-m-d',time()-22592000);
-  	$params['fromdate'] = date('Y-m-d', strtotime('-1 month'));
+  	$params['fromdate'] = date('Y-m-d', $fromdate);
 
   	$response = $this->soapCall($this->base_url.'getlibrarylist.asmx?WSDL','GetNewBooks',$params);
   	
@@ -189,12 +199,12 @@ class eLibClient{
    * @return SimpleXMLElement
    */
   public function getBook($isbn){
-    if(preg_match('/^[0-9]+$/', $isbn)){
+    if(preg_match('/^[0-9]+(X)?$/', $isbn)){
       $response = $this->soapCall($this->base_url.'getproduct.asmx?WSDL','GetProduct',array('ebookid' => $isbn));
       return simplexml_load_string($response->GetProductResult->any);
     }
     else{
-    	throw new Exception('the isbn need to be int');
+    	throw new Exception('the isbn need to be int: "'.$isbn.'" send');
     }
   }
 
