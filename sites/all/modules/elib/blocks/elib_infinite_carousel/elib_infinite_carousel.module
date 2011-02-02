@@ -15,7 +15,7 @@ function elib_infinite_carousel_block($op = 'list', $delta = 0) {
     $form['search'] = array(
       '#type' => 'textfield',
       '#title' => t('Search query string'),
-      '#default_value' => variable_get('elib_infinite_carousel_block_query', 'dc.date = 2011 OR dc.date = 2010'),
+      '#default_value' => variable_get('elib_infinite_carousel_block_query', '(dc.date = 2011 OR dc.date = 2010) AND dc.type = "Lydbog (online)"'),
     );
     return $form;
   }
@@ -28,42 +28,55 @@ function elib_infinite_carousel_block($op = 'list', $delta = 0) {
     drupal_add_js( drupal_get_path('module', 'elib_infinite_carousel') . '/elib_infinite_carousel.js' );
 
     $cache_name = 'elib_infinite_carousel_cache' . $delta;
-    $cache = cache_get($cache_name, 'cache_page');
+    $cache = cache_get($cache_name, 'cache');
 
     if (isset($cache->data)) {
-      $list = $cache->data;
+      $books = $cache->data;
+      error_log(__FILE__ . ' +' . __LINE__ . ' ' . print_r('read from cache', 1));
     }
     else {
+      error_log(__FILE__ . ' +' . __LINE__ . ' ' . print_r('rebuild cache cache', 1));
       module_load_include('client.inc', 'ting');
-      $query = variable_get('elib_infinite_carousel_block_query', 'dc.date = 2011 OR dc.date = 2010');
+      $query = variable_get('elib_infinite_carousel_block_query', '(dc.date = 2011 OR dc.date = 2010) AND dc.type = "Lydbog (online)"');
       $limit = variable_get('elib_infinite_carousel_block_items', 49);
       $result = ting_do_search($query, 1, $limit);
 
-      $list = '';
-      $index = 0;
+      $books = array();
       if (($result instanceof  TingClientSearchResult) && ($result->numTotalObjects)) {
         foreach ($result->collections as $collection) {
           foreach ($collection->objects as $object) {
-            elib_book_cover($object);
-            $image_url = $image_url = ting_covers_collection_url($object, '120_x');
-            $image = theme('image', $image_url, $object->title, $object->title, null, false);
-
-            $list .= '
-              <li>
-                <a href="'.$object->url.'" title="'.$object->title.'">
-                  '.$image.'
-                  <h4>'.$object->title.'</h4>
-                  <h5>'.$object->creators_string . '('.$index.')</h5>
-                </a>
-              </li>
-            ';
-            $index++;
+            $books[] = $object;
           }
         }
       }
-
-      cache_set($cache_name, $list, 'cache_page', CACHE_TEMPORARY);
+      cache_set($cache_name, $books, 'cache', strtotime('+2 minutes'));
     }
+
+
+    shuffle($books);
+    foreach ($books as $object) {
+      elib_book_cover($object);
+      $image_url = $image_url = ting_covers_collection_url($object, '120_x');
+      $image = theme('image', $image_url, $object->title, $object->title, null, false);
+
+//      $list .= '
+//        <li>
+//          <a href="'.$object->url.'" title="'.$object->title.'">
+//            '.$image.'
+//          </a>
+//        </li>
+//      ';
+      $list .= '
+        <li>
+          <a href="'.$object->url.'" title="'.$object->title.'">
+            '.$image.'
+            <h4>' . $object->title . '</h4>
+            <h5>' . $object->creators_string . '</h5>
+          </a>
+        </li>
+      ';
+    }
+
 
     $block['subject'] = t('eLIB infinite carousel');
     $block['content'] = '

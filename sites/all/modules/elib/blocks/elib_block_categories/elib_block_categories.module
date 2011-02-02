@@ -71,7 +71,7 @@ function elib_block_categories_block($op = 'list', $delta = 0) {
   elseif ($op == 'view') {
 
     $cache_name = 'elib_block_categories_cache' . $delta;
-    $cache = cache_get($cache_name, 'cache_page');
+    $cache = cache_get($cache_name, 'cache');
 
     if (isset($cache->data)) {
       $data = $cache->data;
@@ -122,7 +122,7 @@ function elib_block_categories_block($op = 'list', $delta = 0) {
         $count++;
       }
       
-      cache_set($cache_name, $data, 'cache_page', CACHE_TEMPORARY);
+      cache_set($cache_name, $data, 'cache', CACHE_TEMPORARY);
     }
 
     $block['subject'] = t('eLIB categories');
