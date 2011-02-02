@@ -50,6 +50,7 @@ $n = node_build_content($n);
   <div class="icons">
         <?php print l(theme('image', 'sites/all/themes/netsound2/img/stream.png', '', '', null, false), $object->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) ?>
         <?php print l(theme('image', 'sites/all/themes/netsound2/img/fetch.png', '', '', null, false), $object->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe')))?>
+        <?php print l(theme('image', 'sites/all/themes/netsound2/img/sample.png', '', '', null, false), $object->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) ?>
         <?php 
         if($user->uid){
         	print l(theme('image', 'sites/all/themes/netsound2/img/husk.png', '', '', null, false), $object->url.'/huskeliste?'.drupal_get_destination(), array('html' => true));
@@ -165,7 +166,7 @@ $n = node_build_content($n);
               <?php print theme('item_list', $object->record['dc:rights'][''], t('Rights'), 'span', array('class' => 'rights'));?>
             <?php } ?>
 
-            <?php print elib_book_teaser($object) ?>
+            <?php /* print elib_book_teaser($object) */ ?>
 
     </div>
   </div>
