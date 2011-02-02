@@ -13,7 +13,7 @@ foreach ($collection->objects as $obj){
 	}
 } 
 
-elib_book_cover($collection->objects[0]);
+elib_book_cover($lydbogObj);
 $alttext = t('@titel af @forfatter',array('@titel' => $lydbogObj->title, '@forfatter' => $lydbogObj->creators_string));
 
 ?>
