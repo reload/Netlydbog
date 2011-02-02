@@ -7,7 +7,7 @@
  */
 
 foreach ($collection->objects as $obj){
-	if($obj->type == 'Lydbog (online)'){
+	if($obj->type == 'Lydbog (online)') {
 		$lydbogObj = $obj;
 //		$lydbogObj = ting_get_object_by_id($obj->id);
 	}

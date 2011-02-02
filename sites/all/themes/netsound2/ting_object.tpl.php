@@ -13,6 +13,10 @@
 
 //dsm($response);
 
+if($object->type != 'Lydbog (online)') {
+  drupal_set_message(t('Bogen findes ikke som lydbog'), 'error');
+  drupal_goto('/');
+}
 
 /*logic for rating */
 elib_book_cover($object);
