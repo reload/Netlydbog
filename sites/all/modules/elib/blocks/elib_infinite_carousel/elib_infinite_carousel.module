@@ -32,10 +32,8 @@ function elib_infinite_carousel_block($op = 'list', $delta = 0) {
 
     if (isset($cache->data)) {
       $books = $cache->data;
-      error_log(__FILE__ . ' +' . __LINE__ . ' ' . print_r('read from cache', 1));
     }
     else {
-      error_log(__FILE__ . ' +' . __LINE__ . ' ' . print_r('rebuild cache cache', 1));
       module_load_include('client.inc', 'ting');
       $query = variable_get('elib_infinite_carousel_block_query', '(dc.date = 2011 OR dc.date = 2010) AND dc.type = "Lydbog (online)"');
       $limit = variable_get('elib_infinite_carousel_block_items', 49);
@@ -49,7 +47,7 @@ function elib_infinite_carousel_block($op = 'list', $delta = 0) {
           }
         }
       }
-      cache_set($cache_name, $books, 'cache', strtotime('+2 minutes'));
+      cache_set($cache_name, $books, 'cache', strtotime('+24 hours'));
     }
 
 
