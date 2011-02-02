@@ -1,0 +1,81 @@
+<?php
+
+function elib_infinite_carousel_block($op = 'list', $delta = 0) {
+  $block = array();
+  
+  if ($op == 'list') {
+    $block[0]["info"] = t('eLIB infinite carousel');
+  }
+  else if ($op == 'configure' && $delta == 0) {
+    $form['items'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Number of items in the carousel'),
+      '#default_value' => variable_get('elib_infinite_carousel_block_items', 49),
+    );
+    $form['search'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Search query string'),
+      '#default_value' => variable_get('elib_infinite_carousel_block_query', 'dc.date = 2011 OR dc.date = 2010'),
+    );
+    return $form;
+  }
+  else if ($op == 'save' && $delta == 0) {
+    variable_set('elib_infinite_carousel_block_items',  (int) $edit['items']);
+  }
+  else if ($op == 'view' && $delta == 0) {
+
+    drupal_add_css( drupal_get_path('module', 'elib_infinite_carousel') . '/elib_infinite_carousel.css' );
+    drupal_add_js( drupal_get_path('module', 'elib_infinite_carousel') . '/elib_infinite_carousel.js' );
+
+    $cache_name = 'elib_infinite_carousel_cache' . $delta;
+    $cache = cache_get($cache_name, 'cache_page');
+
+    if (isset($cache->data)) {
+      $list = $cache->data;
+    }
+    else {
+      module_load_include('client.inc', 'ting');
+      $query = variable_get('elib_infinite_carousel_block_query', 'dc.date = 2011 OR dc.date = 2010');
+      $limit = variable_get('elib_infinite_carousel_block_items', 49);
+      $result = ting_do_search($query, 1, $limit);
+
+      $list = '';
+      $index = 0;
+      if (($result instanceof  TingClientSearchResult) && ($result->numTotalObjects)) {
+        foreach ($result->collections as $collection) {
+          foreach ($collection->objects as $object) {
+            elib_book_cover($object);
+            $image_url = $image_url = ting_covers_collection_url($object, '120_x');
+            $image = theme('image', $image_url, $object->title, $object->title, null, false);
+
+            $list .= '
+              <li>
+                <a href="'.$object->url.'" title="'.$object->title.'">
+                  '.$image.'
+                  <h4>'.$object->title.'</h4>
+                  <h5>'.$object->creators_string . '('.$index.')</h5>
+                </a>
+              </li>
+            ';
+            $index++;
+          }
+        }
+      }
+
+      cache_set($cache_name, $list, 'cache_page', CACHE_TEMPORARY);
+    }
+
+    $block['subject'] = t('eLIB infinite carousel');
+    $block['content'] = '
+      <div class="infiniteCarousel">
+        <div class="wrapper">
+          <ul>
+          '.$list.'
+          </ul>
+        </div>
+      </div>
+    ';
+  }
+
+  return $block;
+}

@@ -1,0 +1,6 @@
+; $Id$
+name = eLIB Infinite Carousel
+description = Provides a Infinite Carousel block with latest added books
+package = Ding!
+core = 6.x
+dependencies[] = elib

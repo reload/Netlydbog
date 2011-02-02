@@ -1,0 +1,97 @@
+
+.pane-elib-infinite-carousel-0 {
+  background: #E8E4DF url(http://netlydbog.dk/sites/all/themes/netsound2/img/topfeature-shadow.gif) repeat-x bottom;
+  height: 330px;
+  display: block;
+}
+.pane-elib-infinite-carousel-0 h2.pane-title {
+  border-bottom: none;
+  padding: 10px 0 0 15px;
+  margin: 0;
+}
+
+.infiniteCarousel {
+/*  1006*/
+  width: 1006px;
+  height: 310px;
+  position: relative;
+}
+
+
+.infiniteCarousel .bg {
+  margin: 0 20px;
+}
+
+.infiniteCarousel .wrapper {
+  width: 994px; /* .infiniteCarousel width - (.wrapper margin-left + .wrapper margin-right) */
+  overflow: auto;
+  height: 310px;
+  margin: 0 5px;
+  position: absolute;
+  top: 0;
+}
+
+.infiniteCarousel a h4 {
+  margin: 0;
+  padding: 3px 0 0 0;
+  color: #90C50F;
+  font-weight: bold;
+}
+.infiniteCarousel a h5 {
+  margin: 0;
+  padding: 3px 0 0 0;
+  color: #1E8ACE;
+  font-weight: normal;
+}
+
+.infiniteCarousel ul a {
+  display:block;
+  height: 100%;
+  text-decoration: none;
+}
+
+.infiniteCarousel .wrapper ul {
+  width: 9999px;
+  list-style-image:none;
+  list-style-position:outside;
+  list-style-type:none;
+  margin:0;
+  padding:0;
+  position: absolute;
+  top: 0;
+}
+
+.infiniteCarousel ul li {
+  display:block;
+  float:left;
+  padding: 0 11px;
+  height: 298px;
+  width: 120px;
+}
+
+.infiniteCarousel ul li a img {
+  display:block;
+  width: 120px;
+  height: 180px;
+}
+
+.infiniteCarousel .arrow {
+  display: block;
+  height: 36px;
+  width: 37px;
+  text-indent: -9999px;
+  position: absolute;
+  top: 70px;
+  cursor: pointer;
+  background-color: teal;
+}
+
+.infiniteCarousel .forward {
+  background: url(/sites/all/themes/netsound2/img/cycle-right.png) no-repeat center right;
+  right: -12px;
+}
+
+.infiniteCarousel .back {
+  background: url(/sites/all/themes/netsound2/img/cycle-left.png) no-repeat center left;
+  left: -12px;
+}
