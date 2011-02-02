@@ -76,6 +76,7 @@ $alttext = t('@titel af @forfatter',array('@titel' => $lydbogObj->title, '@forfa
       <div class="icons">
         <?php print l(theme('image', 'sites/all/themes/netsound/img/stream.png', '', '', null, false), $lydbogObj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) ?>
         <?php print l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $lydbogObj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe')))?>
+        <?php print l(theme('image', 'sites/all/themes/netsound/img/sample.png', '', '', null, false), $lydbogObj->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) ?>
       </div>
    
       </div>
