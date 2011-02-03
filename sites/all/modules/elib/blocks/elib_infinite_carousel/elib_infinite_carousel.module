@@ -54,25 +54,26 @@ function elib_infinite_carousel_block($op = 'list', $delta = 0) {
     shuffle($books);
     foreach ($books as $object) {
       elib_book_cover($object);
+      $alttext = t('@titel af @forfatter',array('@titel' => $object->title, '@forfatter' => $object->creators_string));
       $image_url = $image_url = ting_covers_collection_url($object, '120_x');
-      $image = theme('image', $image_url, $object->title, $object->title, null, false);
+      $image = theme('image', $image_url, $alttext, $alttext, null, false);
 
-//      $list .= '
-//        <li>
-//          <a href="'.$object->url.'" title="'.$object->title.'">
-//            '.$image.'
-//          </a>
-//        </li>
-//      ';
       $list .= '
         <li>
-          <a href="'.$object->url.'" title="'.$object->title.'">
-            '.$image.'
-            <h4>' . $object->title . '</h4>
-            <h5>' . $object->creators_string . '</h5>
+          <a href="' . $object->url . '" title="' . $alttext . '">
+            ' . $image . '
           </a>
         </li>
       ';
+//      $list .= '
+//        <li>
+//          <a href="' . $object->url . '" title="' . $alttext . '">
+//            ' . $image . '
+//            <h4>' . $object->title . '</h4>
+//            <h5>' . $object->creators_string . '</h5>
+//          </a>
+//        </li>
+//      ';
     }
 
 

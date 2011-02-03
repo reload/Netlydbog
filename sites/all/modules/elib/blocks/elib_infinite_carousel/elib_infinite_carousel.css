@@ -1,7 +1,7 @@
 
 .pane-elib-infinite-carousel-0 {
   background: #E8E4DF url(http://netlydbog.dk/sites/all/themes/netsound2/img/topfeature-shadow.gif) repeat-x bottom;
-  height: 330px;
+  height: 250px;
   display: block;
 }
 .pane-elib-infinite-carousel-0 h2.pane-title {
@@ -13,7 +13,7 @@
 .infiniteCarousel {
 /*  1006*/
   width: 1006px;
-  height: 310px;
+  height: 230px;
   position: relative;
 }
 
@@ -25,7 +25,7 @@
 .infiniteCarousel .wrapper {
   width: 994px; /* .infiniteCarousel width - (.wrapper margin-left + .wrapper margin-right) */
   overflow: auto;
-  height: 310px;
+  height: 230px;
   margin: 0 5px;
   position: absolute;
   top: 0;
@@ -65,7 +65,7 @@
   display:block;
   float:left;
   padding: 0 11px;
-  height: 298px;
+  height: 198px;
   width: 120px;
 }
 
