@@ -24,6 +24,7 @@ function elib_infinite_carousel_block($op = 'list', $delta = 0) {
   }
   else if ($op == 'view' && $delta == 0) {
 
+    module_load_include('client.inc', 'ting');
     drupal_add_css( drupal_get_path('module', 'elib_infinite_carousel') . '/elib_infinite_carousel.css' );
     drupal_add_js( drupal_get_path('module', 'elib_infinite_carousel') . '/elib_infinite_carousel.js' );
 
@@ -34,7 +35,6 @@ function elib_infinite_carousel_block($op = 'list', $delta = 0) {
       $books = $cache->data;
     }
     else {
-      module_load_include('client.inc', 'ting');
       $query = variable_get('elib_infinite_carousel_block_query', '(dc.date = 2011 OR dc.date = 2010) AND dc.type = "Lydbog (online)"');
       $limit = variable_get('elib_infinite_carousel_block_items', 49);
       $result = ting_do_search($query, 1, $limit);
