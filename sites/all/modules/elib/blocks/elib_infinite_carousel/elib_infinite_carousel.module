@@ -50,7 +50,6 @@ function elib_infinite_carousel_block($op = 'list', $delta = 0) {
       cache_set($cache_name, $books, 'cache', strtotime('+24 hours'));
     }
 
-
     shuffle($books);
     foreach ($books as $object) {
       elib_book_cover($object);
@@ -75,7 +74,6 @@ function elib_infinite_carousel_block($op = 'list', $delta = 0) {
 //        </li>
 //      ';
     }
-
 
     $block['subject'] = t('eLIB infinite carousel');
     $block['content'] = '
