@@ -882,13 +882,16 @@ div.fivestar-widget div.hover a {
 .pane-elib-block-categories-0 ul {
   margin-bottom: 10px;
   float: left;
-  width: 115px;
+  width: 49%;
 }
 .pane-elib-block-categories-0 ul li {
   color: #90C50F;
 }
 .pane-elib-block-categories-0 ul li h5 {
   font-weight: 900;
+}
+.pane-elib-block-categories-0 ul li ul {
+  width: 100%;
 }
 .pane-elib-block-categories-0 ul li ul li {
   float: none;
