@@ -364,10 +364,11 @@ h2.pane-title, h1.header, body.clean h1{
 	width:170px;
 	margin:0 auto;
 }
+/*
 .display-book .picture{
 	height:270px;
-	
 }
+*/
 .display-book .picture img{
 	display:block;
 }
