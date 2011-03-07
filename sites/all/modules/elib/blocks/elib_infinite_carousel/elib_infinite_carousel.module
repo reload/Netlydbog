@@ -1,6 +1,6 @@
 <?php
 
-function elib_infinite_carousel_block($op = 'list', $delta = 0) {
+function elib_infinite_carousel_block($op = 'list', $delta = 0, $edit = array()) {
   $block = array();
   
   if ($op == 'list') {
