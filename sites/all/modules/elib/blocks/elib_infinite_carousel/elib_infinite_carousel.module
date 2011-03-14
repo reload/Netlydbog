@@ -2,6 +2,8 @@
 
 function elib_infinite_carousel_block($op = 'list', $delta = 0, $edit = array()) {
   $block = array();
+  $cache_name = 'elib_infinite_carousel_cache' . $delta;
+  $cache_table = 'cache';
   
   if ($op == 'list') {
     $block[0]["info"] = t('eLIB infinite carousel');
@@ -21,6 +23,12 @@ function elib_infinite_carousel_block($op = 'list', $delta = 0, $edit = array())
   }
   else if ($op == 'save' && $delta == 0) {
     variable_set('elib_infinite_carousel_block_items',  (int) $edit['items']);
+    variable_set('elib_infinite_carousel_block_query',  $edit['search']);
+    variable_set('elib_infinite_carousel_block_title',  $edit['title']);
+
+    // now clear the cache...
+    cache_clear_all($cache_name, $cache_table);
+
   }
   else if ($op == 'view' && $delta == 0) {
 
@@ -28,8 +36,7 @@ function elib_infinite_carousel_block($op = 'list', $delta = 0, $edit = array())
     drupal_add_css( drupal_get_path('module', 'elib_infinite_carousel') . '/elib_infinite_carousel.css' );
     drupal_add_js( drupal_get_path('module', 'elib_infinite_carousel') . '/elib_infinite_carousel.js' );
 
-    $cache_name = 'elib_infinite_carousel_cache' . $delta;
-    $cache = cache_get($cache_name, 'cache');
+    $cache = cache_get($cache_name, $cache_table);
 
     if (isset($cache->data)) {
       $books = $cache->data;
@@ -47,7 +54,7 @@ function elib_infinite_carousel_block($op = 'list', $delta = 0, $edit = array())
           }
         }
       }
-      cache_set($cache_name, $books, 'cache', strtotime('+24 hours'));
+      cache_set($cache_name, $books, $cache_table, strtotime('+24 hours'));
     }
 
     shuffle($books);
@@ -75,7 +82,7 @@ function elib_infinite_carousel_block($op = 'list', $delta = 0, $edit = array())
 //      ';
     }
 
-    $block['subject'] = t('eLIB infinite carousel');
+    $block['subject'] = variable_get('elib_infinite_carousel_block_title', t("Nyeste lydbøger"));
     $block['content'] = '
       <div class="infiniteCarousel">
         <div class="wrapper">
