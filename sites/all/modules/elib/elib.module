@@ -113,38 +113,38 @@ function elib_get_lydbog($tingObjectID,$format){
 	
 	if($_GET['downloaded']){
 		
-		$out = t('<h1 style="text-align:center;">Hjælp til afspilning</h1>');
+  		$out = t('<h1 style="text-align:center;">Hjælp til afspilning</h1>');
 	  
-		$sql = 'SELECT node.nid AS nid,
-   nodequeue_nodes_node.position AS nodequeue_nodes_node_position
- FROM node node 
- INNER JOIN nodequeue_nodes nodequeue_nodes_node ON node.nid = nodequeue_nodes_node.nid AND nodequeue_nodes_node.qid = 3
- WHERE node.status <> 0
-   ORDER BY nodequeue_nodes_node_position ASC
-		';
+  		$sql = 'SELECT node.nid AS nid,
+     nodequeue_nodes_node.position AS nodequeue_nodes_node_position
+   FROM node node 
+   INNER JOIN nodequeue_nodes nodequeue_nodes_node ON node.nid = nodequeue_nodes_node.nid AND nodequeue_nodes_node.qid = 3
+   WHERE node.status <> 0
+     ORDER BY nodequeue_nodes_node_position ASC
+  		';
 		
-		$res = db_query($sql);
+  		$res = db_query($sql);
 		
-		while($row = db_fetch_array($res)){
+  		while($row = db_fetch_array($res)){
 			
-			$n = node_load($row['nid']);
+  			$n = node_load($row['nid']);
 			
-			/* hmm */
-			$keys = array_keys($n->taxonomy);
-			$tid = $n->taxonomy[$keys[0]];
-			$tid = $tid->tid;
+  			/* hmm */
+  			$keys = array_keys($n->taxonomy);
+  			$tid = $n->taxonomy[$keys[0]];
+  			$tid = $tid->tid;
 			
-			$anchor = $tid.'n'.$n->nid;
+  			$anchor = $tid.'n'.$n->nid;
 			
-			$items[] =  l($n->title,'faqlist/'.$tid, array("fragment" => $anchor,'attributes' => array('target' => '_top')));
+  			$items[] =  l($n->title,'faqlist/'.$tid, array("fragment" => $anchor,'attributes' => array('target' => '_top')));
 			
-		}
+  		}
 		
-		$out .= '<div class="ruler-after">'.theme('item_list',$items).'</div>';
+  		$out .= '<div class="ruler-after">'.theme('item_list',$items).'</div>';
 		
-		$out .= '<p>'.l(t('Få mere hjælp'),'help',array('attributes' => array('target' => '_top '))).'</p>';
+  		$out .= '<p>'.l(t('Få mere hjælp'),'help',array('attributes' => array('target' => '_top '))).'</p>';
 		
-		return $out; 
+  		return $out; 
 	}
 	
 	
@@ -221,10 +221,27 @@ function elib_get_lydbog($tingObjectID,$format){
 		$pretext = '<h1 style="text-align:center;">Din lydbog afspilles nu nedenfor</h1>';
 		$src = $response->data->downloadurl;
 		if($format != 'stream'){
+			
 			$src = (trim($response->data[1]->files[0]->file));
+			
 			global $base_root;
 			$pretext = '<h1 style="text-align:center;">Vi er ved at generere din lydbog.<br/> Vent venligst...</h1><div class="loader"></div><p>Vi er ved at pakke din lydbog til en fil</p><p>Problemer med download? Hent filen via <a href="'.$src.'">direkte link</a><p>Når du har gemt filen, tryk næste</p>'.l('Næste',$base_root.request_uri(),array('query'=> 'downloaded=1','attributes' => array('class' => 'nextknap knap')));
+		
+			// check for download format, not sure it will ever be shown this way...
+			if(empty($src))
+			{
+			$pretext = '<h1 style="text-align:center;">FEJL</h1><p>Der returneres ikke nogen download url fra eLib webservicen.</p>';
+			}
+		
 		}
+
+    watchdog('elib', 'eLib DOWNLOAD src: @message - @response', 
+             array('@message' => $src, '@response' => var_export($response,true)
+                   , WATCHDOG_DEBUG));
+
+
+
+
 	
 		$content = $pretext;
 		
