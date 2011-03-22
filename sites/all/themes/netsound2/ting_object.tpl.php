@@ -14,8 +14,8 @@
 //dsm($response);
 
 if($object->type != 'Lydbog (online)') {
-  drupal_set_message(t('Bogen findes ikke som lydbog'), 'error');
-  drupal_goto('/');
+  drupal_set_message(t('Bogen findes ikke som lydbog, foretager søgning...'), 'error');
+  drupal_goto('/ting/search/'.$object->title,NULL,NULL,301); // set the statuscode as MOVED PERMANENTLY
 }
 
 /*logic for rating */
