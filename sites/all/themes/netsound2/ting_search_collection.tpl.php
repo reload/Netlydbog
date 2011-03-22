@@ -6,15 +6,15 @@
  * Template to render a Ting collection of books.
  */
 
+// updated so we show ALL objects in the collection in the search result
+
 foreach ($collection->objects as $obj){
 	if($obj->type == 'Lydbog (online)') {
 		$lydbogObj = $obj;
 //		$lydbogObj = ting_get_object_by_id($obj->id);
-	}
-} 
 
-elib_book_cover($lydbogObj);
-$alttext = t('@titel af @forfatter',array('@titel' => $lydbogObj->title, '@forfatter' => $lydbogObj->creators_string));
+  elib_book_cover($lydbogObj);
+  $alttext = t('@titel af @forfatter',array('@titel' => $lydbogObj->title, '@forfatter' => $lydbogObj->creators_string));
 
 ?>
 
@@ -31,10 +31,10 @@ $alttext = t('@titel af @forfatter',array('@titel' => $lydbogObj->title, '@forfa
     <div class="meta unit">
       <div class="inner">
       <h3 class="title">
-        <?php print l($collection->title, $lydbogObj->url, array('attributes' => array('class' =>'title'))) ;?> 
+        <?php print l($lydbogObj->title, $lydbogObj->url, array('attributes' => array('class' =>'title'))) ;?> 
       </h3>
       <div class="author">
-        <?php echo t('By !creator_name', array('!creator_name' => l($collection->creators_string,'ting/search/'.$collection->creators_string,array('html' => true)))); ?>
+        <?php echo t('By !creator_name', array('!creator_name' => l($lydbogObj->creators_string,'ting/search/'.$lydbogObj->creators_string,array('html' => true)))); ?>
       </div>
       
       <?php print elib_get_rating($lydbogObj->id);?>
@@ -71,7 +71,7 @@ $alttext = t('@titel af @forfatter',array('@titel' => $lydbogObj->title, '@forfa
       <div class="inner right">
     
       <div class="abstract">
-        <?php print check_plain($collection->abstract); ?>
+        <?php print check_plain($lydbogObj->abstract); ?>
       </div>
       <div class="icons">
         <?php print l(theme('image', 'sites/all/themes/netsound/img/stream.png', '', '', null, false), $lydbogObj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) ?>
@@ -83,3 +83,7 @@ $alttext = t('@titel af @forfatter',array('@titel' => $lydbogObj->title, '@forfa
     </div>
     
   </li>
+
+<?php
+	}
+}
