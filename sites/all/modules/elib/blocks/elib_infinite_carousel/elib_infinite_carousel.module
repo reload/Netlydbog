@@ -53,8 +53,13 @@ function elib_infinite_carousel_block($op = 'list', $delta = 0, $edit = array())
             $books[] = $object;
           }
         }
+
+        // only cache a valid result
+        // check that the cached data exists and is valid
+        if(count($books) > 0) {
+          cache_set($cache_name, $books, $cache_table, strtotime('+24 hours'));
+        }
       }
-      cache_set($cache_name, $books, $cache_table, strtotime('+24 hours'));
     }
 
     shuffle($books);
