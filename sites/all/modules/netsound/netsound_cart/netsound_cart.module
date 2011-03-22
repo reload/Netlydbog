@@ -77,7 +77,7 @@ function netsound_cart_block($op = 'list', $delta = 0, $edit = array()) {
       	module_load_include('client.inc', 'ting');    
       	
       	
-        $block['subject'] = t('Min huske liste');
+        $block['subject'] = t('Min huskeliste');
         $res = db_query('SELECT DISTINCT ting_object_id, uid FROM {netsound_cart} WHERE uid = %d',array('%d' => $user->uid));
         while($row = db_fetch_array($res)){
         	$rows[] = elib_displaybookNEW(ting_get_object_by_id($row['ting_object_id']),'','small_rm');
