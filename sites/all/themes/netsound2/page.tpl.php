@@ -66,7 +66,7 @@
       
       
       <?php print $content; ?>
-      
+      <?php print $content_bottom;?>
       </div>
       
        <?php// if ($breadcrumb) { print $breadcrumb; } // themename_breadcrumb in template.php ?>
