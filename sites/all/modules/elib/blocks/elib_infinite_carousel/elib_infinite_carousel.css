@@ -51,7 +51,7 @@
 }
 
 .infiniteCarousel .wrapper ul {
-  width: 9999px;
+  width: 9999999px;
   list-style-image:none;
   list-style-position:outside;
   list-style-type:none;

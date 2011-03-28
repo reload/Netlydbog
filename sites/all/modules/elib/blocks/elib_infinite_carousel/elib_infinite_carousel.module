@@ -44,21 +44,39 @@ function elib_infinite_carousel_block($op = 'list', $delta = 0, $edit = array())
     else {
       $query = variable_get('elib_infinite_carousel_block_query', '(dc.date = 2011 OR dc.date = 2010) AND dc.type = "Lydbog (online)"');
       $limit = variable_get('elib_infinite_carousel_block_items', 49);
-      $result = ting_do_search($query, 1, $limit);
+
+      $newlimit = 25;
+
+      $iterations = ceil($limit/$newlimit);
 
       $books = array();
-      if (($result instanceof  TingClientSearchResult) && ($result->numTotalObjects)) {
-        foreach ($result->collections as $collection) {
-          foreach ($collection->objects as $object) {
-            $books[] = $object;
-          }
+      for($i=0;$i<$iterations;$i++){
+
+        $result = array();
+        $page = ($i+1);
+
+        if(($newlimit*$page) > $limit){
+          $newlimit =  $limit % $newlimit;
         }
 
-        // only cache a valid result
-        // check that the cached data exists and is valid
-        if(count($books) > 0) {
-          cache_set($cache_name, $books, $cache_table, strtotime('+24 hours'));
+        $result = ting_do_search($query, $page, $newlimit);
+
+        if (($result instanceof TingClientSearchResult) && ($result->numTotalObjects)) {
+          foreach ($result->collections as $collection) {
+            foreach ($collection->objects as $object) {
+              $books[] = $object;
+              if(count($books) == $limit){
+                break 3;
+              }
+            }
+          }
         }
+      }
+
+      // only cache a valid result
+      // check that the cached data exists and is valid
+      if(count($books) > 0) {
+        cache_set($cache_name, $books, $cache_table, strtotime('+24 hours'));
       }
     }
 
