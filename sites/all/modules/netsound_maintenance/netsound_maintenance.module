@@ -1,0 +1,67 @@
+<?php
+function netsound_maintenance_cron() {
+  error_log("netsound_maintenance_cron is running...");
+  require_once drupal_get_path('module', 'ting') . '/ting.client.inc';
+  
+   $res = db_query('SELECT count(*) AS count FROM votingapi_vote vv LEFT JOIN node ON node.nid = vv.content_id');
+   $row =  db_fetch_array($res);
+   error_log("Found " . $row['count'] . " votes that match the criterias in votingapi_vote");
+  
+   $sql = "SELECT vv.vote_id, node.title FROM votingapi_vote vv LEFT JOIN node ON node.nid = vv.content_id ORDER BY timestamp ASC LIMIT 250";
+   $res = db_query($sql);
+
+   $counter = 0;
+   $deleted = 0;   
+   while ($row = db_fetch_array($res)) {
+     //error_log(var_export($row,true));
+     
+     $book = ting_get_object_by_id($row['title']);
+     if($book instanceof TingClientObject && $book->type != 'Lydbog (online)') {
+      db_query("DELETE FROM votingapi_vote WHERE vote_id = " . $row["vote_id"]);
+      $deleted++;
+      error_log("DELETED VOTE: " . $row["vote_id"] . " / " . $row["title"] . " " . strtoupper($book->type) . ": ". $book->title);
+     }
+     else {
+       //error_log("PASSED: " . $row["vote_id"] . " / " . $row["title"] . " BOOK: ". $book->title);
+       db_query("UPDATE votingapi_vote SET timestamp = '".time()."' WHERE vote_id = " . $row["vote_id"]);
+     }
+
+     $counter++;
+
+   }
+   
+  error_log("netsound_maintenance_cron processed " . $counter . " nodes. " . $deleted . " votes was deleted.");
+  
+  // clean the node table
+  if($deleted > 0) {
+      db_query("DELETE FROM node WHERE type = 'bookrating' and nid NOT IN (SELECT DISTINCT content_id FROM votingapi_vote WHERE content_type = 'node')");
+      
+      $res = db_query("SELECT count(*) as count FROM node WHERE type = 'bookrating'");
+      $row =  db_fetch_array($res); 
+      $bookrating_count = $row['count'];
+      
+      error_log("Cleaned up empty bookrating nodes... Now " . $bookrating_count . " bookrating nodes are left standing...");
+  }
+  
+  // rebuild the voting_api cache
+  if($deleted > 0) {
+    // Get a set of data to work on.
+    $result = db_query('SELECT DISTINCT content_type, content_id FROM {votingapi_vote}');
+
+    // Work that data.
+    $recalculated = 0;
+    while ($content = db_fetch_object($result)) {
+      votingapi_recalculate_results($content->content_type, $content->content_id, TRUE);
+      $recalculated++;
+    }
+
+    $msg = "Recalculated " . $recalculated . " cached vote-results.";
+    error_log($msg);
+  }
+  
+  watchdog('netsound', 'netsound_maintenance_cron processed @counter nodes. @deleted votes was deleted. @bookrating_count bookrating nodes exists after cleanup. Recalculated @recalculated cached vote-results.', 
+           array('@counter' => $counter, '@deleted' => $deleted, '@bookrating_count' => $bookrating_count, '@recalculated' => $recalculated
+                 , WATCHDOG_INFO));
+                   
+  error_log("netsound_maintenance_cron done!");
+}

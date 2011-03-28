@@ -226,6 +226,11 @@ class eLibClient{
       $request = new SoapClient($wsdl,$this->sc_params);
       $response = $request->$func($params);
       // var_dump($request->__getLastRequest());
+       watchdog('elib', 'eLib soapCall: “@message” [REQUEST]: @request [RESPONSE]: @response', 
+                array('@message' => $func . " (" . $wsdl . ")", 
+                      '@request' => var_export($request->__getLastRequest(), true), 
+                      '@response' => var_export($request->__getLastResponse(), true)
+                      , WATCHDOG_DEBUG));
       return $response;
     }
     catch(Exception $e){

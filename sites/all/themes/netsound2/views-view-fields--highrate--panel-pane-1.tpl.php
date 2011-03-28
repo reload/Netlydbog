@@ -21,4 +21,9 @@
 ?>
 <?php module_load_include('client.inc', 'ting');?>
 
-<?php print elib_displaybookNEW(ting_get_object_by_id($fields['title']->content),'','small');?>
+<?php 
+$book = ting_get_object_by_id($fields['title']->content);
+if($book instanceof TingClientObject && $book->type == 'Lydbog (online)') {
+  print elib_displaybookNEW($book,'','small');  
+}
+?>

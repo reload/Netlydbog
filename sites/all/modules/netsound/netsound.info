@@ -1,4 +1,4 @@
-name = Netsound speficic module
+name = Netsound specific module
 description = functions, blocks and settings
 dependencies[] = ting
 package = Ding!

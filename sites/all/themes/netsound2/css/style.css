@@ -364,11 +364,17 @@ h2.pane-title, h1.header, body.clean h1{
 	width:170px;
 	margin:0 auto;
 }
-/*
-.display-book .picture{
-	height:270px;
+
+.display-book.biglist .picture{
+  background-color: #ddd;
+	min-height:233px;
 }
-*/
+
+/* make loans left align if there's only one */
+.size1of1 .display-book.biglist {
+	margin:0; 
+}
+
 .display-book .picture img{
 	display:block;
 }
@@ -477,6 +483,7 @@ h2.pane-title, h1.header, body.clean h1{
 .loanperiod{
 	text-align:center;
 	padding:5px;
+	margin-bottom: 10px;
 }
 .loanperiod.long{
 	background:#9BC833;

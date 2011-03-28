@@ -1,0 +1,5 @@
+name = Netsound Maintenance
+description = Cleans up data (voting / bookratings) one-time-only. WARNING: Should only be enabled for a short amount of time, it's a performance-drainer.
+dependencies[] = ting
+package = Ding!
+core = 6.x
