@@ -222,15 +222,27 @@ function elib_get_lydbog($tingObjectID,$format){
 		$src = $response->data->downloadurl;
 		if($format != 'stream'){
 			
-			$src = (trim($response->data[1]->files[0]->file));
-			
-			global $base_root;
-			$pretext = '<h1 style="text-align:center;">Vi er ved at generere din lydbog.<br/> Vent venligst...</h1><div class="loader"></div><p>Vi er ved at pakke din lydbog til en fil</p><p>Problemer med download? Hent filen via <a href="'.$src.'">direkte link</a><p>Når du har gemt filen, tryk næste</p>'.l('Næste',$base_root.request_uri(),array('query'=> 'downloaded=1','attributes' => array('class' => 'nextknap knap')));
-		
-			// check for download format, not sure it will ever be shown this way...
+			$filesrc = (trim($response->data[1]->files[0]->file));
+			if(!empty($filesrc))
+			{
+			  // ok ready for download
+			  $src = $filesrc;
+        global $base_root;
+      	$pretext = '<h1 style="text-align:center;">Vi er ved at generere din lydbog.<br/> Vent venligst...</h1><div class="loader"></div><p>Vi er ved at pakke din lydbog til en fil</p><p>Problemer med download? Hent filen via <a href="'.$src.'">direkte link</a><p>Når du har gemt filen, tryk næste</p>'.l('Næste',$base_root.request_uri(),array('query'=> 'downloaded=1','attributes' => array('class' => 'nextknap knap')));
+			  
+			}
+			else
+			{
+			  // hmm, something is up...
+			  //$pretext = 'whatup? ('.$format.') ' . $src ;
+			  $format = 'info';
+			  $pretext = '';
+			}
+					
+			// this should never happen.
 			if(empty($src))
 			{
-			$pretext = '<h1 style="text-align:center;">FEJL</h1><p>Der returneres ikke nogen download url fra eLib webservicen.</p>';
+			  $pretext = '<h1 style="text-align:center;">FEJL</h1><p>Der returneres ikke nogen download url fra eLib webservicen.</p>';
 			}
 		
 		}
