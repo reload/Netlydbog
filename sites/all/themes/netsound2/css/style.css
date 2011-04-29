@@ -524,6 +524,12 @@ body.clean #user-login .form-text{
   height:0;
   border:0;
 }
+.audioplayer-info{
+	width:616px;
+	height:320px;
+	border:0;
+}
+
 body .messageouter{
   padding: 1em 0;
 }

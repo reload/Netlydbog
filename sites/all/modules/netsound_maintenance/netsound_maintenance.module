@@ -22,7 +22,7 @@ function netsound_maintenance_cron() {
       error_log("DELETED VOTE: " . $row["vote_id"] . " / " . $row["title"] . " " . strtoupper($book->type) . ": ". $book->title);
      }
      else {
-       //error_log("PASSED: " . $row["vote_id"] . " / " . $row["title"] . " BOOK: ". $book->title);
+       error_log("PASSED: " . $row["vote_id"] . " / " . $row["title"] . " BOOK: ". $book->title);
        db_query("UPDATE votingapi_vote SET timestamp = '".time()."' WHERE vote_id = " . $row["vote_id"]);
      }
 
