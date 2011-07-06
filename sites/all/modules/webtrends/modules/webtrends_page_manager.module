@@ -1,0 +1,95 @@
+<?php
+
+/**
+ * Implementation of hook_page_manager_variant_operations_alter()
+ *
+ * @return array $operations
+ */
+function webtrends_page_manager_page_manager_variant_operations_alter(&$operations, $handler) {
+  if ($handler->task == 'site_template') {
+    return;
+  }
+  
+  $new['webtrends_edit_head'] = array(
+    'title' => t('Webtrends'),
+    'form' => 'webtrends_page_manager_edit',
+  );
+  
+  $operations['children'] = array_merge($operations['children'], $new);
+}
+
+function webtrends_page_manager_edit(&$form, &$form_state) {
+  $form['webtrends_page_manager_general'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('General Settings'),
+  );
+  $form['webtrends_page_manager_general']['webtrends_page_manager_fpcdom'] = array(
+    '#type' => 'textfield',
+    '#title' => t('The site domain you want to track'),
+    '#default_value' => $form_state['handler']->conf['webtrends_page_manager_fpcdom'] ? $form_state['handler']->conf['webtrends_page_manager_fpcdom'] : variable_get('webtrends_fpcdom', ''),
+    '#description' => 'Enter the domain in the following format: example.com, example.co.uk',
+  );
+  $form['webtrends_page_manager_general']['webtrends_page_manager_source_id'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Source Id'),
+    '#default_value' => $form_state['handler']->conf['webtrends_page_manager_source_id'] ? $form_state['handler']->conf['webtrends_page_manager_source_id'] : variable_get('webtrends_source_id', ''),
+    '#description' => 'The Webtrends source id (DCSID), in the following format: dcsxxxxxxxxxxxxxxxxxxxxxx_xxxx',
+  );
+  $form['webtrends_page_manager_general']['webtrends_page_manager_domain'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Data collection server'),
+    '#default_value' => $form_state['handler']->conf['webtrends_page_manager_domain'] ? $form_state['handler']->conf['webtrends_page_manager_domain'] : variable_get('webtrends_domain', 'statse.webtrendslive.com'),
+    '#description' => 'The Internet address of the WebTrends server that collects your web data.',
+  );
+  $form['webtrends_page_manager_custom_tags'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Custom Webtrends meta tags'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $form['webtrends_page_manager_custom_tags']['webtrends_page_manager_head_content'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Page meta tags'),
+    '#description' => t('You can add custom tags to the page\'s head section. Please be aware that there is no validation on this field and the text will be inserted as is.'),
+    '#cols' => 110,
+    '#rows' => 5,
+    '#default_value' => $form_state['handler']->conf['webtrends_page_manager_head_content'],
+  );
+}
+
+function webtrends_page_manager_edit_submit(&$form, &$form_state) {
+  $form_state['handler']->conf['webtrends_page_manager_head_content'] = $form_state['values']['webtrends_page_manager_head_content'];
+  $form_state['handler']->conf['webtrends_page_manager_fpcdom'] = $form_state['values']['webtrends_page_manager_fpcdom'];
+  $form_state['handler']->conf['webtrends_page_manager_source_id'] = $form_state['values']['webtrends_page_manager_source_id'];
+  $form_state['handler']->conf['webtrends_page_manager_domain'] = $form_state['values']['webtrends_page_manager_domain'];
+}
+
+/**
+ * Implementation of hook_preprocess_page()
+ */
+function webtrends_page_manager_preprocess_page(&$variables) {
+  $page = page_manager_get_current_page();
+  
+  if (is_array($page) && count($page)) {
+    $variables['head'] .= $page['handler']->conf['webtrends_page_manager_head_content'];
+  }
+}
+
+/**
+ * Implementation of hook_wt_values()
+ * This is a Webtrends hook that allows you to
+ * override the general settings, useful for this plugin
+ * where each page can have it's own values
+ */
+function webtrends_page_manager_wt_values() {
+  $page = page_manager_get_current_page();
+
+  $values = array();
+
+  $values['webtrends_source_id'] = $page['handler']->conf['webtrends_page_manager_source_id'];
+  $values['webtrends_domain'] = $page['handler']->conf['webtrends_page_manager_domain'];
+  $values['webtrends_fpcdom'] = $page['handler']->conf['webtrends_page_manager_fpcdom'];
+
+  return $values;
+}
+

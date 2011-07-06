@@ -1,0 +1,81 @@
+<?php
+/**
+ * @file webtrends.module
+ */
+
+/**
+ * Implementation of hook_menu()
+ *
+ * @return array $items
+ */
+function webtrends_menu() {
+  $items = array();
+
+  $items['admin/settings/webtrends'] = array(
+    'title' => 'Webtrends',
+    'description' => 'Configure the Webtrends tracking integration settings.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('webtrends_admin_settings_form'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'webtrends_admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implementation of hook_init() to check roles and add the Webtrends javascript file
+ *
+ * @return null
+ */
+function webtrends_init() {
+  global $user;
+  global $webtrends_init;
+  $webtrends_init = false;
+
+  $webtrends_enabled_roles = explode('_', variable_get('webtrends_enabled_roles', ''));
+
+  if (is_array($webtrends_enabled_roles) && count($webtrends_enabled_roles)) {
+
+    $show_for_role = (bool) array_uintersect($webtrends_enabled_roles, array_keys($user->roles), "strcasecmp");
+
+    if ($show_for_role) {
+      $webtrends_init = true;
+      drupal_add_js(drupal_get_path('module', 'webtrends').'/js/webtrends.js');
+    }
+  }
+}
+
+/**
+ * Implementation of hook_footer() to insert Webtrends initialization script at the end of the page
+ *
+ * @return string $script
+ */
+function webtrends_footer() {
+  $script = '';
+  $webtrends_values = array();
+  
+  foreach (module_list() as $module) {
+    $function = $module .'_wt_values';
+    if (function_exists($function)) {
+      $webtrends_values = $function();
+    }
+  }
+
+  global $webtrends_init;
+
+  if ($webtrends_init) {
+    $script = '<script type="text/javascript">function init_webtrends() {';
+    $script .= 'var _tag = new WebTrends();'."\n";
+    $script .= '_tag.timezone = '. variable_get('webtrends_timezone', 0).";\n";
+    $script .= '_tag.dcsid = "'. ($webtrends_values['webtrends_source_id'] ? $webtrends_values['webtrends_source_id'] : variable_get('webtrends_source_id', '')).'";'."\n";
+    $script .= '_tag.domain = "'. ($webtrends_values['webtrends_domain'] ? $webtrends_values['webtrends_domain'] : variable_get('webtrends_domain', '')).'";'."\n";
+    $script .= '_tag.fpcdom = "'. ($webtrends_values['webtrends_fpcdom'] ? $webtrends_values['webtrends_fpcdom'] : variable_get('webtrends_fpcdom', '')).'";'."\n";
+    $script .= '_tag.dcsGetId();'."\n";
+    $script .= '_tag.dcsCollect();'."\n";
+    $script .= '} window.onload=init_webtrends;</script>';    
+  }
+  
+  return $script;
+}
