@@ -8,8 +8,10 @@
 
 // updated so we show ALL objects in the collection in the search result
 
+/*dsm($collection);
+*/
 foreach ($collection->objects as $obj){
-	if($obj->type == 'Lydbog (online)') {
+	if($obj->type == 'Lydbog (online)' || 1==1) { // we asume now that every collection has only this one piece of material 
 		$lydbogObj = $obj;
 //		$lydbogObj = ting_get_object_by_id($obj->id);
 

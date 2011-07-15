@@ -95,7 +95,16 @@ function elib_get_isbn_from_object_id($oid){
   module_load_include('isbn_static_func.inc', 'elib');
   try {
     $object = ting_get_object_by_id($oid);
-    $isbn = convertFromIsbn13ToIsbn10($object->record['dc:identifier']['dkdcplus:ISBN'][0]);
+    if($isbn = convertFromIsbn13ToIsbn10($object->record['dc:identifier']['dkdcplus:ISBN'][0])){
+      // do nothing
+    }
+    else{ // isbn was not a valid isbn13
+	    if(strlen($object->record['dc:identifier']['dkdcplus:ISBN'][0]) == 10){ // must be isbn 10
+	    	$isbn = $object->record['dc:identifier']['dkdcplus:ISBN'][0];
+	    }
+    }
+    
+    
     
     /*$eliburl = $object->record['dc:identifier']['dcterms:URI'][0];
     $first = substr($eliburl,strpos($eliburl,'&id=')+4);

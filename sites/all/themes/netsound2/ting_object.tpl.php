@@ -9,17 +9,10 @@
  * - $object: The TingClientObject instance we're rendering.
  */
 
-//$response = elib_client()->getBooks('01-01-1999');
-
-//dsm($response);
-
-if($object->type != 'Lydbog (online)') {
-  drupal_set_message(t('Bogen findes ikke som lydbog, foretager søgning...'), 'error');
-  drupal_goto('/ting/search/'.$object->title,NULL,NULL,301); // set the statuscode as MOVED PERMANENTLY
-}
-
 /*logic for rating */
 elib_book_cover($object);
+
+//dsm($object);
 
 if(!$n = node_load(array('title' => $object->id,'type' => 'bookrating'))){
 	$n = new stdClass();

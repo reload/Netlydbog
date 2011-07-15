@@ -23,7 +23,7 @@
 
 <?php 
 $book = ting_get_object_by_id($fields['title']->content);
-if($book instanceof TingClientObject && $book->type == 'Lydbog (online)') {
+
   print elib_displaybookNEW($book,'','small');  
-}
+
 ?>

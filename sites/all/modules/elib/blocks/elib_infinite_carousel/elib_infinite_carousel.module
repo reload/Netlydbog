@@ -17,7 +17,7 @@ function elib_infinite_carousel_block($op = 'list', $delta = 0, $edit = array())
     $form['search'] = array(
       '#type' => 'textfield',
       '#title' => t('Search query string'),
-      '#default_value' => variable_get('elib_infinite_carousel_block_query', '(dc.date = 2011 OR dc.date = 2010) AND dc.type = "Lydbog (online)"'),
+      '#default_value' => variable_get('elib_infinite_carousel_block_query', '(dc.date = 2011 OR dc.date = 2010)'),
     );
     return $form;
   }
@@ -42,7 +42,7 @@ function elib_infinite_carousel_block($op = 'list', $delta = 0, $edit = array())
       $books = $cache->data;
     }
     else {
-      $query = variable_get('elib_infinite_carousel_block_query', '(dc.date = 2011 OR dc.date = 2010) AND dc.type = "Lydbog (online)"');
+      $query = variable_get('elib_infinite_carousel_block_query', '(dc.date = 2011 OR dc.date = 2010)');
       $limit = variable_get('elib_infinite_carousel_block_items', 49);
 
       $newlimit = 25;
