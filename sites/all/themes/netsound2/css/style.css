@@ -916,3 +916,8 @@ div.fivestar-widget div.hover a {
 .pane-elib-block-categories-0 ul li ul li.highlight a {
   color: #90C50F;
 }
+
+
+.panel-display .right .inside form > div {
+	padding-top:5px;
+}
