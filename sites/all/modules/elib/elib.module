@@ -90,21 +90,34 @@ function elib_form_alter(&$form, $form_state, $form_id) {
   }
 }
 
+/* return ISBN10 from a ting object */
 function elib_get_isbn_from_object_id($oid){
   module_load_include('client.inc', 'ting');
   module_load_include('isbn_static_func.inc', 'elib');
+
+  $isbn = false;
+  
   try {
     $object = ting_get_object_by_id($oid);
-    if($isbn = convertFromIsbn13ToIsbn10($object->record['dc:identifier']['dkdcplus:ISBN'][0])){
-      // do nothing
-    }
-    else{ // isbn was not a valid isbn13
-	    if(strlen($object->record['dc:identifier']['dkdcplus:ISBN'][0]) == 10){ // must be isbn 10
-	    	$isbn = $object->record['dc:identifier']['dkdcplus:ISBN'][0];
-	    }
-    }
     
-    
+    if(is_array($object->record['dc:identifier']['dkdcplus:ISBN']))
+    {
+      foreach ($object->record['dc:identifier']['dkdcplus:ISBN'] as $isbnno) {
+        if(strlen($isbnno) == 10)
+        {
+          $isbn = $isbnno;
+          break;
+        }
+        else 
+        {
+          // guess it's an ISBN13
+          if($isbn = convertFromIsbn13ToIsbn10($isbnno))
+          {
+            break;
+          }
+        }
+      }
+    }
     
     /*$eliburl = $object->record['dc:identifier']['dcterms:URI'][0];
     $first = substr($eliburl,strpos($eliburl,'&id=')+4);
@@ -113,6 +126,15 @@ function elib_get_isbn_from_object_id($oid){
   catch (TingClientException $e) {
     // If the specified object id does not exist, an exception is throw.
   }
+    
+  if($isbn == false)
+  {
+    watchdog('elib', 'elib_get_isbn_from_object_id(@id) does not return a valid ISBN10 number: @data', 
+             array('@id' => $oid, '@data' => var_export($object,true)
+                   , WATCHDOG_DEBUG));
+    
+  }
+  
   return $isbn;
 }
 
@@ -783,9 +805,8 @@ function elib_get_sample($tingObjectID) {
  * @return string
  */
 function elib_book_teaser(TingClientObject $object, $is_ajax = false) {
-  module_load_include('isbn_static_func.inc', 'elib');
-  $isbn = preg_replace('/[^0-9]+/', '', $object->record['dc:identifier']['dkdcplus:ISBN'][0]);
-  $isbn = convertFromIsbn13ToIsbn10($isbn);
+
+  $isbn = elib_get_isbn_from_object_id($object->id);
 
   $c = elib_client();
   $c->setLibrary(variable_get('elib_retailer_id', ''));
@@ -869,6 +890,7 @@ function elib_book_cover(TingClientObject $object) {
 //  error_log(__FILE__ . ' +' . __LINE__ . ' ' . print_r(convertFromIsbn13ToIsbn10($object->record['dc:identifier']['dkdcplus:ISBN'][0]), 1));
 //  error_log(__FILE__ . ' +' . __LINE__ . ' ' . print_r($book, 1));
 
-  $image_url = 'http://www.elib.se/cover_images/' . convertFromIsbn13ToIsbn10($object->record['dc:identifier']['dkdcplus:ISBN'][0]) . '.jpg';
+  $image_url = 'http://www.elib.se/cover_images/' . elib_get_isbn_from_object_id($object->id) . '.jpg';
+
   return (boolean) _ting_covers_pages_fetch_image($filename, $image_url);
 }
