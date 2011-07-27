@@ -818,8 +818,12 @@ function elib_book_teaser(TingClientObject $object, $is_ajax = false) {
     return;
   }
 
-  if (!empty($book->data->product->teaser->link)) {
+  $teasersamplelink = $book->data->product->teaser->link;
 
+  if (!empty($teasersamplelink)) {
+    // change to an https link
+    $teasersamplelink = str_replace("http://","https://",$teasersamplelink);
+ 
     $javascript = '
       AudioPlayer.setup("' . url(drupal_get_path('theme', 'netsound2') . '/js/audio-player/player.swf', array('absolute' => TRUE)) .'", {
         width: 290,
@@ -836,10 +840,10 @@ function elib_book_teaser(TingClientObject $object, $is_ajax = false) {
     $title = $is_ajax ? 'Du lytter nu til en smagsprøve på bogen:<br />- ' . $book->data->product->title : 'Hør smagsprøve';
     $html = '
       <h4>'.$title.'</h4>
-      <div id="audio-player">Da din browser ikke understøtter flash kan vi ikke afspille smagsprøven for dig, men du kan downloade det ' .l('her', $book->data->product->teaser->link) . ' og selv afspille det på din computer.</div>
+      <div id="audio-player">Da din browser ikke understøtter flash kan vi ikke afspille smagsprøven for dig, men du kan downloade det ' .l('her', $teasersamplelink) . ' og selv afspille det på din computer.</div>
       <script type="text/javascript">
         AudioPlayer.embed("audio-player", {
-          soundFile: "' . $book->data->product->teaser->link . '",
+          soundFile: "' . $teasersamplelink . '",
           titles: "' . $book->data->product->title . '",
           artists: "' . $book->data->product->contributors->contributor[0]->first_name . ' ' . $book->data->product->contributors->contributor[0]->family_name . '"
         });
