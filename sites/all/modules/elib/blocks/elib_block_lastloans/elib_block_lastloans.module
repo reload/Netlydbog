@@ -25,7 +25,6 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
     		
 		    $response = elib_client()->getLatestLoans();  
 		    
-		    
 		    foreach($response as $isbn){
 		      $out .= elib_displaybookNEW(ting_get_object_by_isbn($isbn),'','small'); 
 		    }
@@ -63,7 +62,6 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
     	case 2:
     		$response = elib_client()->getPopularBooks();
 
-    		//var_dump($response);
     		$index = 1;
         foreach($response->data->toplistitem as $item){
             
@@ -71,6 +69,10 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
             if(ting_get_object_by_isbn(trim($item->ebookid))){
               $out .= elib_displaybookNEW(ting_get_object_by_isbn(trim($item->ebookid)), array('popular' => 1), 'small', $index);
               $index++;
+            }
+            else
+            {
+              watchdog('elib','eLib Popular books: Could not retrieve data from ting_get_object_by_isbn() "@data"',array('@data' => var_export($item, true), WATCHDOG_DEBUG));
             }
           }
           if($out == ''){
