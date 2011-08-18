@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * @file
+ * Install file providing install and upgrade functions for the
+ * webtrends module.
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function webtrends_() {
+  db_query("UPDATE {system} SET weight = 99 WHERE name = 'webtrends'");
+}
+
+/**
+ * Update module weight.
+ */
+function webtrends_update_6001() {
+  $ret = array();
+  $ret[] = update_sql("UPDATE {system} SET weight = 99 WHERE name = 'webtrends'");
+  return $ret;
+}
