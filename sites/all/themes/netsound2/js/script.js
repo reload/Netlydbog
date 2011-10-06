@@ -175,4 +175,10 @@ jQuery(function($){
 	 
 	// $('.sort-by-selector').change(onChangeRedirect);
 	
+
+  $(document).ready(function(){
+    $('.display-book.small div:last-child').removeAttr('style').addClass('reader');
+  });
+
+
 });

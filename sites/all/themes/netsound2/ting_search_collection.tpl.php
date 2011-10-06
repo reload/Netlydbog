@@ -21,7 +21,7 @@ foreach ($collection->objects as $obj){
 ?>
 
 
-  <li class="display-book ting-collection ruler-after line clear-block">
+  <li class="display-book ting-collection ruler-after line clear-block" id="<?php print $lydbogObj->id ?>">
     <div class="picture unit">
       <?php $image_url = ting_covers_collection_url($lydbogObj, '80_x'); ?>
       <?php if ($image_url) { ?>
@@ -38,8 +38,7 @@ foreach ($collection->objects as $obj){
       <div class="author">
         <?php echo t('By !creator_name', array('!creator_name' => l($lydbogObj->creators_string,'ting/search/'.$lydbogObj->creators_string,array('html' => true)))); ?>
       </div>
-      
-      <?php print elib_get_rating($lydbogObj->id);?>
+      <div id="<?php print $lydbogObj->localId ?>"></div>
       
         
         <?php if (!empty($lydbogObj->record['dc:contributor']['oss:dkind'])): ?>

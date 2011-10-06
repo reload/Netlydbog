@@ -105,14 +105,5 @@ function netsound2_preprocess_comment(&$variables) {
 }
 function netsound2_fivestar_static_element($value, $title = NULL, $description = NULL) {
   $output = '';
-  $output .= '<div class="fivestar-static-form-item">';
-  $element = array(
-    '#type' => 'item',
-    '#title' => $title,
-    //'#description' => $description,
-  );
-
-  $output .= theme('form_element', $element, $value);
-  $output .= '</div>';
   return $output;
 }

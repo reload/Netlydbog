@@ -387,8 +387,51 @@ h2.pane-title, h1.header, body.clean h1{
 	float:left;
 	margin-right:10px;
 }
-.display-book.small .icons{
-	/*height:100px;*/
+.display-book.small .rating-for-faust {
+  float:left;
+  margin: 3px 0 8px 0;
+  margin-right: 10px;
+}
+.view-anmeldelser .display-book .rating-for-faust {
+  height: 20px;
+}
+.display-book.small .spacing-before {
+  clear: both;
+  margin-top: 0px;
+  padding-top: 10px;
+}
+.display-book.small .reader {
+  margin: 0;
+}
+.display-book.small .addRatingContainer {
+  float: none;
+  display: block;
+}
+.display-book.textright .rating-for-faust,
+.display-book.ting-collection .addRatingContainer {
+  margin: 3px 5px 8px 0;
+  height: 20px;
+}
+
+.rating-for-faust .star-on,
+.display-book.ting-collection .addRatingContainer .rating.star-on {
+  background-image: url('/sites/all/modules/fivestar/widgets/oxygen/star.png');
+  background-repeat: no-repeat;
+  background-position: 0 -32px;
+}
+.rating-for-faust .star-off,
+.display-book.ting-collection .addRatingContainer .rating.star-off {
+  float: left;
+  width: 17px;
+  height: 15px !important;
+  overflow: hidden;
+  text-indent: -999em;
+  background: url(/sites/all/modules/fivestar/widgets/oxygen/star.png) no-repeat 0 0;
+}
+
+#ting-object .ratingCountSpan {
+	padding-top: 4px;
+	padding-left: 4px;
 }
 
 #ting-result .display-book{
@@ -398,6 +441,34 @@ h2.pane-title, h1.header, body.clean h1{
 #ting-result .display-book .picture{
 	height:auto;
 }
+
+
+#ting-object .ratingsContainer {
+  width: 100%;
+  margin: 5px 0;
+  float: none;
+  clear: both;
+  display: block;
+}
+#ting-object .ratingsContainer .rating {
+  height: 15px !important;
+}
+#ting-object .ratingsContainer .star-on {
+  background-image: url('/sites/all/modules/fivestar/widgets/oxygen/star.png');
+  background-repeat: no-repeat;
+  background-position: 0 -32px;
+}
+#ting-object .ratingsContainer .star-off {
+  background-image: url('/sites/all/modules/fivestar/widgets/oxygen/star.png');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+}
+#ting-object .ratingsContainer .star-black {
+  background-image: url('/sites/all/modules/fivestar/widgets/oxygen/star.png');
+  background-repeat: no-repeat;
+  background-position: 0 -16px;
+}
+
 
 .pane-elib-block-lastloans-2 .display-book.small {
   padding-left: 38px;
@@ -422,9 +493,16 @@ h2.pane-title, h1.header, body.clean h1{
 	float: left;
 }
 
+.display-book.ting-collection .item-list .title{
+	font-weight: normal;
+	margin-right: 5px;
+	margin-left: 0px;
+}
+
 .display-book .item-list .title{
 	font-weight: normal;
 	margin-right: 5px;
+	margin-left: 6px;
 }
 .display-book.textright .item-list  {
 	margin-bottom: 10px;
@@ -837,16 +915,18 @@ ul.pager li{
 	margin: 3px 0 8px 0;
 }
 
-.display-book.small .fivestar-static-form-item{
-	float:left;
-	margin-right:10px;
+.display-book.small .icons {
+  height: 47px;
 }
+
 .display-book.small .icons .icons{
 	float:left;
   height: 16px;
 }
-.display-book.small .icons {
-  height: 47px;
+
+.display-book.small .fivestar-static-form-item{
+	float:left;
+	margin-right:10px;
 }
 
 div.fivestar-widget div.on a {

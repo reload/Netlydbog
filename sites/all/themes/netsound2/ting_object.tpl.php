@@ -14,17 +14,29 @@ elib_book_cover($object);
 
 //dsm($object);
 
-if(!$n = node_load(array('title' => $object->id,'type' => 'bookrating'))){
-	$n = new stdClass();
-	$n->type = 'bookrating';
-	$n->title = $object->id;
-	node_save($n);
-}
-
-$n = node_build_content($n);
-
 ?>
 <!-- ting_object.tpl -->
+  <?php
+    drupal_add_css(VOXB_PATH . '/css/voxb-pager.css');
+    drupal_add_css(VOXB_PATH . '/css/voxb.css');
+    drupal_add_css(VOXB_PATH . '/css/jqModal.css');
+    drupal_add_js(VOXB_PATH . '/js/jqModal.js');
+    drupal_add_js(VOXB_PATH . '/js/livequery.js');
+    drupal_add_js(VOXB_PATH . '/js/cyclic.fade.js');
+    drupal_add_js(VOXB_PATH . '/js/voxb.item.js');
+    drupal_add_js(VOXB_PATH . '/js/voxb.details.js');
+
+    require_once(VOXB_PATH . '/lib/VoxbItem.class.php');
+    require_once(VOXB_PATH . '/lib/VoxbProfile.class.php');
+    require_once(VOXB_PATH . '/lib/VoxbReviews.class.php');
+
+    $faust_number = $object->localId;
+    $voxb_item = new VoxbItem();
+    $voxb_item->addReviewHandler('review', new VoxbReviews());
+    $voxb_item->fetchByFaust($faust_number);
+    $profile = unserialize($_SESSION['voxb']['profile']);
+  ?>
+
 <div id="ting-object" class="line rulerafter">
 
   <div class="picture unit ">
@@ -57,7 +69,27 @@ $n = node_build_content($n);
     <div class="inner">
       <h1 class="book-title"><?php print check_plain($object->record['dc:title'][''][0]); ?></h1>
       <div class="author"><?php echo t('By %creator_name%', array('%creator_name%' => $object->creators_string)) ?></div>
-      <?php print $n->content["fivestar_widget"]['#value']; ?>
+
+      <div class="ratingsContainer">
+        <?php
+          $rating = $voxb_item->getRating();
+          $rating = intval($rating / 20);
+        ?>
+        <div class="addRatingContainer">
+          <div id="<?php echo $faust_number; ?>" <?php echo(($profile && $profile->isAbleToRate($faust_number)) ? 'class="userRate"' : ''); ?>>
+            <?php for ($i = 1; $i <= 5; $i++) { ?>
+              <div class="rating <?php echo($i <= $rating ? 'star-on' : 'star-off'); ?>"></div>
+            <?php } ?>
+          </div>
+        </div>
+        <?php
+        if ($voxb_item->getRatingCount() > 0) {
+          echo '<span class="ratingCountSpan">(<span class="ratingVotesNumber">' . $voxb_item->getRatingCount() . '</span> stemmer)</span>';
+        }
+        ?>
+        <img src="/<?php echo VOXB_PATH . '/img/ajax-loader.gif'; ?>" alt="" class="ajax_anim" />
+        <div class="clearfix"></div>
+      </div>
          
             <?php print theme('item_list', array($object->type), t('Type'), 'span', array('class' => 'type')); ?>
             <?php if (!empty($object->record['dc:format'][''])) { ?>
@@ -177,3 +209,11 @@ $n = node_build_content($n);
 	  </div>
  </div>
  </div>
+
+
+  <div class="jqmWindow" id="dialog">
+    <a href="#" class="jqmClose">Close</a>
+    <hr>
+    <p class="ajax_message">Service unavailable.</p>
+  </div>
+  <span class="ajaxLoaderTpl"><img src="/<?php echo VOXB_PATH . '/img/ajax-loader.gif'; ?>" alt="in progress.." class="ajax_anim" /></span>
