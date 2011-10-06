@@ -513,7 +513,7 @@ function elib_displaybook(TingClientObject $object,$elib_data = false){
    $out[] = '<div class="author">' .
       t('By %creator_name%', array('%creator_name%' => $object->creators_string)) . 
     '</div>';
-   $out[] = elib_get_rating($object->id);
+   $out[] = '<div class="rating-for-faust '.$object->localId.'"></div>';
     $out[] = '<div class="icons">' .
       l(theme('image', 'sites/all/themes/netsound/img/stream.png', '', '', null, false), $object->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) .' '.
       l(theme('image', 'sites/all/themes/netsound/img/fetch.png', '', '', null, false), $object->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . ' ' .
@@ -561,7 +561,7 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
     $part['loginexpire'] = '<div class="loanperiod '.$loanperiod_class.'">'.t('Lånet udløber om <div>%days',array('%days' => format_plural($days, 'en dag', '@count dage'))).'</div></div>';
   }
   
-  $part['rating'] = elib_get_rating($obj->id);
+  $part['rating'] = '<div class="rating-for-faust"><div class="'.$obj->localId.'"></div></div>';
   $part['title'] = '<h3 class="title">' . l($obj->title, $obj->url, array('attributes' => array('class' =>'title'))) . '</h3>';
   $part['author'] = '<div class="author">' . t('!creator_name', array('!creator_name' => l($obj->creators_string,'ting/search/'.$obj->creators_string))) . '</div>';
   $part['icons'] = '
@@ -670,12 +670,13 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
     
   }
 
-  $part['icons'] = '<div class="icons">'.$part['rating'].$part['icons'].'</div>';
+  $part['icons'] = '<div class="icons">'.$part['icons'].'</div>';
   return '<div class="display-book '.$displaysize.' line ruler-after index-' . $block_index . '">'.
     $part['picture'].
     $part['loginexpire'].
     $part['title'].
     $part['author'].
+    $part['rating'].
     $part['icons'].
     $part['text'].
     '<div style="margin-left:80px;">'.$extras.'</div>
