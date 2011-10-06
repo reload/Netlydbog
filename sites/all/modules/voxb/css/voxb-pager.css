@@ -1,0 +1,50 @@
+/**
+ * @file
+ *
+ * Markup of the pager.
+ */
+
+div#pager_block * {
+  outline: none;
+}
+
+div#pager_block {
+  margin: 0 auto;
+  width: 230px;
+}
+
+div#pager_block ul {
+  list-style-type: none;
+}
+
+div#pager_block ul li {
+  float: left;
+  margin-right: 5px;
+  text-align: center;
+}
+
+div#pager_block ul li a {
+  width: inherit !important;
+  color: #000000;
+}
+
+div#pager_block ul li.active_page a {
+  font-weight: bold;
+  color: #666666;
+  font-size: 120%;
+}
+
+div#pager_block ul li.next_page a {
+  margin-left: 10px;
+  color: #000000;
+}
+
+div#pager_block ul li.prev_page a {
+  margin-right: 10px;
+  color: #000000;
+}
+
+div#pager_block .ajax-progress {
+  display: none;
+  width: 1px;
+}

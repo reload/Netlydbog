@@ -1,0 +1,57 @@
+/**
+ * @file
+ *
+ * General markup of the module.
+ */
+
+#voxb {
+  clear: both;
+  background-color: #F6F6F2;
+}
+
+.voxbReview {
+  margin-bottom: 15px;
+}
+
+.addRatingContainer {
+  float: left;
+}
+
+.addReviewTextarea {
+  width: 100%;
+  height: 100px;
+}
+.tagsContainer, .ratingsContainer {
+  float: left;
+  width: 50%;
+}
+
+#edit-rating, img.ajax_anim, #voxbItem {
+  display: none;
+}
+
+.rating {
+  width: 16px;
+  height: 16px !important;
+  float: left;
+}
+
+.star-on {
+	background-image: url(../img/star-on.png);
+}
+
+.star-off {
+	background-image: url(../img/star-off.png);
+}
+
+.star-black {
+  background-image: url(../img/star-black.png);
+}
+
+.userRate .ajax-progress, .tagsContainer .ajax-progress, .addReviewContainer .ajax-progress {
+  display: none;
+}
+
+.recordTagHighlight div, .recordTagHighlight .tag {
+  float: left;
+}

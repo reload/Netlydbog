@@ -1,0 +1,8 @@
+name = "VoxB module"
+description = "Implementation of VoxB to Ding!"
+package = INLEAD
+core = 6.x
+version = 0.1
+
+configure = admin/config/ding/voxb
+dependencies[] = ting_search

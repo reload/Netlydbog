@@ -1,0 +1,451 @@
+<?php
+
+// Define reviews per page
+define('VOXB_REVIEWS_PER_PAGE', 3);
+// Define path to VoxB module
+define('VOXB_PATH', drupal_get_path('module', 'ding_voxb'));
+
+/**
+ * @file
+ *
+ * hook_init
+ * Adding JS code to the page for ajax login form.
+ */
+function ding_voxb_init() {
+  drupal_add_css(VOXB_PATH . '/css/voxb-pager.css');
+  drupal_add_css(VOXB_PATH . '/css/voxb.css');
+  drupal_add_css(VOXB_PATH . '/css/jqModal.css');
+  drupal_add_js(VOXB_PATH . '/js/jqModal.js');
+  drupal_add_js(VOXB_PATH . '/js/livequery.js');
+  drupal_add_js(VOXB_PATH . '/js/cyclic.fade.js');
+  drupal_add_js(VOXB_PATH . '/js/voxb.item.js');
+  drupal_add_js(VOXB_PATH . '/js/voxb.details.js');
+}
+
+/**
+ * Implements hook_menu().
+ */
+function ding_voxb_menu() {
+  $items = array();
+
+  $items['admin/settings/voxb'] = array(
+    'title' => 'VoxB',
+    'description' => 'VoxB module settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ding_voxb_admin'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'ding_voxb.admin.inc',
+  );
+
+  $items['admin/settings/voxb/access'] = array(
+    'title' => 'VoxB access',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $items['voxb/ajax/seek/%/%'] = array(
+    'title' => 'VoxB pagination handler',
+    'description' => '',
+    'page arguments' => array(3, 4),
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('search content'),
+    'page callback' => 'ding_voxb_paginator',
+  );
+
+  $items['voxb/ajax/seek/%/%/reviews'] = array(
+    'title' => 'VoxB paging reviews handler',
+    'description' => '',
+    'page arguments' => array(3, 4),
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('search content'),
+    'page callback' => 'ding_voxb_paging_reviews',
+  );
+
+  $items['voxb/ajax/rating/%/%'] = array(
+    'title' => 'VoxB rating handler',
+    'description' => '',
+    'page arguments' => array(3, 4),
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('search content'),
+    'page callback' => 'ding_voxb_rating',
+  );
+
+  $items['voxb/ajax/tag/%/%'] = array(
+    'title' => 'VoxB tagging handler',
+    'description' => '',
+    'page arguments' => array(3, 4),
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('search content'),
+    'page callback' => 'ding_voxb_tag',
+  );
+
+  $items['voxb/ajax/review/%/%'] = array(
+    'title' => 'VoxB review handler',
+    'description' => '',
+    'page arguments' => array(3, 4),
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('search content'),
+    'page callback' => 'ding_voxb_review',
+  );
+
+  $items['voxb/ajax/details'] = array(
+    'title' => 'VoxB ting objects details handler',
+    'description' => '',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('search content'),
+    'page callback' => 'ding_voxb_details',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_user()
+ */
+function ding_voxb_user($op, &$edit, &$account, $category = NULL) {
+  if ($op == 'login') {
+    require_once VOXB_PATH . '/lib/VoxbLogin.class.php';
+    $obj = new VoxbLogin();
+    $obj->login($account);
+  }
+}
+
+/**
+ * Creates and output the pagination
+ *
+ * @param $faust_number
+ *   Item's faust_number
+ * @param $page
+ *   Current displayed page
+ */
+function ding_voxb_paginator($faust_number = '', $page = 1) {
+  if ($faust_number != '') {
+    require_once(VOXB_PATH . '/lib/VoxbItem.class.php');
+    require_once(VOXB_PATH . '/lib/VoxbReviews.class.php');
+
+    $item = new VoxbItem();
+    $item->addReviewHandler('review', new VoxbReviews());
+    $item->fetchByFaust($faust_number);
+    $reviews = $item->getReviews('review');
+
+    echo theme('voxb_review_pager', array(
+        'count' => $reviews->getCount(),
+        'limit' => variable_get('voxb_reviews_per_page', VOXB_REVIEWS_PER_PAGE),
+        'faust_number' => $faust_number,
+        'cur_page' => $page));
+  }
+}
+
+/**
+ * Display the reviews at the specific page
+ *
+ * @param $faust_number
+ *   Item's faust_number
+ * @param $page
+ *   The page number, which comments are to be displayed
+ */
+function ding_voxb_paging_reviews($faust_number = '', $page = 1) {
+  // Calculate the reviews array fetch limits
+  $per_page = variable_get('voxb_reviews_per_page', VOXB_REVIEWS_PER_PAGE);
+  $start = ($page - 1) * $per_page;
+  $end = $start + $per_page;
+
+  require_once VOXB_PATH . '/lib/VoxbItem.class.php';
+  require_once VOXB_PATH . '/lib/VoxbReviews.class.php';
+
+  // Get the reviews
+  $item = new VoxbItem();
+  $item->addReviewHandler('review', new VoxbReviews());
+  $item->fetchByFaust($faust_number);
+  $reviews = $item->getReviews('review')->toArray();
+
+  // Place the reviews
+  $html = '';
+  for ($i = $start; $i < $end; $i++) {
+    $html .= theme(
+      'voxb_review_record',
+      array(
+        'author' => $reviews[$i]['authorName'],
+        'review' => $reviews[$i]['text']
+      )
+    );
+  }
+
+  echo $html;
+}
+
+/**
+ * Implements hook_theme()
+ */
+function ding_voxb_theme($existing, $type, $theme, $path) {
+  $hooks['voxb_tag_record'] = array(
+    'arguments' => array('data' => NULL),
+    'template' => 'ding_voxb-tag-record'
+  );
+
+  $hooks['voxb_review_record'] = array(
+    'arguments' => array('data' => NULL),
+    'template' => 'ding_voxb-review-record',
+  );
+
+  $hooks['voxb_review_pager'] = array(
+    'arguments' => array('data' => NULL),
+    'template' => 'ding_voxb-pager',
+  );
+
+  $hooks['voxb'] = array(
+    'arguments' => array('data' => NULL),
+    'template' => 'ding_voxb'
+  );
+
+  return $hooks;
+}
+
+/**
+ * Display's the text review form
+ *
+ * @param $form_state
+ *   The form state
+ * @param $params
+ *   Additional parameters as startup form values
+ * @return array
+ *   Form structure
+ */
+function ding_voxb_review_form(&$form_state, $params) {
+  $form = array();
+
+  $form['review_content'] = array(
+    '#type' => 'textarea',
+    '#default_value' => ($params['action'] == 'update') ? $params['review_content'] : '',
+  );
+
+  $form['faust_number'] = array(
+    '#type' => 'hidden',
+    '#value' => $params['faust_number'],
+  );
+
+  $form['review_submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Send anmeldelse',
+  );
+
+  return $form;
+}
+
+/**
+ * AJAX responder for adding a new text review
+ *
+ * @param $faust_number
+ *   Item's faust_number
+ * @param $new_review
+ *   The review text
+ */
+function ding_voxb_review($faust_number = '', $new_review = '') {
+  // Check if we have review message and faustNumber
+  if (empty($new_review)) {
+    echo json_encode(array('status' => FALSE, 'message' => t('Empty review!')));
+  }
+  elseif (empty($faust_number)) {
+    echo json_encode(array('status' => FALSE, 'message' => t('Empty faust number!')));
+  }
+  else {
+    require_once VOXB_PATH . '/lib/VoxbBase.class.php';
+    require_once VOXB_PATH . '/lib/VoxbReviewRecord.class.php';
+
+    // add review to to voxb
+    $review = new VoxbReviewRecord();
+
+    require_once(VOXB_PATH . '/lib/VoxbProfile.class.php');
+    $profile = unserialize($_SESSION['voxb']['profile']);
+
+    if (!$review->create($faust_number, $new_review, $profile)) {
+      echo json_encode(array('status' => FALSE, 'message' => t('Service unavailable.')));
+    }
+    else {
+      // update profile object in session
+      $profile->updateActedItems();
+      $_SESSION['voxb']['profile'] = serialize($profile);
+
+      // Get reviews updated list
+      require_once VOXB_PATH . '/lib/VoxbItem.class.php';
+      require_once VOXB_PATH . '/lib/VoxbReviews.class.php';
+
+      $item = new VoxbItem();
+      $item->addReviewHandler('review', new VoxbReviews());
+      $item->fetchByFaust($faust_number);
+      $reviews = $item->getReviews('review');
+      $reviews_count = $reviews->getCount();
+
+      // Limit the count of displayed text reviews
+      $limit = variable_get('voxb_reviews_per_page', VOXB_REVIEWS_PER_PAGE);
+
+      // Loop through reviews and display them
+      $html = '';
+      foreach ($reviews as $k => $review) {
+        if ($k >= $limit) {
+          break;
+        }
+
+        $html .= theme(
+          'voxb_review_record',
+          array(
+            'author' => $review->getAuthorName(),
+            'review' => $review->getText())
+          );
+      }
+      echo json_encode(array('status' => TRUE, 'message' => $html));
+    }
+  }
+}
+
+/**
+ * Display a form for adding tags
+ *
+ * @param $form_state
+ *   The form state
+ * @param $faust_number
+ *   Item's faust number
+ * @return
+ *   Form structure
+ */
+function ding_voxb_tag_form(&$form_state, $faust_number) {
+  $form = array();
+
+  $form['name'] = array(
+    '#type' => 'textfield',
+    '#size' => 20,
+    '#name' => 'name',
+  );
+
+  $form['faustNumber'] = array(
+    '#type' => 'hidden',
+    '#name' => 'faustNumber',
+    '#value' => $faust_number,
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+  );
+
+  return $form;
+}
+
+/**
+ * AJAX responder for adding tags
+ *
+ * @param $faust_number
+ *   Item's faust number
+ * @param $tag
+ *   The new tag to be added
+ */
+function ding_voxb_tag($faust_number = '', $tag = '') {
+  if (empty($tag)) {
+    echo json_encode(array('status' => FALSE, 'message' => t('Empty tag!')));
+  }
+  elseif (empty($faust_number)) {
+    echo json_encode(array('status' => FALSE, 'message' => t('Empty faust number!')));
+  }
+  else {
+    require_once VOXB_PATH . '/lib/VoxbItem.class.php';
+    require_once VOXB_PATH . '/lib/VoxbProfile.class.php';
+    $new_tag = new VoxbTagRecord();
+    $profile = unserialize($_SESSION['voxb']['profile']);
+
+    if (!$new_tag->create($faust_number, $tag, $profile)) {
+      echo json_encode(array('status' => FALSE, 'message' => t('Service unavailable.')));
+    }
+    else {
+      // update profile object in session
+      $profile->updateActedItems();
+      $_SESSION['voxb']['profile'] = serialize($profile);
+
+      echo json_encode(array('status' => TRUE, 'message' => $tag));
+    }
+  }
+}
+
+/**
+ * AJAX responder for adding rating
+ *
+ * @param $faust_number
+ *   Item's faust_number
+ * @param $rating
+ *   The rating to be set
+ */
+function ding_voxb_rating($faust_number = '', $rating = 0) {
+  $rating = intval($rating);
+
+  if ($rating == 0) {
+    echo json_encode(array('status' => FALSE, 'message' => t('Empty rating!')));
+  }
+  elseif (empty($faust_number)) {
+    echo json_encode(array('status' => FALSE, 'message' => t('Empty faust number!')));
+  }
+  else {
+    require_once VOXB_PATH . '/lib/VoxbItem.class.php';
+    require_once VOXB_PATH . '/lib/VoxbProfile.class.php';
+
+    $item = new VoxbItem();
+
+    $profile = unserialize($_SESSION['voxb']['profile']);
+    $record_id = $profile->getVoxbUserData($faust_number);
+    $r = NULL;
+
+    if ($record_id == NULL) {
+      $r = $item->rateItem($faust_number, $rating * 20, $_SESSION['voxb']['userId']);
+    }
+    else {
+      $r = $item->updateRateItem($record_id['voxbIdentifier'], $rating * 20);
+      // update profile object in session
+    }
+    $profile->updateActedItems();
+    $_SESSION['voxb']['profile'] = serialize($profile);
+
+    if ($r) {
+      // Rating is successfully submited
+      // Now we need to fetch new rating form VoxB
+      $item->fetchByFaust($faust_number);
+      echo json_encode(array('status' => TRUE, 'rating' => intval($item->getRating() / 20), 'rating_count' => $item->getRatingCount()));
+    }
+    else {
+      echo json_encode(array('status' => FALSE, 'message' => t('Service unavailable.')));
+    }
+  }
+}
+
+function ding_voxb_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'ctools') {
+    return 'plugins/' . $plugin;
+  }
+}
+
+/**
+ * Request ratings for multiple items
+ *
+ * @param $items
+ *   Array of faust numbers
+ * @return
+ *   JSON encoded response
+ *   in form of Object faustNum{faustNum,rating,count}
+ */
+function ding_voxb_details() {
+  require_once(VOXB_PATH . '/lib/VoxbItems.class.php');
+  require_once(VOXB_PATH . '/lib/VoxbReviews.class.php');
+  $faust_numbers = explode(',', $_REQUEST['ids']);
+  $items = new VoxbItems();
+  $items->fetchByFaust($faust_numbers);
+  foreach ($faust_numbers as $faust) {
+    $item = $items->getItem($faust);
+    $res['faustNum'] = $faust;
+    if ($item) {
+      $res['rating'] = intval($item->getRating() / 20);
+      $res['count'] = $item->getRatingCount();
+    }
+    else {
+      $res['rating'] = 0;
+      $res['count'] = 0;
+    }
+    $result[$faust] = $res;
+  }
+  print json_encode($result);
+}
