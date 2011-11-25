@@ -23,7 +23,7 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
     switch($delta){
     	case 0:
     		
-		    $response = elib_client()->getLatestLoans();  
+		    $response = elib_client()->getLatestLoans(10);  
 		    
 		    foreach($response as $isbn){
 		      $out .= elib_displaybookNEW(ting_get_object_by_isbn($isbn),'','small'); 

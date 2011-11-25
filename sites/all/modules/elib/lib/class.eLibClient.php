@@ -128,7 +128,7 @@ class eLibClient{
     
   }
 
-  public function getLatestLoans(){
+  public function getLatestLoans($limit = 5){
     
   	$params['fromdate'] = date('Y-m-d',time()-2592000);
     
@@ -149,7 +149,7 @@ class eLibClient{
   	
   //	var_dump($ids);
   	
-  	return array_slice(array_reverse($ids),0,5);
+  	return array_slice(array_reverse($ids),0,$limit);
   }
 
   public function makeLoan($ebookid){
