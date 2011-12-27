@@ -1,0 +1,121 @@
+; $Id: omega_starterkit.info,v 1.1.2.15 2010/07/10 17:28:44 himerus Exp $
+
+; ------- Declare default theme information
+
+name        = ebog
+description = Omega Sub-Theme starter kit
+screenshot = screenshot.png
+core       = 6.x
+base theme = omega
+
+; ------- Declare default stylesheets
+
+stylesheets[all][] = css/regions.css
+stylesheets[all][] = css/text.css
+stylesheets[all][] = css/style.css
+stylesheets[all][] = css/item.css
+stylesheets[all][] = css/search.css
+stylesheets[all][] = css/faq.css
+stylesheets[all][] = css/responsive.css
+
+; ------- Declare default javascript includes
+
+scripts[] = js/script.js
+
+
+; ------- Declare default theme regions
+
+regions[navigation] = Navigation
+regions[search] = Search
+
+regions[header_first] = Header
+
+regions[content_top] = Content
+regions[content_bottom] = Content bottom
+
+regions[sidebar_first] = Sidebar
+
+regions[footer_first] = Footer
+
+; ------- Declare default theme features
+
+features[] = logo
+features[] = node_user_picture
+features[] = comment_user_picture
+features[] = search
+features[] = favicon
+features[] = primary_links
+
+; ------- Set the default settings to be used in theme-settings.php
+
+; ------- Non-960gs general settings
+settings[reset_css] = 1
+settings[text_css] = 1
+settings[regions_css] = 1
+settings[defaults_css] = 1
+settings[custom_css] = 1
+
+settings[front_page_title_display] = title_slogan
+settings[page_title_display_custom] = ''
+settings[other_page_title_display] = ptitle_stitle
+settings[other_page_title_display_custom] = ''
+settings[configurable_separator] = ' | '
+
+settings[omega_breadcrumb] = 'yes'
+settings[omega_breadcrumb_separator] = ' / '
+settings[omega_breadcrumb_home] = 1
+settings[omega_breadcrumb_trailing] = 1
+settings[omega_breadcrumb_title] = 1
+
+settings[mission_statement_pages] = home
+
+settings[sidebar_combine] = 1
+settings[sidebar_contain_pages] = ''
+
+; ------- / Non-960gs general settings
+
+; ------- 960gs default region settings
+
+; ------- default_container_width applies to regions like $help, $messages
+settings[omega_default_container_width] = 16
+
+; ------- Region settings for top zone (logo, menus)
+
+settings[omega_branding_wrapper_width] = 16
+settings[omega_header_logo_width] = 4
+settings[omega_header_menu_width] = 12
+
+; ------- Region settings for header regions
+
+settings[omega_header_wrapper_width] = 16
+settings[omega_header_first_width] = 8
+settings[omega_header_last_width] = 8
+
+; ------- Region settings for default breadcrumb and search box placement
+
+settings[omega_internal_nav_wrapper_width] = 16
+settings[omega_breadcrumb_slogan_width] = 10
+settings[omega_search_width] = 6
+
+; ------- Region settings for content regions
+
+settings[omega_content_layout] = first_content_last
+settings[omega_content_container_width] = 16
+settings[omega_sidebar_first_width] = 4
+settings[omega_content_main_width] = 8
+settings[omega_sidebar_last_width] = 4
+
+; ------- Region settings for footer regions
+
+settings[omega_footer_container_width] = 16
+settings[omega_footer_first_width] = 16
+settings[omega_footer_last_width] = 16
+
+; ------- / 960gs default region settings
+
+; Information added by drupal.org packaging script on 2010-11-16
+version = "6.x-1.0"
+core = "6.x"
+project = "omega"
+datestamp = "1289918471"
+

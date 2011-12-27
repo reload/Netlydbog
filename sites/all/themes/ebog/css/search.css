@@ -1,0 +1,97 @@
+#ting-search-results #ting-search-tabs,
+#ting-search-results #ting-search-sort,
+#ting-search-results #ting-search-legend {
+  display: none;
+}
+
+#ting-search-results .ui-tabs-panel,
+#ting-search-result ul,
+#ting-search-result li {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+#ting-search-result div.picture,
+#ting-search-result div.record {
+  float: left;
+}
+
+#ting-search-result ul li.display-book {
+  display: inline-block;
+  zoom: 1; /* ie7 hack for display:inline-block */
+  *display: inline;
+  clear: both;
+  padding: 10px 0 10px 0;
+  border-bottom: 2px solid #DBDDDA;
+}
+
+.display-book.last {
+  border: none !important;
+  padding-bottom: 0 !important;
+}
+
+#ting-search-result ul li.display-book .picture {
+  width: 100px;
+}
+
+#ting-search-result ul li.display-book .record {
+  width: 600px;
+}
+
+#ting-search-result ul li.display-book .record .left {
+  width: 260px;
+  float: left;
+}
+
+#ting-search-result ul li.display-book .record .right {
+  width: 328px;
+  float: left;
+}
+
+#ting-search-result .subjects {
+  display: none;
+}
+
+#ting-search-result .meta {
+  clear: both;
+}
+
+#ting-search-result .meta .publication_date {
+  display: none;
+}
+
+#ting-result.loading {
+  display: none;
+}
+
+#ting-result #pager {
+  margin-top: 20px;
+}
+
+#ting-result #pager .navwide,
+#ting-result #pager .nav {
+  float: left;
+}
+
+#ting-result #pager .nav-placeholder {
+  height: 20px;
+}
+
+#ting-result #pager .nav {
+  margin-right: 10px;
+}
+
+#ting-result #pager .navwide {
+  margin-left: 10px;
+  text-align: right;
+}
+
+ #ting-result #pager div:first-child + * {
+  text-align: center;
+}
+
+#ting-result #ting-sort-by {
+  float: right;
+  margin-bottom: 15px;
+}

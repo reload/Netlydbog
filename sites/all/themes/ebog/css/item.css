@@ -1,0 +1,38 @@
+.section-ting .pane-content,
+.page-emner .pane-content,
+.page-help .pane-content,
+.pane-elib-block-lastloans-6 .pane-content {
+  border: 0 none;
+  padding: 0;
+}
+
+#ting-object .panel-1col .panel-pane {
+  float: right;
+} 
+
+#ting-object .author,
+#ting-object .abstract,
+#ting-object .description,
+#ting-object .details,
+#ting-object .icons,
+.panel-separator {
+  clear:both;
+  list-style-type: none;
+}
+
+.panel-separator {
+  height: 0;
+}
+
+#ting-object .details .item-list h3 {
+  float: left;
+  font-weight: normal;
+}
+
+#ting-object .details {
+  color: #8c938b;
+}
+
+#ting-object .abstract {
+  margin-top: 25px;
+}
