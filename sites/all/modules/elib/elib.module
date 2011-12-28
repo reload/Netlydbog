@@ -589,7 +589,7 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
   if($displaysize == 'review'){
   	
   	$u = elib_user_get_cred($elib[1]);
-    $part['text'] = '<div class="clearfix"></div><div class="text">'.truncate_utf8($elib[0],400,true,true).' '.l('LÆS MERE →',$obj->url).'</div>';
+    $part['text'] = '<div class="clearfix"></div><div class="text">'.truncate_utf8($elib[0],400,true,true).'</div>';
   	$part['icons'] = '
     <div class="icons">
       <ul>
@@ -781,7 +781,7 @@ function elib_displaybook2(TingClientObject $obj,$fields,$settings='',$displaysi
     
     $u = elib_user_get_cred($elib[1]);
     
-    $part['text'] = '<div class="clearfix"></div><div class="text">'.truncate_utf8($elib[0],400,true,true).' '.l('LÆS MERE →',$obj->url).'</div>';
+    $part['text'] = '<div class="clearfix"></div><div class="text">'.truncate_utf8($elib[0],400,true,true).'</div>';
     $part['icons'] = '
     <div class="iconsnoheight">8
       <ul>
