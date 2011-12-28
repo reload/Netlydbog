@@ -1,1 +1,0 @@
-Drupal.locale = { 'pluralFormula': function($n) { return Number(($n!=1)); }, 'strings': { "The selected file %filename cannot not be uploaded. Only files with the following extensions are allowed: %extensions.": "Den valgte fil %filename kan ikke uploades. Kun filer med følgende endelser er tilladt: %extensions.", "Automatic alias": "Automatisk alias" } };
