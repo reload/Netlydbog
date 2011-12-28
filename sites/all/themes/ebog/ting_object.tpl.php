@@ -8,9 +8,10 @@
  * - $object: The TingClientObject instance we're rendering.
  */
 
-module_load_include('isbn_static_func.inc', 'elib');
+/*logic for rating */
+elib_book_cover($object);
 
-$isbn = preg_replace('/[^0-9]+/', '', $object->record['dc:identifier']['dkdcplus:ISBN'][0]);
+//dsm($object);
 
 if (module_exists('ding_voxb')) {
   drupal_add_css(VOXB_PATH . '/css/voxb-pager.css');
@@ -38,7 +39,7 @@ if (module_exists('ding_voxb')) {
 <div id="ting-object" class="line rulerafter">
 
   <div class="picture unit grid-3 alpha">
-    <?php $image_url = elib_book_cover($isbn, '170_x'); ?>
+    <?php $image_url = ting_covers_collection_url($object, '170_x'); ?>
     <?php if (strpos($image_url,'imagecache')): ?>
       <div class="inner left" style="margin-bottom:10px;">
         <?php print theme('image', $image_url, $object->title, $object->title, null, false); ?>
@@ -183,11 +184,11 @@ if (module_exists('ding_voxb')) {
       </div>
       <div class="icons">
         <ul>
-          <li><?php print l(t('Sample'), $object->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) ?></li>
+          <li><?php print l(t('Stream'), $object->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) ?></li>
           <li class="seperator"></li>
-          <li><?php print l(t('Buy'), 'butik', array('html' => true, 'attributes' => array('rel' => 'lightframe')))?></li>
+          <li><?php print l(t('Fetch'), $object->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe')))?></li>
           <li class="seperator"></li>
-          <li><?php print l(t('Loan'), $object->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]', 'class' => 'ting-object-loan'))) ?></li>
+          <li><?php print l(t('Sample'), $object->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) ?><li>
           <?php 
             if($user->uid){
               print '<li class="seperator"></li>';
