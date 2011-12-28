@@ -589,8 +589,7 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
   if($displaysize == 'review'){
   	
   	$u = elib_user_get_cred($elib[1]);
-  	$part['text'] = '<div class="spacing-before" style="text-transform:uppercase;">Anmelder</div><div>'.$u['user'].'</div><div class="text"  style="margin-left:80px;"><p class="spacing-before">'.truncate_utf8($elib[0],400,true,true).' '.l('LÆS MERE →',$obj->url).'</p>';
-  	
+    $part['text'] = '<div class="clearfix"></div><div class="text">'.truncate_utf8($elib[0],400,true,true).' '.l('LÆS MERE →',$obj->url).'</div>';
   	$part['icons'] = '
     <div class="icons">
       <ul>
@@ -704,10 +703,10 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
     $part['title'].
     $part['author'].
     $part['rating'].
-    $part['icons'].
+    $part['icons'].'
+    </div>'.
     $part['text'].
-      '<div class="extras" style="margin-left:80px;">'.$extras.'</div>
-    </div>
+    '<div class="extras" style="margin-left:80px;">'.$extras.'</div>
   </div>';
   
 }
@@ -782,7 +781,7 @@ function elib_displaybook2(TingClientObject $obj,$fields,$settings='',$displaysi
     
     $u = elib_user_get_cred($elib[1]);
     
-    $part['text'] = '<div class="spacing-before" style="text-transform:uppercase;">Anmelder</div><div>'.$u['user'].'</div><div class="text"  style="margin-left:80px;"><p class="spacing-before">'.truncate_utf8($elib[0],400,true,true).' '.l('LÆS MERE →',$obj->url).'</p>';
+    $part['text'] = '<div class="clearfix"></div><div class="text">'.truncate_utf8($elib[0],400,true,true).' '.l('LÆS MERE →',$obj->url).'</div>';
     $part['icons'] = '
     <div class="iconsnoheight">8
       <ul>
