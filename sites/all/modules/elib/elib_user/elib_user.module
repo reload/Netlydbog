@@ -135,14 +135,14 @@ if ($op == 'list') {
   	        else{
   	        	$size = sizeof($loans->orderitem);
   	        }
-  	        $out[] = '<li class="unit size1of'.$size.'"><div class="display-book biglist">'.$bookdisplay.'</div></li>';
+  	        $out[] = '<div class="display-book biglist">'.$bookdisplay.'</div>';
   	      }
 	      }
 	      else {
 	        $out[] = t('Du har ingen aktive netlydbog lån.');
 	      }
       
-      $block['content'] = '<ul class="line">'.implode($out).'</ul>';
+      $block['content'] = implode($out);
     
     
     $block['subject'] = t('Mine lån');   
