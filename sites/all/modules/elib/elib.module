@@ -608,7 +608,7 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
 
   if($displaysize == 'textright'){
     #error_log(__FILE__ . ' +' . __LINE__ . ' ' . print_r($obj->record, 1));
-    $part['picture'] = '<div class="picture main size1of2">' . l(theme('image', $image_url, $alttext, $alttext, null, false), $obj->url, array('html' => true)) . '</div>';
+    $part['picture'] = '<div class="left"><div class="picture main size1of2">' . l(theme('image', $image_url, $alttext, $alttext, null, false), $obj->url, array('html' => true)) . '</div></div>';
     $part['author'] = '<div class="author">' . t('By !creator_name', array('!creator_name' => l($obj->creators_string,'ting/search/'.$obj->creators_string))) . '</div>';
 
 // removet pr. ticket: #165
@@ -635,7 +635,7 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
   	return '
       <div class="display-book '.$displaysize.' line">'.
         $part['picture'].
-        '<div class="main size1of2">'.
+        '<div class="right">'.
         $part['loginexpire'].
         $part['title'].
         $part['author'].
