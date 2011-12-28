@@ -376,4 +376,8 @@
     clear: both;
     float: left;
   }
+
+  #ting-object h1.book-title {
+    width: 100%;
+  }
 }
