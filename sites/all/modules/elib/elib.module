@@ -1,4 +1,7 @@
-<?php 
+<?php
+
+define('PLATFORM_GENERIC', 1);
+define('PLATFORM_IOS', 2);
 
 function elib_menu() {
   $path  = drupal_get_path('module', 'elib') . '/includes';
