@@ -199,6 +199,7 @@
     height: 32px;
     float: left;
     background: none;
+    margin: 0;
   }
 
   #site-menu ul.menu li a {
@@ -218,10 +219,12 @@
   }
 
   #site-menu ul.menu li a.active {
-    color: #BF2226;
+    color: #1C75BC;
   }
 
-  .panel-pane.pane-block.pane-elib-block-lastloans-2 .pane-content {
+  .panel-pane.pane-block.pane-elib-block-lastloans-2 .pane-content,
+  .panel-pane.pane-views-panes.pane-anmeldelser-panel-pane-1 .pane-content,
+  .panel-pane.pane-views-panes.pane-user-reviews-panel-pane-2 .pane-content {
     border: 0;
     border-top: 2px solid #DBDDDA;
     -webkit-border-radius: 0;
@@ -372,5 +375,9 @@
     position: inherit;
     clear: both;
     float: left;
+  }
+
+  #ting-object h1.book-title {
+    width: 100%;
   }
 }

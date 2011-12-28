@@ -169,6 +169,8 @@ div#sidebar-first div#block-block-12 .content h3 {
 
 #ting-object h1.book-title {
   font: 24px/30px 'DroidSerifRegular', Helvetica, Arial, sans-serif;
+  width: 76%;
+  word-wrap: break-word;
 }
 
 div#sidebar-first div#block-block-12 .content h3 {

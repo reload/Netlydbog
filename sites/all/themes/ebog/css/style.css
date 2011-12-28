@@ -78,7 +78,8 @@ div.messages.error {
 .panel-pane.pane-embedvideo .pane-content,
 .pane-embedvideo .ebog_embed_video,
 .pane-front .feed-and-compare-front,
-.pane-elib-block-lastloans-2 .pane-content {
+.pane-elib-block-lastloans-2 .pane-content,
+.pane-node-content .pane-content {
   border-bottom: 0;
 }
 
@@ -569,13 +570,16 @@ h1#page-title.title,
 }
 
 #voxb textarea,
-#user-login .form-item input {
+#user-login .form-item input,
+#comment-form textarea,
+#comment-form input {
   width: 500px;
   border: 1px solid #DBDDDA;
 }
 
 #voxb input[type="submit"],
-#user-login input#edit-submit {
+#user-login input#edit-submit,
+#comment-form input[type="submit"] {
   float: right;
   width: auto;
   line-height: 100%;
@@ -598,7 +602,8 @@ h1#page-title.title,
   width: 500px;
 }
 
-#user-login .form-item input {
+#user-login .form-item input,
+#comment-form #edit-elib-username-wrapper input {
   width: 490px;
   padding: 4px;
 }
@@ -609,7 +614,8 @@ h1#page-title.title,
 }
 
 #user-login #edit-name-wrapper label,
-#user-login #edit-pass-wrapper label {
+#user-login #edit-pass-wrapper label,
+#comment-form label {
   color: #8C938B;
 }
 
