@@ -964,9 +964,9 @@ function elib_check_platform() {
   $user_agent = $_SERVER['HTTP_USER_AGENT'];
 
   if (preg_match('/(iPod)|(iPad)|(iPhone)/i', $user_agent)) {
-    return PLATFORM_GENERIC;
+    return PLATFORM_IOS;
   }
   else {
-    return PLATFORM_IOS;
+    return PLATFORM_GENERIC;
   }
 }
