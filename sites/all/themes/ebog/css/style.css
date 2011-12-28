@@ -443,7 +443,8 @@ h1#page-title.title,
 }
 
 .display-book,
-.view-anmeldelser .views-row {
+.view-anmeldelser .views-row,
+.view-user-reviews .views-row {
   display: inline-block;
   zoom: 1; /* ie7 hack for display:inline-block */
   *display: inline;
@@ -457,7 +458,8 @@ h1#page-title.title,
 
 .display-book:first-child,
 .view-anmeldelser .views-row-first,
-.pane-elib-user-account .pane-content .display-book.biglist:first-child {
+.pane-elib-user-account .pane-content .display-book.biglist:first-child,
+.view-user-reviews .views-row-first {
   padding-top: 0;
 }
 
