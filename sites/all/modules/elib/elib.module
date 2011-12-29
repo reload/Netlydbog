@@ -147,7 +147,7 @@ function elib_get_lydbog($tingObjectID,$format){
 
   if($_GET['downloaded']){
 
-      $out = t('<h1>Hjælp til afspilning</h1>');
+      $out = t('<h1 style="text-align:center;">Hjælp til afspilning</h1>');
 
       $sql = 'SELECT node.nid AS nid,
      nodequeue_nodes_node.position AS nodequeue_nodes_node_position
@@ -192,7 +192,7 @@ function elib_get_lydbog($tingObjectID,$format){
   $userinfo = elib_user_get_cred();
 
   if(!$userinfo['cpr']){
-    $out = '<h1>Mangler eLIB tilknytning</h1>';
+    $out = '<h1 style="text-align:center;">Mangler eLIB tilknytning</h1>';
     $out .= t('<p>Der er ikke knyttet nogle elib informationer til den bruger du er logget ind med. Det er højstsansyneligt fordi du er logget ind som redaktør eller administrator. Hvis dette ikke er tilfældet, kontakt !email</p>',array('!email' => l('info@ereolen.dk','info@ereolen.dk')));
 
     return $out;
@@ -252,7 +252,7 @@ function elib_get_lydbog($tingObjectID,$format){
   }*/
   if($alreadyloaned){
 
-    $pretext = '<h1>Din lydbog afspilles nu nedenfor</h1>';
+    $pretext = '<h1 style="text-align:center;">Din lydbog afspilles nu nedenfor</h1>';
     $src = $response->data->downloadurl;
     if($format != 'stream'){
 
@@ -262,7 +262,7 @@ function elib_get_lydbog($tingObjectID,$format){
         // ok ready for download
         $src = $filesrc;
         global $base_root;
-        $pretext = '<h1>Vi er ved at generere din lydbog.<br/> Vent venligst...</h1><div class="loader"></div><p>Vi er ved at pakke din ebog til en fil</p><p>Problemer med download? Hent filen via <a href="'.$src.'">direkte link</a><p>Når du har gemt filen, tryk næste</p>'.l('Næste',$base_root.request_uri(),array('query'=> 'downloaded=1','attributes' => array('class' => 'nextknap knap')));
+        $pretext = '<h1 style="text-align:center;">Vi er ved at generere din lydbog.<br/> Vent venligst...</h1><div class="loader"></div><p>Vi er ved at pakke din ebog til en fil</p><p>Problemer med download? Hent filen via <a href="'.$src.'">direkte link</a><p>Når du har gemt filen, tryk næste</p>'.l('Næste',$base_root.request_uri(),array('query'=> 'downloaded=1','attributes' => array('class' => 'nextknap knap')));
 
       }
       else
@@ -276,7 +276,7 @@ function elib_get_lydbog($tingObjectID,$format){
       // this should never happen.
       if(empty($src))
       {
-        $pretext = '<h1>FEJL</h1><p>Der returneres ikke nogen download url fra eLib webservicen.</p>';
+        $pretext = '<h1 style="text-align:center;">FEJL</h1><p>Der returneres ikke nogen download url fra eLib webservicen.</p>';
       }
 
     }
@@ -292,7 +292,7 @@ function elib_get_lydbog($tingObjectID,$format){
     if ($platform == PLATFORM_GENERIC) {
       $content .= '<iframe src="' . $src . '" class="audioplayer-' . $format . '" scrolling="no"></iframe>';
     } elseif($platform == PLATFORM_IOS) {
-      $content .= '<h4>You are running iOS.</h4>';
+      $content .= t('<p>You are running iOS. We currently do not have a iOS stream for this item.</p>');
     }
   } else {
 
@@ -329,7 +329,7 @@ function elib_get_lydbog($tingObjectID,$format){
 
     $loaned = $loaned ? format_plural($loaned,'en lånt lydbog','@count lånte lydbøger'): t('ikke lånt nogen bøger');
 
-    return '<h1>Lån denne lydbog?</h1><p>'.t('Du har %loaned og kan pt. låne %max.',array('%loaned' => $loaned,'%max' => format_plural($max,'en mere', '@count til'))).'</p>'.l('Ok',$base_root.request_uri(),array('query'=> 'confirm=1','attributes' => array('class' => 'okknap'))).l('Fortryd',$base_root.request_uri(),array('attributes' => array('class' => 'annullerknap')));
+    return '<h1 style="text-align:center;">Lån denne lydbog?</h1><p>'.t('Du har %loaned og kan pt. låne %max.',array('%loaned' => $loaned,'%max' => format_plural($max,'en mere', '@count til'))).'</p>'.l('Ok',$base_root.request_uri(),array('query'=> 'confirm=1','attributes' => array('class' => 'okknap'))).l('Fortryd',$base_root.request_uri(),array('attributes' => array('class' => 'annullerknap')));
 
    }
    $response = elib_client()->makeLoan($isbn);
@@ -358,11 +358,11 @@ function elib_get_lydbog($tingObjectID,$format){
       //var_dump($response);
       if($response->status->code == 101){
         $src = $response->data->downloadurl;
-			  $pretext = '<h1>Din lydbog afspilles nu nedenfor</h1>';
+			  $pretext = '<h1 style="text-align:center;">Din lydbog afspilles nu nedenfor</h1>';
         if ($format != 'stream') {
           $src = (trim($response->data[1]->files[0]->file));
           global $base_root;
-          $pretext = '<h1>Vi er ved at generere din lydbog.<br/> Vent venligst...</h1><div class="loader"></div><p>Vi er ved at pakke din lydbog til en fil</p><p>Når du har gemt filen, tryk næste</p>'.l('Næste',$base_root.request_uri(),array('query'=> 'downloaded=1','attributes' => array('class' => 'nextknap knap')));
+          $pretext = '<h1 style="text-align:center;">Vi er ved at generere din lydbog.<br/> Vent venligst...</h1><div class="loader"></div><p>Vi er ved at pakke din lydbog til en fil</p><p>Når du har gemt filen, tryk næste</p>'.l('Næste',$base_root.request_uri(),array('query'=> 'downloaded=1','attributes' => array('class' => 'nextknap knap')));
         }
        
         $content = $pretext;
@@ -389,7 +389,7 @@ function elib_get_lydbog($tingObjectID,$format){
 
   // ellers så hent lokal URL
   if($response->status->code != 101){
-    $content .= '<div class="status">Fejl: '.$status.'</div>';
+    $content .= '<div class="status" style="position:absolute;bottom:0;">Fejl: '.$status.'</div>';
   }
 
   return $content;
