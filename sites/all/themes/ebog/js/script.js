@@ -12,7 +12,13 @@ jQuery(function($){
       }
     });
   });
+	
+  $('.annullerknap').click(function(){
+    window.parent.Lightbox.end();
+    return false;
+  });
 
+  var kill = false;
   function lookupSelector(){
     if(kill){
       return false;
@@ -27,8 +33,8 @@ jQuery(function($){
   }
   lookupSelector();
 
-  var kill = false;
   function onChangeRedirect(){
+		
     var url = location.href;
     var parts = url.split('#');
     var cleanurl = parts[0];
