@@ -887,9 +887,11 @@ function elib_book_teaser(TingClientObject $object, $is_ajax = false) {
     elseif ($platform == PLATFORM_IOS) {
       $html = '
         <h4> ' . $title . ' </h4>
-        <p class="ios-lydbog-link"><a href="' . $book->data->product->teaser->link . '">'  .t('Listen') . '</a></p>';
+        <iframe src="' . $book->data->product->teaser->link . '" style="display: none;"></iframe>';
 
-      die($html);
+      if ($is_ajax) {
+        die($html);
+      }
     }
 
     return $html;
