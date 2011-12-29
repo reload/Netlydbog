@@ -193,7 +193,7 @@ function elib_get_lydbog($tingObjectID,$format){
 
   if(!$userinfo['cpr']){
     $out = '<h1 style="text-align:center;">Mangler eLIB tilknytning</h1>';
-    $out .= t('<p>Der er ikke knyttet nogle elib informationer til den bruger du er logget ind med. Det er højstsansyneligt fordi du er logget ind som redaktør eller administrator. Hvis dette ikke er tilfældet, kontakt !email</p>',array('!email' => l('info@ereolen.dk','info@ereolen.dk')));
+    $out .= t('<p>Der er ikke knyttet nogle elib informationer til den bruger du er logget ind med. Det er højstsansyneligt fordi du er logget ind som redaktør eller administrator. Hvis dette ikke er tilfældet, kontakt !email</p>',array('!email' => l('info@netlydbog.dk','info@netlydbog.dk')));
 
     return $out;
   }
@@ -262,7 +262,7 @@ function elib_get_lydbog($tingObjectID,$format){
         // ok ready for download
         $src = $filesrc;
         global $base_root;
-        $pretext = '<h1 style="text-align:center;">Vi er ved at generere din lydbog.<br/> Vent venligst...</h1><div class="loader"></div><p>Vi er ved at pakke din ebog til en fil</p><p>Problemer med download? Hent filen via <a href="'.$src.'">direkte link</a><p>Når du har gemt filen, tryk næste</p>'.l('Næste',$base_root.request_uri(),array('query'=> 'downloaded=1','attributes' => array('class' => 'nextknap knap')));
+        $pretext = '<h1 style="text-align:center;">Vi er ved at generere din lydbog.<br/> Vent venligst...</h1><div class="loader"></div><p>Vi er ved at pakke din lydbog til en fil</p><p>Problemer med download? Hent filen via <a href="'.$src.'">direkte link</a><p>Når du har gemt filen, tryk næste</p>'.l('Næste',$base_root.request_uri(),array('query'=> 'downloaded=1','attributes' => array('class' => 'nextknap knap')));
 
       }
       else
@@ -286,11 +286,11 @@ function elib_get_lydbog($tingObjectID,$format){
                    , WATCHDOG_DEBUG));
 
     $content = $pretext;
-    
+
     $platform = elib_check_platform();
 
     if ($platform == PLATFORM_GENERIC) {
-      $content .= '<iframe src="' . $src . '" class="audioplayer-' . $format . '" scrolling="no"></iframe>';
+      $content .= '<iframe src="' . $src . '" class="audioplayer-' . $format . '" frameborder="0" scrolling="no"></iframe>';
     } elseif($platform == PLATFORM_IOS) {
       $content .= t('<p>You are running iOS. We currently do not have a iOS stream for this item.</p>');
     }
@@ -329,9 +329,11 @@ function elib_get_lydbog($tingObjectID,$format){
 
     $loaned = $loaned ? format_plural($loaned,'en lånt lydbog','@count lånte lydbøger'): t('ikke lånt nogen bøger');
 
-    return '<h1 style="text-align:center;">Lån denne lydbog?</h1><p>'.t('Du har %loaned og kan pt. låne %max.',array('%loaned' => $loaned,'%max' => format_plural($max,'en mere', '@count til'))).'</p>'.l('Ok',$base_root.request_uri(),array('query'=> 'confirm=1','attributes' => array('class' => 'okknap'))).l('Fortryd',$base_root.request_uri(),array('attributes' => array('class' => 'annullerknap')));
+    return '<h1 style="text-align:center;">Lån denne lydbog?</h1><p style="text-align:center;">'.t('Du har %loaned og kan pt. låne %max.',array('%loaned' => $loaned,'%max' => format_plural($max,'en mere', '@count til'))).'</p>'.l('Ok',$base_root.request_uri(),array('query'=> 'confirm=1','attributes' => array('class' => 'okknap'))).l('Fortryd',$base_root.request_uri(),array('attributes' => array('class' => 'annullerknap')));
 
    }
+
+
    $response = elib_client()->makeLoan($isbn);
    if($response->status->code == 120) {
     // else show cart
@@ -358,13 +360,13 @@ function elib_get_lydbog($tingObjectID,$format){
       //var_dump($response);
       if($response->status->code == 101){
         $src = $response->data->downloadurl;
-			  $pretext = '<h1 style="text-align:center;">Din lydbog afspilles nu nedenfor</h1>';
+        $pretext = '<h1 style="text-align:center;">Din lydbog afspilles nu nedenfor</h1>';
         if ($format != 'stream') {
           $src = (trim($response->data[1]->files[0]->file));
           global $base_root;
           $pretext = '<h1 style="text-align:center;">Vi er ved at generere din lydbog.<br/> Vent venligst...</h1><div class="loader"></div><p>Vi er ved at pakke din lydbog til en fil</p><p>Når du har gemt filen, tryk næste</p>'.l('Næste',$base_root.request_uri(),array('query'=> 'downloaded=1','attributes' => array('class' => 'nextknap knap')));
         }
-       
+
         $content = $pretext;
         $platform = elib_check_platform();
 
@@ -373,8 +375,9 @@ function elib_get_lydbog($tingObjectID,$format){
         } elseif($platform == PLATFORM_IOS) {
           $content .= '<h4>You are running iOS.</h4>';
         }
-			}
-			
+      }
+
+
   }
 
     //krumo($response );
@@ -495,7 +498,7 @@ function elib_login_validate($form, &$form_state) {
 
 function elib_displaybook(TingClientObject $object,$elib_data = false){
 
-   $image_url = ting_covers_collection_url($object, '170_x');
+  $image_url = ting_covers_collection_url($object, '170_x');
   $out[] = '<div class="left">';
     $out[] = '<div class="picture">' . l(theme('image', $image_url, '', '', null, false), $object->url, array('html' => true)) . ' </div>';
   $out[] = '</div>';
@@ -508,7 +511,13 @@ function elib_displaybook(TingClientObject $object,$elib_data = false){
       $loanlimit = elib_str_to_time($elib_data->loanexpiredate,true);
       $diff = $loanlimit-time();
       $days = floor($diff/86400);
-      $loanperiod_class = 'short';
+      $loanperiod_class = 'long';
+      if($days < 14){
+        $loanperiod_class = 'medium';
+      }
+      if($days < 7){
+        $loanperiod_class = 'short';
+      }
       $out[] = '<div class="loanperiod '.$loanperiod_class.'">'.t('Lånet udløber om <div>%days',array('%days' => format_plural($days, 'en dag', '@count dage'))).'</div></div>';
     }
 
@@ -525,6 +534,7 @@ function elib_displaybook(TingClientObject $object,$elib_data = false){
   $out[] = '</div>';
 
   return implode($out);
+
 }
 
 function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1){
@@ -554,7 +564,13 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
     $loanlimit = elib_str_to_time($elib_data->loanexpiredate,true);
     $diff = $loanlimit-time();
     $days = floor($diff / 86400);
+    $loanperiod_class = 'long';
+    if($days < 14){
+      $loanperiod_class = 'medium';
+    }
+    if($days < 7){
     $loanperiod_class = 'short';
+    }
     $part['loginexpire'] = '<div class="loanperiod '.$loanperiod_class.'">'.t('Lånet udløber om <div>%days',array('%days' => format_plural($days, 'en dag', '@count dage'))).'</div></div>';
   }
 
@@ -577,7 +593,8 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
 
     $u = elib_user_get_cred($elib[1]);
     $part['text'] = '<div class="clearfix"></div><div class="text">'.truncate_utf8($elib[0],400,true,true).'</div>';
-    $part['icons'] = '
+
+        $part['icons'] = '
     <div class="icons">
       <ul>
         <li>' . l(t('Stream'), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
@@ -746,7 +763,13 @@ function elib_displaybook2(TingClientObject $obj,$fields,$settings='',$displaysi
     $loanlimit = elib_str_to_time($elib_data->loanexpiredate,true);
     $diff = $loanlimit-time();
     $days = floor($diff/86400);
-    $loanperiod_class = 'short';
+    $loanperiod_class = 'long';
+    if($days < 15){
+      $loanperiod_class = 'medium';
+    }
+    if($days < 5){
+      $loanperiod_class = 'short';
+    }
     $part['loginexpire'] = '<div class="loanperiod '.$loanperiod_class.'">'.t('Lånet udløber om <div>%days',array('%days' => format_plural($days, 'en dag', '@count dage'))).'</div></div>';
   }
 
@@ -770,7 +793,7 @@ function elib_displaybook2(TingClientObject $obj,$fields,$settings='',$displaysi
 
     $part['text'] = '<div class="clearfix"></div><div class="text">'.truncate_utf8($elib[0],400,true,true).'</div>';
     $part['icons'] = '
-    <div class="iconsnoheight">8
+    <div class="iconsnoheight">
       <ul>
         <li>' . l(t('Stream'), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
         <li class="seperator"></li>
