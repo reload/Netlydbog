@@ -1,5 +1,5 @@
 <?php
-// $Id: filters.backup_restore.inc,v 1.1.2.1 2009/08/22 19:58:13 ronan Exp $
+// $Id: filters.backup_restore.inc,v 1.1.2.2 2010/03/24 04:02:58 ronan Exp $
 
 
 /**
@@ -38,6 +38,24 @@ class backup_migrate_filter_backup_restore extends backup_migrate_filter {
       $out += $destination->backup_settings_default();
     }
     return $out;
+  }
+
+  /**
+   * Get the form for the settings for this filter.
+   */
+  function backup_settings_form_validate($form, &$form_state) {
+    foreach ($this->_get_destination_types() as $destination) {
+      $destination->backup_settings_form_validate($form, $form_state);
+    }
+  }
+
+  /**
+   * Submit the settings form. Any values returned will be saved.
+   */
+  function backup_settings_form_submit($form, $form_state) {
+    foreach ($this->_get_destination_types() as $destination) {
+      $destination->backup_settings_form_submit($form, $form_state);
+    }
   }
 
   /**

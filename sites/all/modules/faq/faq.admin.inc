@@ -1,5 +1,5 @@
 <?php
-// $Id: faq.admin.inc,v 1.1.2.22 2009/11/30 20:57:00 snpower Exp $
+// $Id: faq.admin.inc,v 1.1.2.26 2010/09/15 12:06:37 snpower Exp $
 
 /**
  * @file
@@ -45,6 +45,12 @@ function faq_general_settings_form() {
     '#rows' => 5,
   );
   $form['body_filter']['faq_description_format'] = filter_form(variable_get('faq_description_format', ''), NULL, array('faq_description_format'));
+  $form['faq_custom_breadcrumbs'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Create custom breadcrumbs for the FAQ'),
+    '#description' => t('This option set the breadcrumb path to "%home > %faqtitle > category trail".', array('%home' => t('Home'), '%faqtitle' => variable_get('faq_title', 'Frequently Asked Questions'))),
+    '#default_value' => variable_get('faq_custom_breadcrumbs', TRUE),
+  );
 
   return system_settings_form($form);
 }
@@ -91,7 +97,7 @@ function faq_questions_settings_form() {
   $form['faq_questions_misc']['faq_qa_mark'] = array(
     '#type' => 'checkbox',
     '#title' => t('Label questions and answers'),
-    '#description' => t('This option is only valid for the "Questions Inline" layout.  It labels all questions on the faq page with the "question label" setting and all answers with the "answer label" setting.  For example these could be set to "Q:" and "A:".'),
+    '#description' => t('This option is only valid for the "Questions Inline" and "Clicking on question takes user to answer further down the page" layouts.  It labels all questions on the faq page with the "question label" setting and all answers with the "answer label" setting.  For example these could be set to "Q:" and "A:".'),
     '#default_value' => variable_get('faq_qa_mark', FALSE),
   );
 
@@ -115,6 +121,12 @@ function faq_questions_settings_form() {
     '#options' => array('long' => t('Display longer text'), 'short' => t('Display short text'), 'both' => t('Display both short and long questions')),
     '#description' => t("The length of question text to display on the FAQ page.  The short question will always be displayed in the FAQ blocks."),
     '#default_value' => variable_get('faq_question_length', 'short'),
+  );
+
+  $form['faq_questions_misc']['faq_question_long_form'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Allow long question text to be configured'),
+    '#default_value' => variable_get('faq_question_long_form', 1),
   );
 
   $form['faq_questions_misc']['faq_hide_qa_accordion'] = array(
@@ -284,7 +296,7 @@ function faq_categories_settings_form() {
         '#type' => 'checkboxes',
         '#title' => t('Omit vocabulary'),
         '#description' => t('Terms from these vocabularies will be <em>excluded</em> from the FAQ pages.'),
-        '#default_value' => variable_get('faq_omit_vocabulary', 0),
+        '#default_value' => variable_get('faq_omit_vocabulary', array()),
         '#options' => $vocab_options,
         '#multiple' => TRUE,
       );

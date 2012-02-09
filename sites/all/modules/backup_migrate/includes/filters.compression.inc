@@ -1,5 +1,5 @@
 <?php
-// $Id: filters.compression.inc,v 1.1.2.4 2009/08/22 19:58:13 ronan Exp $
+// $Id: filters.compression.inc,v 1.1.2.5 2010/03/24 04:02:58 ronan Exp $
 
 
 /**
@@ -49,13 +49,6 @@ class backup_migrate_filter_compression extends backup_migrate_filter {
       "#default_value" => $settings['compression'],
     );
     return $form;
-  }
-
-  /**
-   * Submit the settings form. Any values returned will be saved.
-   */
-  function backup_settings_form_submit($form_values) {
-    return $form_values;
   }
 
   /**

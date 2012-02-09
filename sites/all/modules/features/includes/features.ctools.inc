@@ -1,5 +1,4 @@
 <?php
-// $Id: features.ctools.inc,v 1.1.2.22 2010/05/25 21:51:30 yhahn Exp $
 
 /**
  * This is a wild hack, but effective.
@@ -17,10 +16,10 @@ foreach (_ctools_features_get_info() as $component => $info) {
     $code .= 'function '. $component .'_features_export_options() { return ctools_component_features_export_options("'. $component .'"); }';
   }
   if (!function_exists("{$component}_features_export_render")) {
-    $code .= 'function '. $component .'_features_export_render($module = "foo", $data) { return ctools_component_features_export_render("'. $component .'", $module, $data); }';
+    $code .= 'function '. $component .'_features_export_render($module, $data) { return ctools_component_features_export_render("'. $component .'", $module, $data); }';
   }
   if (!function_exists("{$component}_features_revert")) {
-    $code .= 'function '. $component .'_features_revert($module = "foo") { return ctools_component_features_revert("'. $component .'", $module); }';
+    $code .= 'function '. $component .'_features_revert($module) { return ctools_component_features_revert("'. $component .'", $module); }';
   }
   eval($code);
 }
@@ -66,11 +65,9 @@ function ctools_features_export($data, &$export, $module_name = '') {
  * Implementation of hook_features_export_render().
  * Adds the ctools mothership hook, ctools_plugin_api().
  */
-function ctools_features_export_render($module = 'foo', $data) {
+function ctools_features_export_render($module, $data) {
   $code = array();
-  $code[] = '  $args = func_get_args();';
-  $code[] = '  $module = array_shift($args);';
-  $code[] = '  $api = array_shift($args);';
+  $code[] = '  list($module, $api) = func_get_args();';
 
   $first = TRUE;
   foreach ($data as $component) {
@@ -111,18 +108,14 @@ function ctools_component_features_export_options($component) {
   ctools_include('export');
   $schema = ctools_export_get_schema($component);
   if ($schema && $schema['export']['bulk export']) {
-    $export_key = $schema['export']['key'];
-    // If a list callback is available use it, otherwise fallback to generating
-    // options from ctools_export_load_object().
-    if (function_exists($schema['export']['list callback'])) {
-      $objects = $schema['export']['list callback']();
-      $options = drupal_map_assoc(array_keys($objects));
+    if (!empty($schema['export']['list callback']) && function_exists($schema['export']['list callback'])) {
+      $options = $schema['export']['list callback']();
     }
-    else if ($objects = ctools_export_load_object($component, 'all')) {
-      $options = drupal_map_assoc(array_keys($objects));
+    else {
+      $options = _ctools_features_export_default_list($component, $schema);
     }
   }
-  ksort($options);
+  asort($options);
   return $options;
 }
 
@@ -133,13 +126,12 @@ function ctools_component_features_export($component, $data, &$export, $module_n
   // Add the actual implementing module as a dependency
   $info = _ctools_features_get_info();
   if ($module_name !== $info[$component]['module']) {
-    $export['dependencies'][$module] = $info[$component]['module'];
+    $export['dependencies'][$info[$component]['module']] = $info[$component]['module'];
   }
 
   // Add the components
   foreach ($data as $object_name) {
-    if ($objects = ctools_export_load_object($component, 'names', array($object_name))) {
-      $object = array_shift($objects);
+    if ($object = _ctools_features_export_crud_load($component, $object_name)) {
       // If this object is provided as a default by a different module, don't
       // export and add that module as a dependency instead.
       if (!empty($object->export_module) && $object->export_module !== $module_name) {
@@ -162,15 +154,11 @@ function ctools_component_features_export($component, $data, &$export, $module_n
 /**
  * Master implementation of hook_features_export_render() for all ctools components.
  */
-function ctools_component_features_export_render($component, $module = 'foo', $data) {
+function ctools_component_features_export_render($component, $module, $data) {
   ctools_include('export');
-
   $schema = ctools_export_get_schema($component);
-  if (function_exists('page_manager_page_manager_handlers_list')) {
-    page_manager_page_manager_handlers_list();
-  }
+
   if (function_exists($schema['export']['to hook code callback'])) {
-    $list = $schema['export']['list callback']();
     $export = $schema['export']['to hook code callback']($data, $module);
     $code = explode("{\n", $export);
     array_shift($code);
@@ -179,21 +167,12 @@ function ctools_component_features_export_render($component, $module = 'foo', $d
     $code = implode('}', $code);
   }
   else {
-    $code = '  $export = array();'."\n";
-    foreach ($data as $object) {
-      $identifier = $schema['export']['identifier'];
-      $objects = ctools_export_load_object($component, 'names', array($object));
-      if (!empty($objects[$object])) {
-        // Support objects that have a defined export callback, but fall back to.
-        // ctools_export_object().
-        if (function_exists($schema['export']['export callback'])) {
-          $code .= $schema['export']['export callback']($objects[$object], '  ');
-        }
-        else {
-          $code .= ctools_export_object($component, $objects[$object], '  ', $identifier);
-        }
-        $code .= "\n";
-        $code .= '  $export[\''. $object .'\'] = $'. $identifier .';'."\n";
+    $code = '  $export = array();'."\n\n";
+    foreach ($data as $object_name) {
+      if ($object = _ctools_features_export_crud_load($component, $object_name)) {
+        $identifier = $schema['export']['identifier'];
+        $code .= _ctools_features_export_crud_export($component, $object, '  ');
+        $code .= "  \$export[" . ctools_var_export($object_name) . "] = \${$identifier};\n\n";
       }
     }
     $code .= '  return $export;';
@@ -205,14 +184,11 @@ function ctools_component_features_export_render($component, $module = 'foo', $d
 /**
  * Master implementation of hook_features_revert() for all ctools components.
  */
-function ctools_component_features_revert($component, $module = 'foo') {
-  $info = _ctools_features_get_info();
-  $objects = module_invoke($module, $info[$component]['default_hook']);
-  if (!empty($objects)) {
-    $schema = ctools_export_get_schema($component);
-    $export = $schema['export'];
-    $names = db_placeholders(array_keys($objects), $schema['fields'][$export['key']]['type']);
-    db_query("DELETE FROM {{$component}} WHERE {$export['key']} IN ({$names})", array_keys($objects));
+function ctools_component_features_revert($component, $module) {
+  if ($objects = features_get_default($component, $module)) {
+    foreach ($objects as $object) {
+      _ctools_features_export_crud_delete($component, $object);
+    }
   }
 }
 
@@ -232,12 +208,18 @@ function _ctools_features_get_info($identifier = NULL, $reset = FALSE) {
           $api_module = isset($schema['export']['api']['owner']) ? $schema['export']['api']['owner'] : $module;
           $components[$table] = array(
             'name' => isset($modules[$api_module]->info['name']) ? $modules[$api_module]->info['name'] : $api_module,
-            'api' => $schema['export']['api']['api'],
             'default_hook' => $schema['export']['default hook'],
-            'current_version' => $schema['export']['api']['current_version'],
+            'default_file' => FEATURES_DEFAULTS_CUSTOM,
             'module' => $api_module,
             'feature_source' => TRUE,
           );
+          if (isset($schema['export']['api'])) {
+            $components[$table] += array(
+              'api' => $schema['export']['api']['api'],
+              'default_filename' => $schema['export']['api']['api'],
+              'current_version' => $schema['export']['api']['current_version'],
+            );
+          }
         }
       }
     }
@@ -267,4 +249,72 @@ function _ctools_features_get_info($identifier = NULL, $reset = FALSE) {
   }
 
   return $components;
+}
+
+/**
+ * Wrapper around ctools_export_crud_export() for < 1.7 compatibility.
+ */
+function _ctools_features_export_crud_export($table, $object, $indent = '') {
+  return ctools_api_version('1.7') ? ctools_export_crud_export($table, $object, $indent) : ctools_export_object($table, $object, $indent);
+}
+
+/**
+ * Wrapper around ctools_export_crud_load() for < 1.7 compatibility.
+ */
+function _ctools_features_export_crud_load($table, $name) {
+  if (ctools_api_version('1.7')) {
+    return ctools_export_crud_load($table, $name);
+  }
+  elseif ($objects = ctools_export_load_object($table, 'names', array($name))) {
+    return array_shift($objects);
+  }
+  return FALSE;
+}
+
+/**
+ * Wrapper around ctools_export_default_list() for < 1.7 compatibility.
+ */
+function _ctools_features_export_default_list($table, $schema) {
+  if (ctools_api_version('1.7')) {
+    return ctools_export_default_list($table, $schema);
+  }
+  elseif ($objects = ctools_export_load_object($table, 'all')) {
+    return drupal_map_assoc(array_keys($objects));
+  }
+  return array();
+}
+
+/**
+ * Wrapper around ctools_export_crud_delete() for < 1.7 compatibility.
+ */
+function _ctools_features_export_crud_delete($table, $object) {
+  if (ctools_api_version('1.7')) {
+    ctools_export_crud_delete($table, $object);
+  }
+  else {
+    $schema = ctools_export_get_schema($table);
+    $export = $schema['export'];
+    db_query("DELETE FROM {{$table}} WHERE {$export['key']} = '%s'", $object->{$export['key']});
+  }
+}
+
+/**
+ * Implementation of hook_features_export_render() for page_manager.
+ */
+function page_manager_pages_features_export_render($module, $data) {
+  // Ensure that handlers have their code included before exporting.
+  page_manager_get_tasks();
+  return ctools_component_features_export_render('page_manager_pages', $module, $data);
+}
+
+/**
+ * Implementation of hook_features_revert() for page_manager.
+ */
+function page_manager_pages_features_revert($module) {
+  if ($pages = features_get_default('page_manager_pages', $module)) {
+    require_once drupal_get_path('module','ctools').'/page_manager/plugins/tasks/page.inc';
+    foreach ($pages as $page) {
+      page_manager_page_delete($page);
+    }
+  }
 }

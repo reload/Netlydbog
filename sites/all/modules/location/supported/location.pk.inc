@@ -1,5 +1,5 @@
 <?php
-// $Id: location.pk.inc,v 1.6 2008/01/24 09:00:03 bdragon Exp $
+// $Id: location.pk.inc,v 1.6.4.1 2009/02/04 20:04:10 bdragon Exp $
 
 // Pakistan
 
@@ -9,5 +9,5 @@ function location_province_list_pk() {
     'I' => "Islamabad Capital Territory",
     'N' => "North-West Frontier Province",
     'P' => "Punjab",
-    'S' => "Sindh ");
+    'S' => "Sindh");
 }

@@ -1,5 +1,5 @@
 <?php
-// $Id: faq.questions_inline.inc,v 1.1.2.7 2009/12/23 18:13:12 snpower Exp $
+// $Id: faq.questions_inline.inc,v 1.1.2.8 2010/09/15 14:03:30 snpower Exp $
 
 /**
  * @file
@@ -35,7 +35,7 @@ function template_preprocess_faq_questions_inline(&$variables) {
   $nodes = array();
   $count = 0;
   foreach ($data as $node) {
-    faq_view_question($nodes[$count], $node);
+    faq_view_question($nodes[$count], $node, NULL, 'n'. $node->nid);
     faq_view_answer($nodes[$count], $node, $back_to_top, $teaser, $links);
     $count++;
   }

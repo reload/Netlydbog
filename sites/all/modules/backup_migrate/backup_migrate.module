@@ -1,5 +1,5 @@
 <?php
-// $Id: backup_migrate.module,v 1.1.2.25.2.1.2.31 2009/12/09 22:07:42 ronan Exp $
+// $Id: backup_migrate.module,v 1.1.2.25.2.1.2.35 2010/09/13 02:36:49 ronan Exp $
 
 
 /**
@@ -346,6 +346,7 @@ function backup_migrate_ui_manual_quick_backup_form_validate($form, &$form_state
  * Submit the quick backup form.
  */
 function backup_migrate_ui_manual_quick_backup_form_submit($form, &$form_state) {
+  backup_migrate_include('profiles', 'destinations');
   if (user_access('perform backup')) {
     // For a quick backup use the default settings.
     $settings = _backup_migrate_profile_saved_default_profile($form_state['values']['profile_id']);
@@ -474,7 +475,8 @@ function backup_migrate_ui_manual_backup_form(&$form_state, $profile = array()) 
       '#value' => t('Save Without Backing Up'),
     );
   }
-  $form['#validate'] = array('backup_migrate_ui_manual_quick_backup_form_validate');
+  $form['#validate'][] = 'backup_migrate_ui_manual_quick_backup_form_validate';
+  $form['#submit'][] = 'backup_migrate_ui_manual_backup_form_submit';
 
   $form[] = array(
     '#type' => 'submit',
@@ -489,15 +491,15 @@ function backup_migrate_ui_manual_backup_form(&$form_state, $profile = array()) 
  * Submit the form. Save the values as defaults if desired and output the backup file.
  */
 function backup_migrate_ui_manual_backup_form_submit($form, &$form_state) {
-  // Save the settings profile if the save box is checked.
-//  $form_state['values']['nodata_tables'] = array_filter((array)$form_state['values']['nodata_tables']);
-//  $form_state['values']['exclude_tables'] = array_filter((array)$form_state['values']['exclude_tables']);
-
+  // Create a profile with the gien settings.
   $profile = backup_migrate_crud_create_item('profile', $form_state['values']);
 
+  // Save the settings profile if the save box is checked.
   if ($form_state['values']['save_settings'] && user_access('administer backup and migrate')) {
     if (@$form_state['values']['create_new']) {
+      // Reset the id and storage so a new item will be saved.
       $profile->set_id(NULL);
+      $profile->storage = BACKUP_MIGRATE_STORAGE_NONE;
     }
     $profile->save();
     variable_set("backup_migrate_profile_id", $profile->get_id());
@@ -811,7 +813,6 @@ function backup_migrate_shutdown($settings) {
 
 /**
  * Action to backup the drupal site. Requires actions.module.
- */
 function action_backup_migrate_backup($op, $edit = array()) {
   switch ($op) {
     case 'do':
@@ -843,10 +844,10 @@ function action_backup_migrate_backup($op, $edit = array()) {
       return '';
   }
 }
+ */
 
 /*
  * Implementation of hook_action_info().
- */
 function backup_migrate_action_info() {
   return array(
     'backup_migrate_action_backup' => array(
@@ -856,6 +857,7 @@ function backup_migrate_action_info() {
     ),
   );
 }
+ */
 
 /*
  * Action callback.
@@ -940,6 +942,11 @@ function _backup_migrate_message_callback($callback = NULL) {
 
 function _backup_migrate_check_timeout() {
   static $timeout;
+
+  // Max execution of 0 means unlimited.
+  if (ini_get('max_execution_time') == 0) {
+    return false;
+  }
   // Figure out when we should stop execution.
   if (!$timeout) {
     $timeout = (!empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time()) + ini_get('max_execution_time') - variable_get('backup_migrate_timeout_buffer', 5);

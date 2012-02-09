@@ -1,4 +1,4 @@
-# $Id: es.po,v 1.1.2.1 2009/10/26 00:14:54 snpower Exp $
+# $Id: es.po,v 1.1.2.2 2010/09/14 20:29:38 snpower Exp $
 #
 # Spanish translation of Drupal (general)
 # Copyright YEAR NAME <EMAIL@ADDRESS>
@@ -163,8 +163,7 @@ msgstr "Estilo de listado de pregunta"
 
 #: faq.module:426
 msgid "This allows to select how the questions listing is presented.  It only applies to the layouts: 'Clicking on question takes user to answer further down the page' and 'Clicking on question opens the answer in a new page'.  An ordered listing would number the questions, whereas an unordered list will have a bullet to the left of each question."
-msgstr "
-Esto permite seleccionar la forma en que la lista de preguntas se presenta. Sólo se aplica a los diseños de: 'Al hacer clic en lleva al usuario a la respuesta más abajo en la página' y 'Al hacer clic en la pregunta abre la respuesta en una nueva página'. la lista ordenada numerara las preguntas, mientras que una lista desordenada tendrá una 'bala' a la izquierda de cada pregunta."
+msgstr "Esto permite seleccionar la forma en que la lista de preguntas se presenta. Sólo se aplica a los diseños de: 'Al hacer clic en lleva al usuario a la respuesta más abajo en la página' y 'Al hacer clic en la pregunta abre la respuesta en una nueva página'. la lista ordenada numerara las preguntas, mientras que una lista desordenada tendrá una 'bala' a la izquierda de cada pregunta."
 
 #: faq.module:432
 msgid "Label questions and answers"

@@ -1,5 +1,5 @@
 <?php
-// $Id: faq.hide_answer.inc,v 1.1.2.7 2009/11/10 00:17:45 snpower Exp $
+// $Id: faq.hide_answer.inc,v 1.1.2.8 2010/09/15 14:03:30 snpower Exp $
 
 /**
  * @file
@@ -24,7 +24,7 @@ function template_preprocess_faq_hide_answer(&$variables) {
   $nodes = array();
   $count = 0;
   foreach ($data as $node) {
-    faq_view_question($nodes[$count], $node, $this_page);
+    faq_view_question($nodes[$count], $node, $this_page, 'n'. $node->nid);
     faq_view_answer($nodes[$count], $node, array(), $teaser, $links);
     $count++;
   }

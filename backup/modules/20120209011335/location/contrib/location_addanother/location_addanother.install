@@ -1,0 +1,27 @@
+<?php
+// $Id: location_addanother.install,v 1.1 2008/03/06 20:14:52 bdragon Exp $
+
+/**
+ * @file
+ * Installation routines for location_addanother.
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function location_addanother_install() {
+
+
+  // Change weight so we execute after location.
+  db_query("UPDATE {system} SET weight = 1 WHERE name = '%s' AND type = '%s'", 'location_addanother', 'module');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function location_addanother_uninstall() {
+  $types = node_get_types('types');
+  foreach ($types as $type) {
+    variable_del('location_addanother_'. $type);
+  }
+}

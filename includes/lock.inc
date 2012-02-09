@@ -1,5 +1,4 @@
 <?php
-// $Id: lock.inc,v 1.1.2.2 2010/02/01 16:49:14 goba Exp $
 
 /**
  * @file
@@ -18,7 +17,7 @@
  *
  * This is a cooperative, advisory lock system. Any long-running operation
  * that could potentially be attempted in parallel by multiple requests should
- * try to acquire a lock before proceeding. By obtaiing a lock, one request
+ * try to acquire a lock before proceeding. By obtaining a lock, one request
  * notifies any other requests that a specific opertation is in progress which
  * must not be executed in parallel.
  *
@@ -52,11 +51,6 @@
  *
  * lock_acquire() and lock_wait() will automatically break (delete) a lock
  * whose duration has exceeded the timeout specified when it was acquired.
- *
- * A function that has acquired a lock may attempt to renew a lock (extend the
- * duration of the lock) by calling lock_acquire() again during the operation.
- * Failure to renew a lock is indicative that another request has acquired
- * the lock, and that the current operation may need to be aborted.
  *
  * Alternative implementations of this API (such as APC) may be substituted
  * by setting the 'lock_inc' variable to an alternate include filepath.  Since
@@ -108,7 +102,8 @@ function lock_acquire($name, $timeout = 30.0) {
   $expire = (float)$usec + (float)$sec + $timeout;
   if (isset($locks[$name])) {
     // Try to extend the expiration of a lock we already acquired.
-    if (!db_result(db_query("UPDATE {semaphore} SET expire = %f WHERE name = '%s' AND value = '%s'", $expire, $name, _lock_id()))) {
+    db_query("UPDATE {semaphore} SET expire = %f WHERE name = '%s' AND value = '%s'", $expire, $name, _lock_id());
+    if (!db_affected_rows()) {
       // The lock was broken.
       unset($locks[$name]);
     }

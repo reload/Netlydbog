@@ -1,5 +1,5 @@
 <?php
-// $Id: destinations.db.inc,v 1.1.2.13 2009/11/27 19:29:40 ronan Exp $
+// $Id: destinations.db.inc,v 1.1.2.15 2010/10/28 14:58:58 ronan Exp $
 
 
 /**
@@ -141,18 +141,19 @@ class backup_migrate_destination_db extends backup_migrate_destination_remote {
    */
   function backup_to_file($file, $settings) {
     $file->push_type($this->get_file_type_id());
-    $this->switch_db();
 
     backup_migrate_filters_invoke_all('pre_backup', $this, $file, $settings);
-    $this->lock_tables($settings);
 
     // Switch to a different db if specified.
     $this->switch_db();
+
+    $this->lock_tables($settings);
     $success = $this->_backup_db_to_file($file, $settings);
+    $this->unlock_tables($settings);
+
     // Switch back to the previous db.
     $this->switch_db(TRUE);
 
-    $this->unlock_tables($settings);
     backup_migrate_filters_invoke_all('post_backup', $this, $file, $settings, $success);
 
     return $success ? $file : FALSE;
@@ -239,7 +240,6 @@ class backup_migrate_destination_db extends backup_migrate_destination_remote {
    */
   function lock_tables($settings) {
     if ($settings->filters['utils_lock_tables']) {
-      $this->switch_db();
       $tables = array();
       foreach ($this->get_table_names() as $table) {
         // There's no need to lock excluded or structure only tables because it doesn't matter if they change.
@@ -248,7 +248,6 @@ class backup_migrate_destination_db extends backup_migrate_destination_remote {
         }
       }
       $this->_lock_tables($tables);
-      $this->switch_db(TRUE);
     }
   }
 

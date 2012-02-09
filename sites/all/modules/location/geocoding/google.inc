@@ -1,5 +1,5 @@
 <?php
-// $Id: google.inc,v 1.11 2008/10/09 19:38:16 bdragon Exp $
+// $Id: google.inc,v 1.11.2.4 2010/05/27 12:16:14 rooby Exp $
 
 /**
  * @file
@@ -13,63 +13,71 @@
  */
 function google_geocode_country_list() {
   return array(
-    'al',
-    'at',
-    'au',
-    'ba',
-    'be',
-    'bg',
-    'br',
-    'by',
-    'ca',
-    'ch',
-    'ci',
-    'cl',
-    'cz',
-    'de',
-    'dk',
-    'ec',
-    'ee',
-    'es',
-    'fi',
-    'fr',
-    'gr',
-    'hk',
-    'hu',
-    'ie',
-    'in',
-    'it',
-    'jp',
-    'li',
-    'lt',
-    'lu',
-    'lv',
-    'md',
-    'me',
-    'mo',
-    'mx',
-    'nc',
-    'ni',
-    'nl',
-    'no',
-    'pl',
-    'pt',
-    'ro',
-    'ru',
-    'rs',
-    'se',
-    'sg',
-    'si',
-    'sk',
-    'sm',
-    'sv',
-    'th',
-    'tr',
-    'tw',
-    'ua',
-    'uk',
-    'us',
-    'uy',
+    /* Albania                      */ 'al',
+    /* Argentina                    */ 'ar',
+    /* Australia                    */ 'au',
+    /* Austria                      */ 'at',
+    /* Belarus                      */ 'by',
+    /* Belgium                      */ 'be',
+    /* Bosnia and Herzegovina       */ 'ba',
+    /* Brazil                       */ 'br',
+    /* Bulgaria                     */ 'bg',
+    /* Canada                       */ 'ca',
+    /* Chile                        */ 'cl',
+    /* China                        */ 'cn',
+    /* Croatia                      */ 'hr',
+    /* Czech Republic               */ 'cz',
+    /* Denmark                      */ 'dk',
+    /* Ecuador                      */ 'ec',
+    /* El Salvador                  */ 'sv',
+    /* Estonia                      */ 'ee',
+    /* Finland                      */ 'fi',
+    /* France                       */ 'fr',
+    /* Germany                      */ 'de',
+    /* Greece                       */ 'gr',
+    /* Hong Kong                    */ 'hk',
+    /* Hungary                      */ 'hu',
+    /* India                        */ 'in',
+    /* Ireland                      */ 'ie',
+    /* Italy                        */ 'it',
+    /* Japan                        */ 'jp',
+    /* Kenya                        */ 'ke',
+    /* Latvia                       */ 'lv',
+    /* Lebanon                      */ 'lb',
+    /* Liechtenstein                */ 'li',
+    /* Lithuania                    */ 'lt',
+    /* Luxembourg                   */ 'lu',
+    /* Macau                        */ 'mo',
+    /* Macedonia                    */ 'mk',
+    /* Malaysia                     */ 'my',
+    /* Mexico                       */ 'mx',
+    /* Moldova                      */ 'md',
+    /* Montenegro                   */ 'me',
+    /* Netherlands                  */ 'nl',
+    /* New Zealand                  */ 'nz',
+    /* Nicaragua                    */ 'ni',
+    /* Norway                       */ 'no',
+    /* Panama                       */ 'pa',
+    /* Poland                       */ 'pl',
+    /* Portugal                     */ 'pt',
+    /* Romania                      */ 'ro',
+    /* Russia                       */ 'ru',
+    /* San Marino                   */ 'sm',
+    /* Serbia                       */ 'rs',
+    /* Singapore                    */ 'sg',
+    /* Slovakia                     */ 'sk',
+    /* Slovenia                     */ 'si',
+    /* South Korea                  */ 'kr',
+    /* Spain                        */ 'es',
+    /* Sweden                       */ 'se',
+    /* Switzerland                  */ 'ch',
+    /* Taiwan                       */ 'tw',
+    /* Thailand                     */ 'th',
+    /* Turkey                       */ 'tr',
+    /* Ukraine                      */ 'ua',
+    /* United Kingdom               */ 'uk',
+    /* United States                */ 'us',
+    /* Uruguay                      */ 'uy',
   );
 }
 
@@ -93,46 +101,30 @@ function google_geocode_info() {
  *   an associative array with keys 'lat' and 'lon' containing the coordinates.
  */
 function google_geocode_location($location = array()) {
-  switch ($location['country']) {
-    case 'li':
-      $location['country'] = 'Liechtenstein';
-      $query = location_address2singleline($location);
-      break;
 
-    case 'at':
-      $location['country'] = 'Austria';
-      $query = location_address2singleline($location);
-      break;
-
-    case 'uk':
-      // @@@ Bdragon: Doesn't google support UK postcodes now?
-      if ($location['street'] && $location['city']) {
-        unset($location['postal_code']);
-      }
-      elseif ($location['postal_code']) {
-        unset($location['city']);
-        unset($location['street']);
-        unset($location['additional']);
-      }
-      else {
-        unset($location['postal_code']);
-      }
-      $query = location_address2singleline($location);
-      break;
-
-    default:
-      $query = location_address2singleline($location);
-      break;
-  }
-
-  $key = variable_get('location_geocode_google_apikey', '');
   if (function_exists('gmap_get_key')) {
     $key = gmap_get_key();
   }
+  else {
+    $key = variable_get('location_geocode_google_apikey', '');
+  }
 
-  $service_url = 'http://maps.google.com/maps/geo?output=xml&key='. $key .'&q=';
+  $query = array(
+    'key' => $key,
+    'sensor' => 'false', // Required by TOS.
+    'output' => 'xml',
+    //'ll' => 0,
+    //'spn' => 0,
+    'gl' => $location['country'],
+    'q' => _google_geocode_flatten($location),
+  );
 
-  $http_reply = drupal_http_request($service_url . urlencode($query));
+  $url = url('http://maps.google.com/maps/geo', array(
+    'query' => $query,
+    'external' => TRUE,
+  ));
+
+  $http_reply = drupal_http_request($url);
 
   $status_code_match = array();
   preg_match('/<code>(.*)<\/code>/', $http_reply->data, $status_code_match);
@@ -144,7 +136,7 @@ function google_geocode_location($location = array()) {
   $accuracy_code_match = array();
   preg_match('/Accuracy="([0-9])"/', $http_reply->data, $accuracy_code_match);
   $accuracy_code = $accuracy_code_match[1];
-  if ($accuracy_code < 3) {
+  if ($accuracy_code < variable_get('location_geocode_' . $location['country'] . 'google_accuracy_code', variable_get('location_geocode_google_minimum_accuracy', '3'))) {
     return NULL;
   }
 
@@ -185,5 +177,59 @@ function google_geocode_settings() {
     );
   }
 
+  $country = arg(4);
+  if ($country) {
+    $form['location_geocode_' . $country . '_google_accuracy_code'] = array(
+      '#type' => 'select',
+      '#title' => t('Google Maps Geocoding Accuracy for %country', array('%country' => $country ) ),
+      '#default_value' => variable_get('location_geocode_' . $country . '_google_accuracy_code', variable_get('location_geocode_google_minimum_accuracy', '3')),
+      '#options' => location_google_geocode_accuracy_codes(),
+      '#description' => t('The minimum required accuracy for the geolocation data to be saved.'),
+    );
+  }
   return $form;
+}
+
+function _google_geocode_flatten($location = array()) {
+  // Check if its a valid address
+  if (empty($location)) {
+    return '';
+  }
+
+  $address = '';
+  if (!empty($location['street'])) {
+    $address .= $location['street'];
+  }
+
+  if (!empty($location['city'])) {
+    if (!empty($location['street'])) {
+      $address .= ', ';
+    }
+
+    $address .= $location['city'];
+  }
+
+  if (!empty($location['province'])) {
+    if (!empty($location['street']) || !empty($location['city'])) {
+      $address .= ', ';
+    }
+
+    // @@@ Fix this!
+    if (substr($location['province'], 0, 3) == $location['country'] .'-') {
+      $address .= substr($location['province'], 3);
+      watchdog('Location', 'BUG: Country found in province attribute.');
+    }
+    else {
+      $address .= $location['province'];
+    }
+  }
+
+  if (!empty($location['postal_code'])) {
+    if (!empty($address)) {
+      $address .= ' ';
+    }
+    $address .= $location['postal_code'];
+  }
+
+  return $address;
 }

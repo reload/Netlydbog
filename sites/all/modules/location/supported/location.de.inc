@@ -1,5 +1,5 @@
 <?php
-// $Id: location.de.inc,v 1.16 2008/06/05 15:28:12 bdragon Exp $
+// $Id: location.de.inc,v 1.16.4.1 2009/02/04 23:16:17 bdragon Exp $
 
 function location_province_list_de() {
   return array(
@@ -213,7 +213,7 @@ function theme_location_de($location = array(), $hide = array()) {
       $output .= '<div class="country-name">'. t('Germany') .'</div>';
     }
 
-    if (isset($location['latitude']) && isset($location['longitude'])) {
+    if (location_has_coordinates($location)) {
       $output .=  '<div class="geo"><abbr class="latitude" title="'. $location['latitude'] .'" /><abbr class="longitude" title="'. $location['latitude'] .'" /></div>';
     }
 
