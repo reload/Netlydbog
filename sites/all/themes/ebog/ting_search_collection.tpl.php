@@ -6,24 +6,19 @@
  * Template to render a Ting collection of books.
  */
 
-// updated so we show ALL objects in the collection in the search result
-
-/*dsm($collection);
-*/
+module_load_include('isbn_static_func.inc', 'elib');
 foreach ($collection->objects as $obj){
 	if($obj->type == 'Lydbog (online)' || 1==1) { // we asume now that every collection has only this one piece of material 
 		$lydbogObj = $obj;
-//		$lydbogObj = ting_get_object_by_id($obj->id);
 
-  elib_book_cover($lydbogObj);
+  $isbn = convertToEAN($obj->record['dc:identifier']['dkdcplus:ISBN'][0]);
   $alttext = t('@titel af @forfatter',array('@titel' => $lydbogObj->title, '@forfatter' => $lydbogObj->creators_string));
 
 ?>
-
-
   <li class="display-book ting-collection ruler-after line clear-block" id="<?php print $lydbogObj->id ?>">
-    <div class="picture unit">
-      <?php $image_url = ting_covers_collection_url($lydbogObj, '80_x'); ?>
+  
+    <div class="picture">
+      <?php $image_url = elib_book_cover($isbn, '80_x'); ?>
       <?php if ($image_url) { ?>
         <?php print l(theme('image', $image_url, $alttext, $alttext, null, false), $lydbogObj->url, array('html' => true)); ?>
       <?php } ?>

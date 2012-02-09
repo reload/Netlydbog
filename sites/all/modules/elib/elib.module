@@ -93,34 +93,12 @@ function elib_form_alter(&$form, $form_state, $form_id) {
   }
 }
 
-/* return ISBN10 from a ting object */
 function elib_get_isbn_from_object_id($oid){
   module_load_include('client.inc', 'ting');
   module_load_include('isbn_static_func.inc', 'elib');
-
-  $isbn = false;
-
   try {
     $object = ting_get_object_by_id($oid);
-
-    if(is_array($object->record['dc:identifier']['dkdcplus:ISBN']))
-    {
-      foreach ($object->record['dc:identifier']['dkdcplus:ISBN'] as $isbnno) {
-        if(strlen($isbnno) == 10)
-        {
-          $isbn = $isbnno;
-          break;
-        }
-        else
-        {
-          // guess it's an ISBN13
-          if($isbn = convertFromIsbn13ToIsbn10($isbnno))
-          {
-            break;
-          }
-        }
-      }
-    }
+    $isbn = convertFromIsbn13ToIsbn10($object->record['dc:identifier']['dkdcplus:ISBN'][0]);
 
     /*$eliburl = $object->record['dc:identifier']['dcterms:URI'][0];
     $first = substr($eliburl,strpos($eliburl,'&id=')+4);
@@ -129,15 +107,6 @@ function elib_get_isbn_from_object_id($oid){
   catch (TingClientException $e) {
     // If the specified object id does not exist, an exception is throw.
   }
-
-  if($isbn == false)
-  {
-    watchdog('elib', 'elib_get_isbn_from_object_id(@id) does not return a valid ISBN10 number: @data',
-             array('@id' => $oid, '@data' => var_export($object,true)
-                   , WATCHDOG_DEBUG));
-
-  }
-
   return $isbn;
 }
 
@@ -497,14 +466,33 @@ function elib_login_validate($form, &$form_state) {
 
 
 function elib_displaybook(TingClientObject $object,$elib_data = false){
+  $isbn = convertToEAN($object->record['dc:identifier']['dkdcplus:ISBN'][0]);
+  $image_url = elib_book_cover($isbn, '65_x');
 
-  $image_url = ting_covers_collection_url($object, '170_x');
-  $out[] = '<div class="left">';
-    $out[] = '<div class="picture">' . l(theme('image', $image_url, '', '', null, false), $object->url, array('html' => true)) . ' </div>';
-  $out[] = '</div>';
-  $out[] = '<div class="right">';
-    $out[] = '<h3 class="title">' . l($object->title, $object->url, array('attributes' => array('class' =>'title'))) . '</h3>';
-    $out[] = '<div class="author">' . t('By %creator_name%', array('%creator_name%' => $object->creators_string)) . '</div>';
+  $out[] = '
+    <div class="left">
+  ';
+
+  $out[] = '
+      <div class="picture">' . 
+        l(theme('image', $image_url, '', '', null, false), $object->url, array('html' => true)) . '
+      </div>
+  ';
+
+  $out[] = '
+    </div>
+  ';
+
+  $out[] = '
+    <div class="right">
+  ';
+
+    $out[] = '<h3 class="title">' . 
+      l($object->title, $object->url, array('attributes' => array('class' =>'title'))) . 
+    '</h3>';
+    $out[] = '<div class="author">' .
+      t('!creator_name', array('!creator_name' => l($object->creators_string,'ting/search/'.$object->creators_string))) .
+    '</div>';
     $out[] = '<div class="rating-for-faust"><div class="'.$object->localId.'"></div></div>';
 
     if($elib_data->loanexpiredate){
@@ -537,23 +525,24 @@ function elib_displaybook(TingClientObject $object,$elib_data = false){
 
 }
 
-function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1){
+function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1, $item){
   if(!is_a($obj,'TingClientObject')){
     return;
   }
   // fetch cover from elib
   elib_book_cover($obj);
+  $isbn = convertToEAN($obj->record['dc:identifier']['dkdcplus:ISBN'][0]);
 
   switch($displaysize){
     case 'small':
     case 'small_rm':
     case 'lorem':
     case 'review':
-      $image_url = ting_covers_collection_url($obj, '65_x');
+      $image_url = elib_book_cover($isbn, '65_x');
       break;
     case 'medium':
     case 'textright':
-      $image_url = ting_covers_collection_url($obj, '170_x');
+      $image_url = elib_book_cover($isbn, '170_x');
       break;
   }
 
@@ -845,8 +834,9 @@ function elib_get_sample($tingObjectID) {
  * @return string
  */
 function elib_book_teaser(TingClientObject $object, $is_ajax = false) {
-
-  $isbn = elib_get_isbn_from_object_id($object->id);
+  module_load_include('isbn_static_func.inc', 'elib');
+  $isbn = preg_replace('/[^0-9]+/', '', $object->record['dc:identifier']['dkdcplus:ISBN'][0]);
+  $isbn = convertFromIsbn13ToIsbn10($isbn);
 
   $c = elib_client();
   $c->setLibrary(variable_get('elib_retailer_id', ''));
@@ -923,33 +913,80 @@ function elib_book_teaser(TingClientObject $object, $is_ajax = false) {
 
 
 /**
- * ensure that covers are fetched from elib rather than dbc
+ * Getting a cover form eLib WS by ISBN
  *
- * @param TingClientObject $object
- * @return boolean
+ * @param string $isbn
+ * @param string $presetname
+ * @return string
  */
-function elib_book_cover(TingClientObject $object) {
-
-  $path = ting_covers_collection_path($object->id);
-  $filename = file_directory_path() . '/' . $path;
-
-  if (file_exists($filename)) {
-    return;
+function elib_book_cover($isbn, $presetname) {
+  if (!$isbn || $isbn == '') {
+    _elib_covers_default_image();
+  }
+  $path = elib_init_cover_path($isbn);
+  if (file_exists(file_create_path($path))) {
+    return imagecache_create_url($presetname, $path);
+  } else {
+    // init elib client
+    $c = elib_client();
+    $c->setLibrary(variable_get('elib_retailer_id', ''));
+    // fetch book from elib by isbn
+    try {
+      $book = $c->getBook($isbn);
+    } catch (Exception $e) { }
+    // store cover from elib in drupal
+    if ((string)$book->data->coverimage == '') {
+      _elib_covers_default_image();
+    }
+    $path = _elib_covers_fetch_or_redirect($path, (string)$book->data->coverimage);
+    return imagecache_create_url($presetname, $path);
+  }
   }
 
-  module_load_include('isbn_static_func.inc', 'elib');
-  module_load_include('pages.inc', 'ting_covers');
+/**
+* Help function, returns path to default image.
+*/
+function _elib_covers_default_image() {
+  return drupal_get_path('module', 'ting_covers') . '/img/default.gif';
+}
 
-  // DEBUG
-//  $c = elib_client();
-//  $c->setLibrary(variable_get('elib_retailer_id', ''));
-//  $book = $c->getBook((int) convertFromIsbn13ToIsbn10($object->record['dc:identifier']['dkdcplus:ISBN'][0]));
-//  error_log(__FILE__ . ' +' . __LINE__ . ' ' . print_r(convertFromIsbn13ToIsbn10($object->record['dc:identifier']['dkdcplus:ISBN'][0]), 1));
-//  error_log(__FILE__ . ' +' . __LINE__ . ' ' . print_r($book, 1));
+/**
+ * Support method to get default cover (from ting_cover) or ask for real cover
+ */
+function _elib_covers_fetch_or_redirect($path, $source_url) {
+  if ($source_url && filter_var($source_url, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED)) {
+    $path = _elib_covers_pages_fetch_image($path, $source_url);
+    if ($path) {
+      return $path;
+    }
+  }
+  return _elib_covers_default_image();
+}
 
-  $image_url = 'http://www.elib.se/cover_images/' . elib_get_isbn_from_object_id($object->id) . '.jpg';
+/**
+ * Help method to get cover from elib and store it locally
+ */
+function _elib_covers_pages_fetch_image($path, $image_url) {
+  // check if the init cover is already stored localy
+  $result = drupal_http_request($image_url);
 
-  return (boolean) _ting_covers_pages_fetch_image($filename, $image_url);
+  if ($result->code == 200) {
+    // get the folder for the final location of this preset...
+    $dir = file_directory_path() . '/' . dirname($path);
+     // Build the destination folder tree if it doesn't already exists.
+    if (!file_check_directory($dir, FILE_CREATE_DIRECTORY) &&
+        !mkdir($dir, 0775, TRUE)) {
+      return 0;
+    }
+    return file_save_data($result->data, $path, FILE_EXISTS_REPLACE);
+  }
+}
+
+/**
+* Get a path to stored cover 
+*/
+function elib_init_cover_path($isbn) {
+  return 'elib/covers/' . md5($isbn) . '.jpg';
 }
 
 /**
