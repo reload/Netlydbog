@@ -1,0 +1,66 @@
+<?php
+
+// $Id
+
+/**
+ * 
+ * 
+ */
+ 
+
+/**
+ * Returns the table we use to track memory usage
+ *
+ * @param n/a
+ *
+ * @return
+ * 		The schema array
+ */
+function droptor_schema() {
+   $schema['droptor_memory'] = array(
+		'fields' => array(
+			'id'      => array('type' => 'serial', 'length' => 15, 'not null' => TRUE),
+			'q'      => array('type' => 'varchar', 'length' => 250, 'not null' => TRUE),
+			'dt'     => array('type' => 'int', 'length' => 11, 'not null' => TRUE),
+			'memory'    => array('type' => 'int', 'length' => 15, 'not null' => TRUE),
+            'execution_time'    => array('type' => 'int', 'length' => 11, 'not null' => TRUE)
+		),
+		'primary key' => array('id'),
+	);
+	
+	return $schema;
+}
+
+/**
+ * Installs the table we use to track memory usage
+ *
+ * @param n/a
+ *
+ * @return n/a
+ */
+function droptor_install() {
+   drupal_install_schema('droptor');
+}
+
+/**
+ * Removes the memory tracking table and removes variables we use
+ *
+ * @param n/a
+ *
+ * @return n/a
+ */
+function droptor_uninstall() {
+   drupal_uninstall_schema('droptor');
+   variable_del('droptor_memory_monitoring');
+   variable_del('droptor_debug_mode');
+   variable_del('droptor_ssl_feed');
+   variable_del('droptor_domain');
+   variable_del('droptor_hash');
+}
+
+function droptor_update_6200() {
+  $schema = droptor_schema();
+  $ret = array();
+  db_create_table($ret, 'droptor_memory', $schema['droptor_memory']);
+  return $ret;
+}
