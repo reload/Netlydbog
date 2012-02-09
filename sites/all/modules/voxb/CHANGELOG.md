@@ -1,6 +1,10 @@
 VoxB module
 ==========
 
+### Version 1.1:
+
+* New: Render the different elements (tag, rating, review) through ting object.
+
 ### Version 1.0:
 
 * Hotfixes.

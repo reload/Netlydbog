@@ -19,28 +19,35 @@
     },
     // show ajax loader
     hideAjaxLoader: function(container, el) {
-      container.find('.ajaxLoaderTpl').remove()
+      container.find('.ajaxLoaderTpl').remove();
       el.show();
     },
 
     // Init function, binds method to user input and sets variables
     init: function() {
-      Drupal.voxb_item.initial_rating = $('div.userRate div.star-on').length;
+      Drupal.voxb_item.initial_rating = $('.addRatingContainer:first div.userRate div.star-on').length;
       // Bind ratings on mouse over and out
-      $('div.userRate div.rating').mouseover(function() {
-        if (!Drupal.voxb_item.rating_set) {
-          $("div.userRate div.rating:lt(" + ($(this).parent().children().index($(this)) + 1) + ")").removeClass('star-off').removeClass('star-on').addClass('star-black');
-          $("div.userRate div.rating:gt(" + $(this).parent().children().index($(this)) + ")").removeClass('star-black').removeClass('star-on').addClass('star-off');
-        }
+      $('.addRatingContainer').each(function() {
+        var parent = $(this);
+        parent.find('div.userRate div.rating').mouseover(function() {
+          if (!Drupal.voxb_item.rating_set) {
+            parent.find('div.userRate div.rating:lt(' + ($(this).parent().children().index($(this)) + 1) + ')').removeClass('star-off').removeClass('star-on').addClass('star-black');
+            parent.find('div.userRate div.rating:gt(' + $(this).parent().children().index($(this)) + ')').removeClass('star-black').removeClass('star-on').addClass('star-off');
+          }
+        });
       });
-
-      $('div.userRate div.rating').mouseout(function() {
-        if (!Drupal.voxb_item.rating_set) {
-          // Restore the stars after mouseout
-          $("div.userRate div.rating:lt(" + Drupal.voxb_item.initial_rating + ")").removeClass('star-off').removeClass('star-black').addClass('star-on');
-          $("div.userRate div.rating:gt(" + (Drupal.voxb_item.initial_rating - 1) + ")").removeClass('star-on').removeClass('star-black').addClass('star-off');
-        }
+      
+      $('.addRatingContainer').each(function() {
+        var parent = $(this);
+        parent.find('div.userRate div.rating').mouseout(function() {
+          if (!Drupal.voxb_item.rating_set) {
+            // Restore the stars after mouseout
+            parent.find('div.userRate div.rating:lt(' + Drupal.voxb_item.initial_rating + ')').removeClass('star-off').removeClass('star-black').addClass('star-on');
+            parent.find('div.userRate div.rating:gt(' + (Drupal.voxb_item.initial_rating - 1) + ')').removeClass('star-on').removeClass('star-black').addClass('star-off');
+          }
+        });
       });
+      
 
       // Show the ajax animation and blink the stars 3 times
       $('div.userRate div.rating').click(function() {
@@ -62,9 +69,11 @@
                   $('.ratingCountSpan').html('(' + msg['rating_count'] + ')');
                   // update rating
                   Drupal.voxb_item.initial_rating = msg['rating'];
-                  $("div.userRate div.rating:lt(" + Drupal.voxb_item.initial_rating + ")").removeClass('star-off').removeClass('star-black').addClass('star-on');
-                  $("div.userRate div.rating:gt(" + (Drupal.voxb_item.initial_rating - 1) + ")").removeClass('star-on').removeClass('star-black').addClass('star-off');
-                  $('div.addRatingContainer').cyclicFade({
+                  $('.addRatingContainer').each(function() {
+                    parent = $(this);
+                    parent.find('div.userRate div.rating:lt(' + Drupal.voxb_item.initial_rating + ')').removeClass('star-off').removeClass('star-black').addClass('star-on');
+                    parent.find('div.userRate div.rating:gt(' + (Drupal.voxb_item.initial_rating - 1) + ')').removeClass('star-on').removeClass('star-black').addClass('star-off');
+                  }).cyclicFade({
                     repeat: 3,
                     params: [
                       {fadeout:200, stayout:100, opout:0, fadein:200, stayin:100, opin:1},
@@ -72,6 +81,7 @@
                       {fadeout:200, stayout:100, opout:0, fadein:200, stayin:100, opin:1}
                     ]
                   });
+                  
                 }
                 else if (!msg['status']) {
                   var error = msg['message'];
@@ -131,7 +141,7 @@
 
       $('#ding-voxb-review-form .form-submit').click(function(){
         var review = $('#ding-voxb-review-form textarea[name=review_content]').val();
-        var item = $('#ding-voxb-review-form input[name=faust_number]').val();
+        var item = $('#ding-voxb-tag-form input[name=faustNumber]').val();
 
         if (review != '' && item != '') {
           var button = $(this);

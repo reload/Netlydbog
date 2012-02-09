@@ -7,7 +7,7 @@
 require_once(drupal_get_path('module', 'ding_voxb') . '/lib/VoxbBase.class.php');
 require_once(drupal_get_path('module', 'ding_voxb') . '/lib/VoxbItem.class.php');
 /**
- * Items layer class
+ * Items layer class.
  */
 class VoxbItems extends VoxbBase {
 
@@ -23,18 +23,20 @@ class VoxbItems extends VoxbBase {
    * Fetch multiple items with one request by list of faust numbers.
    *
    * @param string $faustNum
-   * Item faust number
+   *   Item faust number.
    * @param bool $multiple
-   * Whether to send a multiple request
+   *   Whether to send a multiple request.
    */
   public function fetchByFaust($faustNums) {
     $fetch = array();
 
     foreach ($faustNums as $k => $v) {
-      $fetch[] = array(
-        'objectIdentifierValue' => $v,
-        'objectIdentifierType' => 'FAUST'
-      );
+      if ($v) {
+        $fetch[] = array(
+          'objectIdentifierValue' => $v,
+          'objectIdentifierType' => 'FAUST'
+        );
+      }
     }
 
     $data = array(
@@ -43,11 +45,11 @@ class VoxbItems extends VoxbBase {
     );
 
     $this->reviews = new VoxbReviewsController($this->reviewHandlers);
-
     $o = $this->call('fetchData', $data);
 
     if ($o->totalItemData) {
-      foreach ($o->totalItemData as $k => $v) {
+      $items = is_array($o->totalItemData) ? $o->totalItemData : array($o->totalItemData);
+      foreach ($items as $k => $v) {
         $this->items[(string)$v->fetchData->objectIdentifierValue] = new VoxbItem();
         $this->items[(string)$v->fetchData->objectIdentifierValue]->addReviewHandler('review', new VoxbReviews());
         $this->items[(string)$v->fetchData->objectIdentifierValue]->fetchData($v);
@@ -62,7 +64,8 @@ class VoxbItems extends VoxbBase {
   }
 
   /**
-   * Getter function. Returns voxbItem object by faust number
+   * Getter function.
+   * Returns voxbItem object by faust number.
    *
    * @param string $faust
    * @return object
@@ -76,7 +79,7 @@ class VoxbItems extends VoxbBase {
   }
 
   /**
-   * Get amount of items in the layer
+   * Get amount of items in the layer.
    *
    * @return integer
    */

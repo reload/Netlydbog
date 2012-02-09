@@ -5,16 +5,8 @@ This module provides capability for the user to review, tag and rate on an item 
 
 Installation
 -----------------
-1. Include the module in `ting/ting_object_details.tpl.php`.
-2. Activate the module.
-3. Configure the module with the values given as examples.
-
-Improvements
-----------------------------------
-In order to make the item landing page look & feel nice, content types for showing VoxB is needed ([Chaos tool suite] [ctools]?).
-
-At this moment the module is included in `ting/ting_object_details.tpl.php`.
-This is not the right solution.
+1. Activate the module.
+2. Configure the module with the values given as examples.
 
 VoxB related issues
 -----------------------------
@@ -30,4 +22,3 @@ VoxB related issues
 * Lists and user lists (highest rated items, mostly reviewed items, popular items, etc.).
 * Rating of reviews in order to hide inappropriate reviews.
 
-[ctools]: http://drupal.org/project/ctools

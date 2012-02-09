@@ -77,5 +77,3 @@ class VoxbReviewTest extends VoxbTest {
     $this->assertEquals($reviews[0]['text'], 'SecondReview');
   }
 }
-
-?>

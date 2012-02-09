@@ -56,5 +56,3 @@ class VoxbRateTest extends VoxbTest {
     $this->assertEquals($ratingAfter, 55);
   }
 }
-
-?>

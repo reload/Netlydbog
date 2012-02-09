@@ -51,5 +51,3 @@ class VoxbTagTest extends VoxbTest {
     $this->assertEquals($item->getTags()->getCount(), 5);
   }
 }
-
-?>
