@@ -77,7 +77,7 @@ if (module_exists('ding_voxb')) {
       </div>
       <?php } ?>
       <div class="facebook-like">
-        <iframe src="//www.facebook.com/plugins/like.php?href=https%3A%2F%2Fereolen.dk%2Fting%2Fobject%2F150028%3A<?php echo $isbn; ?>&amp;send=false&amp;layout=box_count&amp;width=130&amp;show_faces=false&amp;action=recommend&amp;colorscheme=light&amp;font&amp;height=75" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:130px; height:75px;" allowTransparency="true"></iframe>
+        <iframe src="//www.facebook.com/plugins/like.php?href=https%3A%2F%2Fnetlydbog.dk%2Fting%2Fobject%2F150015%3A<?php echo $isbn; ?>&amp;send=false&amp;layout=box_count&amp;width=130&amp;show_faces=false&amp;action=recommend&amp;colorscheme=light&amp;font&amp;height=75" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:130px; height:75px;" allowTransparency="true"></iframe>
       </div>
       <div class="abstract"><?php print check_plain($object->record['dcterms:abstract'][''][0]); ?></div>
       <div class="description">
