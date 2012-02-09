@@ -935,10 +935,10 @@ function elib_book_cover($isbn, $presetname) {
       $book = $c->getBook($isbn);
     } catch (Exception $e) { }
     // store cover from elib in drupal
-    if ((string)$book->data->coverimage == '') {
+    if ((string)$book->data->product->coverimage == '') {
       _elib_covers_default_image();
     }
-    $path = _elib_covers_fetch_or_redirect($path, (string)$book->data->coverimage);
+    $path = _elib_covers_fetch_or_redirect($path, (string)$book->data->product->coverimage);
     return imagecache_create_url($presetname, $path);
   }
   }
