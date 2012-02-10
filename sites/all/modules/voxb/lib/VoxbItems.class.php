@@ -7,7 +7,7 @@
 require_once(drupal_get_path('module', 'ding_voxb') . '/lib/VoxbBase.class.php');
 require_once(drupal_get_path('module', 'ding_voxb') . '/lib/VoxbItem.class.php');
 /**
- * Items layer class.
+ * Items layer class
  */
 class VoxbItems extends VoxbBase {
 
@@ -23,9 +23,9 @@ class VoxbItems extends VoxbBase {
    * Fetch multiple items with one request by list of faust numbers.
    *
    * @param string $faustNum
-   *   Item faust number.
+   * Item faust number
    * @param bool $multiple
-   *   Whether to send a multiple request.
+   * Whether to send a multiple request
    */
   public function fetchByFaust($faustNums) {
     $fetch = array();
@@ -64,8 +64,7 @@ class VoxbItems extends VoxbBase {
   }
 
   /**
-   * Getter function.
-   * Returns voxbItem object by faust number.
+   * Getter function. Returns voxbItem object by faust number
    *
    * @param string $faust
    * @return object
@@ -79,7 +78,7 @@ class VoxbItems extends VoxbBase {
   }
 
   /**
-   * Get amount of items in the layer.
+   * Get amount of items in the layer
    *
    * @return integer
    */

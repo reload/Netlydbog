@@ -26,8 +26,6 @@ function ding_voxb_init() {
   drupal_add_js(VOXB_PATH . '/js/livequery.js');
   drupal_add_js(VOXB_PATH . '/js/cyclic.fade.js');
   drupal_add_js(VOXB_PATH . '/js/voxb.item.js');
-  drupal_add_js(VOXB_PATH . '/js/voxb.details.js');
-  drupal_add_js(VOXB_PATH . '/js/voxb.login.js');
 }
 
 /**
@@ -127,16 +125,6 @@ function ding_voxb_menu() {
     'type' => MENU_CALLBACK,
   );
 
-  // VoxB display handler,
-  //   allowing editor to show VoxB.
-  $items['voxb/ajax/details'] = array(
-    'title' => 'VoxB ting objects details handler',
-    'description' => '',
-    'type' => MENU_CALLBACK,
-    'access arguments' => array('search content'),
-    'page callback' => 'ding_voxb_details',
-  );
-
   return $items;
 }
 
@@ -163,7 +151,7 @@ function ding_voxb_user_login() {
   }
 
   echo json_encode($response);
-  exit(0);
+  exit(1);
 }
 
 /**
@@ -172,7 +160,6 @@ function ding_voxb_user_login() {
  * @global $user
  *   Logged in user.
  */
-
 function ding_voxb_user_create() {
   $response = array();
   $alias_name = isset($_POST['alias_name']) ? check_plain($_POST['alias_name']) : '';
@@ -193,16 +180,16 @@ function ding_voxb_user_create() {
   }
 
   echo json_encode($response);
-  exit(0);
+  exit(1);
 }
 
 /**
- * Creates and output the pagination.
+ * Creates and outputs the pagination.
  *
  * @param $faust_number
- *   Item's faust_number
+ *   Item's faust number.
  * @param $page
- *   Current displayed page
+ *   Current displayed page.
  */
 function ding_voxb_paginator($faust_number = '', $page = 1) {
   if ($faust_number != '') {
@@ -214,11 +201,9 @@ function ding_voxb_paginator($faust_number = '', $page = 1) {
     $item->fetchByFaust($faust_number);
     $reviews = $item->getReviews('review');
 
-    echo theme('voxb_review_pager', array(
-        'count' => $reviews->getCount(),
-        'limit' => variable_get('voxb_reviews_per_page', VOXB_REVIEWS_PER_PAGE),
-        'faust_number' => $faust_number,
-        'cur_page' => $page));
+    $pages = (int)ceil($reviews->getCount() / variable_get('voxb_reviews_per_page', VOXB_REVIEWS_PER_PAGE));
+    echo ding_voxb_reviews_pager($pages, $page, $faust_number);
+    exit(1);
   }
 }
 
@@ -261,6 +246,7 @@ function ding_voxb_paging_reviews($faust_number = '', $page = 1) {
   }
 
   echo $html;
+  exit(1);
 }
 
 /**
@@ -280,6 +266,11 @@ function ding_voxb_theme($existing, $type, $theme, $path) {
   $hooks['voxb_review_pager'] = array(
     'arguments' => array('data' => NULL),
     'template' => 'templates/ding_voxb-pager',
+  );
+
+  $hooks['voxb_review_pager_leaf'] = array(
+    'arguments' => array('data' => NULL),
+    'template' => 'templates/ding_voxb-pager-leaf'
   );
 
   $hooks['voxb_rating'] = array(
@@ -420,9 +411,9 @@ function ding_voxb_tag_form(&$form_state, $faust_number) {
     '#name' => 'name',
   );
 
-  $form['faustNumber'] = array(
+  $form['faust_number'] = array(
     '#type' => 'hidden',
-    '#name' => 'faustNumber',
+    '#name' => 'faust_number',
     '#value' => $faust_number,
   );
 
@@ -545,17 +536,17 @@ function ding_voxb_preprocess_ting_object(&$variables) {
   $voxb_item->fetchByFaust($faust_number);
   $profile = unserialize($_SESSION['voxb']['profile']);
 
-  // Tagging section.
-  $is_able_to_tag = ($profile && $profile->isAbleToTag($faust_number)) ? TRUE : FALSE;
-
+  // Tagging section
+  $is_able_to_tag = ($user->uid) ? TRUE : FALSE;
   $tags = '';
+  
   // Prepare tags for display.
   foreach ($voxb_item->getTags() as $v) {
     $tags .= theme('voxb_tag_record', array('tag_name' => htmlspecialchars($v->getName())));
   }
 
   $tag_form = '';
-  if (($user->uid != 0 && $is_able_to_tag)) {
+  if ($is_able_to_tag) {
     $tag_form = drupal_get_form('ding_voxb_tag_form', $faust_number);
   }
 
@@ -569,12 +560,13 @@ function ding_voxb_preprocess_ting_object(&$variables) {
 
   $variables['object']->voxb_tags = $voxb_tags;
 
-  // Reviewing section.
-  $is_able_to_review = ($profile && $profile->isAbleToReview($faust_number)) ? TRUE : FALSE;
+  // Reviewing section
+  $is_able_to_review = ($user->uid) ? TRUE : FALSE;
   $user_data = ($profile && is_object($profile)) ? $profile->getVoxbUserData($faust_number) : array();
 
   $limit = variable_get('voxb_reviews_per_page', VOXB_REVIEWS_PER_PAGE);
   $reviews = '';
+
   // Prepare the needed number of existing reviews.
   foreach ($voxb_item->getReviews('review') as $k => $v) {
     if ($k >= $limit) {
@@ -587,46 +579,49 @@ function ding_voxb_preprocess_ting_object(&$variables) {
   }
 
   $review_form = '';
+  
   // Either show review form only if user has no reviews at all,
   //   or he reviewed with a text review.
   // Also fill the form with the review if it exists and set correct button values.
-  if ($user->uid && $is_able_to_review) {
-    if ($user_data['review']['title'] != 'videoreview') {
-      if ($user_data['review']['title'] == 'review') {
-        $params = array(
-          'faust_number' => $faust_number,
-          'review_content' => $user_data['review']['data'],
-          'action' => 'update',
-        );
-      }
-      else {
-        $params = array(
-          'faust_number' => $faust_number,
-          'review_content' => '',
-          'action' => 'submit',
-        );
-      }
-
-      $review_form = drupal_get_form('ding_voxb_review_form', $params);
+  if ($is_able_to_review) {
+    if (isset($user_data['review']['title']) && $user_data['review']['title'] == 'review') {
+      $params = array(
+        'faust_number' => $faust_number,
+        'review_content' => $user_data['review']['data'],
+        'action' => 'update',
+      );
     }
+    else {
+      $params = array(
+        'faust_number' => $faust_number,
+        'review_content' => '',
+        'action' => 'submit',
+      );
+    }
+
+    $review_form = drupal_get_form('ding_voxb_review_form', $params);
   }
 
-  $voxb_reviews = theme(
-    'voxb_review',
-    array(
-      'voxb_item' => $voxb_item,
-      'reviews' => $reviews,
-      'review_form' => $review_form,
-    )
-  );
+  // Reviews pager
+  $pages = (int)ceil($voxb_item->getReviews('review')->getCount() / variable_get('voxb_reviews_per_page', VOXB_REVIEWS_PER_PAGE));
+  $voxb_pager = ding_voxb_reviews_pager($pages, 1, $faust_number);
 
+  $voxb_reviews = theme(
+          'voxb_review',
+          array(
+            'voxb_item' => $voxb_item,
+            'reviews' => $reviews,
+            'review_form' => $review_form,
+            'pager' => $voxb_pager,
+          )
+  );
+  
   $variables['object']->voxb_reviews = $voxb_reviews;
 
-  // Rating section.
-  // Since voxb stores rating in within 0-100 range,
-  //   divide the actual rating to 20, to process 5 stars.
-  $is_able_to_rate = ($profile && $profile->isAbleToTag($faust_number)) ? TRUE : FALSE;
-
+  // Rating section
+  // Since voxb stores rating in within 0-100 range, divide the actual rating to 20,
+  // to process 5 stars.
+  $is_able_to_rate = ($user->uid) ? TRUE : FALSE;
   $voxb_rating = theme(
     'voxb_rating',
     array(
@@ -641,35 +636,56 @@ function ding_voxb_preprocess_ting_object(&$variables) {
 }
 
 /**
- * Request ratings for multiple items.
+ * Build pager for VoxB reviews.
  *
- * @param $items
- *   Array of faust numbers.
+ * @param $pages
+ *   The total amount of pages with reviews.
+ * @param $current
+ *   Current page.
+ * @param $faust_number
+ *   Item faust number.
  * @return
- *   JSON encoded response.
- *     in form of Object faustNum{faustNum,rating,count}.
+ *   Pager markup
  */
-function ding_voxb_details() {
-  require_once(VOXB_PATH . '/lib/VoxbItems.class.php');
-  require_once(VOXB_PATH . '/lib/VoxbReviews.class.php');
+function ding_voxb_reviews_pager($pages = 1, $current = 1, $faust_number = '') {
+  if ($pages > 1) {
+    $pager_leaves = '';
+    $count = 5;
+    $prev = ($current - 1) > 0 ? $current - 1 : 1;
+    $next = $current + 1 < $pages ? $current + 1 : $pages;
+    $offset = 2;
 
-  $faust_numbers = explode(',', $_REQUEST['ids']);
-  $items = new VoxbItems();
-  $items->fetchByFaust($faust_numbers);
+    for ($i = $current; $i <= $count + ($current - 1); $i++) {
+      $classes = array('page-num');
+      $page_label = $i - $offset;
 
-  foreach ($faust_numbers as $faust) {
-    $item = $items->getItem($faust);
-    $res['faustNum'] = $faust;
-    $res['rating'] = 0;
-    $res['count'] = 0;
+      if ($page_label == $current) {
+        $classes[] = 'active-page';
+      }
 
-    if ($item) {
-      $res['rating'] = intval($item->getRating() / 20);
-      $res['count'] = $item->getRatingCount();
+      $pager_leaves .= theme(
+              'voxb_review_pager_leaf',
+              array(
+                'link' => ($page_label > 0 && $page_label <= $pages) ? ($i - 2) : '',
+                'path' => ($page_label > 0 && $page_label <= $pages) ? 'voxb/ajax/seek/' . $faust_number . '/' . $page_label : '',
+                'current' => $current,
+                'classes' => $classes
+              )
+      );
     }
 
-    $result[$faust] = $res;
+    $voxb_pager = theme(
+            'voxb_review_pager',
+            array(
+              'previous' => $prev,
+              'next' => $next,
+              'faust_number' => $faust_number,
+              'leaves' => $pager_leaves,
+            )
+    );
+
+    return $voxb_pager;
   }
 
-  print json_encode($result);
+  return '';
 }
