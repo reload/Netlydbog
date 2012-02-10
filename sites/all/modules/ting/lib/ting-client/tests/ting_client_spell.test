@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * Test for Ting Open Search.
+ */
+class TingClientSpellTest extends TingClientTest {
+  function __construct($test_id = NULL, $includes = array()) {
+
+    $includes[] = '/../lib/request/TingClientSpellRequest.php';
+    $includes[] = '/../lib/result/spell/TingClientSpellSuggestion.php';
+    parent::__construct($test_id, $includes);
+  }
+
+  /**
+   * Test info.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Ting Client spell',
+      'description' => 'Test the Ting Open Spell client.' ,
+      'group' => 'Ting Client',
+    );
+  }
+
+  public function testSpelling() {
+    $request = $this->requestFactory->getSpellRequest();
+    // Should be 'terrasse', but gives lots of other fun suggestions.
+    $request->setWord('terasse');
+    $request->setNumResults(3);
+
+    $suggestions = $this->client->execute($request);
+
+    $this->assertEqual(sizeof($suggestions), 3, 'Suggestions should return the requested number of results');
+  }
+}
+
