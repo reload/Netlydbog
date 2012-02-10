@@ -1,34 +1,57 @@
 <?php
-// $Id: transliteration.inc,v 1.6.2.6 2009/11/29 15:59:06 smk Exp $
+// $Id: transliteration.inc,v 1.2.2.2 2009/06/07 19:05:50 smk Exp $
 
 /**
- * @file
- * Transliteration processing functions.
+ * Sanitize a file name.
+ *
+ * Transliterates the file name and removes all problematic characters.
+ *
+ * @param string $filename
+ *   A file name.
+ * @param string $langcode
+ *   Optional ISO 639 language code used to import language specific
+ *   replacements. Defaults to the current display language.
+ *
+ * @return string
+ *   Cleaned file name.
  */
+function transliteration_clean_filename($filename, $langcode = NULL) {
+  // Trim any leading/trailing dots.
+  $filename = trim($filename, '.');
+  // Transliterate to ASCII.
+  $filename = transliteration_process($filename, '', $langcode);
+  // Replace whitespace.
+  $filename = str_replace(' ', '_', $filename);
+  // Remove any remaining non-safe characters.
+  $filename = preg_replace('/[^0-9A-Za-z_.-]/', '', $filename);
+
+  return $filename;
+}
 
 /**
- * Transliterate UTF-8 encoded text to US-ASCII.
+ * Transliterate UTF-8 input to plain ASCII.
  *
  * Based on Mediawiki's UtfNormal::quickIsNFCVerify().
  *
- * @param $string
- *   UTF-8 encoded text input.
- * @param $unknown
- *   Replacement string for characters that do not have a suitable ASCII
- *   equivalent.
- * @param $source_langcode
- *   Optional ISO 639 language code that denotes the language of the input and
- *   is used to apply language-specific variations. If the source language is
- *   not known at the time of transliteration, it is recommended to set this
- *   argument to the site default language to produce consistent results.
- *   Otherwise the current display language will be used.
- * @return
- *   Transliterated text.
+ * @param string $string
+ *   UTF-8 text input.
+ * @param string $unknown
+ *   Replacement for unknown characters and illegal UTF-8 sequences.
+ * @param string $langcode
+ *   Optional ISO 639 language code used to import language specific
+ *   replacements. Defaults to the current display language.
+ *
+ * @return string
+ *   Plain ASCII output.
+ * @see transliteration_get()
  */
-function transliteration_process($string, $unknown = '?', $source_langcode = NULL) {
-  // ASCII is always valid NFC! If we're only ever given plain ASCII, we can
-  // avoid the overhead of initializing the decomposition tables by skipping
-  // out early.
+function transliteration_process($string, $unknown = '?', $langcode = NULL) {
+  // Screen out some characters that eg won't be allowed in XML.
+  $string = preg_replace('/[\x00-\x08\x0b\x0c\x0e-\x1f]/', $unknown, $string);
+
+  // ASCII is always valid NFC!
+  // If we're only ever given plain ASCII, we can avoid the overhead
+  // of initializing the decomposition tables by skipping out early.
   if (!preg_match('/[\x80-\xff]/', $string)) {
     return $string;
   }
@@ -36,7 +59,8 @@ function transliteration_process($string, $unknown = '?', $source_langcode = NUL
   static $tailBytes;
 
   if (!isset($tailBytes)) {
-    // Each UTF-8 head byte is followed by a certain number of tail bytes.
+    // Each UTF-8 head byte is followed by a certain
+    // number of tail bytes.
     $tailBytes = array();
     for ($n = 0; $n < 256; $n++) {
       if ($n < 0xc0) {
@@ -64,26 +88,27 @@ function transliteration_process($string, $unknown = '?', $source_langcode = NUL
     }
   }
 
-  // Chop the text into pure-ASCII and non-ASCII areas; large ASCII parts can
-  // be handled much more quickly. Don't chop up Unicode areas for punctuation,
-  // though, that wastes energy.
+  // Chop the text into pure-ASCII and non-ASCII areas;
+  // large ASCII parts can be handled much more quickly.
+  // Don't chop up Unicode areas for punctuation, though,
+  // that wastes energy.
   preg_match_all('/[\x00-\x7f]+|[\x80-\xff][\x00-\x40\x5b-\x5f\x7b-\xff]*/', $string, $matches);
 
   $result = '';
   foreach ($matches[0] as $str) {
-    if ($str[0] < "\x80") {
-      // ASCII chunk: guaranteed to be valid UTF-8 and in normal form C, so
-      // skip over it.
+    if ($str{0} < "\x80") {
+      // ASCII chunk: guaranteed to be valid UTF-8
+      // and in normal form C, so skip over it.
       $result .= $str;
       continue;
     }
 
-    // We'll have to examine the chunk byte by byte to ensure that it consists
-    // of valid UTF-8 sequences, and to see if any of them might not be
-    // normalized.
+    // We'll have to examine the chunk byte by byte to ensure
+    // that it consists of valid UTF-8 sequences, and to see
+    // if any of them might not be normalized.
     //
-    // Since PHP is not the fastest language on earth, some of this code is a
-    // little ugly with inner loop optimizations.
+    // Since PHP is not the fastest language on earth, some of
+    // this code is a little ugly with inner loop optimizations.
 
     $head = '';
     $chunk = strlen($str);
@@ -91,28 +116,29 @@ function transliteration_process($string, $unknown = '?', $source_langcode = NUL
     $len = $chunk + 1;
 
     for ($i = -1; --$len; ) {
-      $c = $str[++$i];
+      $c = $str{++$i};
       if ($remaining = $tailBytes[$c]) {
         // UTF-8 head byte!
         $sequence = $head = $c;
         do {
           // Look for the defined number of tail bytes...
-          if (--$len && ($c = $str[++$i]) >= "\x80" && $c < "\xc0") {
+          if (--$len && ($c = $str{++$i}) >= "\x80" && $c < "\xc0") {
             // Legal tail bytes are nice.
             $sequence .= $c;
           }
           else {
             if ($len == 0) {
-              // Premature end of string! Drop a replacement character into
-              // output to represent the invalid UTF-8 sequence.
+              // Premature end of string!
+              // Drop a replacement character into output to
+              // represent the invalid UTF-8 sequence.
               $result .= $unknown;
               break 2;
             }
             else {
               // Illegal tail byte; abandon the sequence.
               $result .= $unknown;
-              // Back up and reprocess this byte; it may itself be a legal
-              // ASCII or UTF-8 sequence head.
+              // Back up and reprocess this byte; it may itself
+              // be a legal ASCII or UTF-8 sequence head.
               --$i;
               ++$len;
               continue 2;
@@ -122,21 +148,21 @@ function transliteration_process($string, $unknown = '?', $source_langcode = NUL
 
         $n = ord($head);
         if ($n <= 0xdf) {
-          $ord = ($n - 192) * 64 + (ord($sequence[1]) - 128);
+          $ord = ($n - 192) * 64 + (ord($sequence{1}) - 128);
         }
-        elseif ($n <= 0xef) {
-          $ord = ($n - 224) * 4096 + (ord($sequence[1]) - 128) * 64 + (ord($sequence[2]) - 128);
+        else if ($n <= 0xef) {
+          $ord = ($n - 224) * 4096 + (ord($sequence{1}) - 128) * 64 + (ord($sequence{2}) - 128);
         }
-        elseif ($n <= 0xf7) {
-          $ord = ($n - 240) * 262144 + (ord($sequence[1]) - 128) * 4096 + (ord($sequence[2]) - 128) * 64 + (ord($sequence[3]) - 128);
+        else if ($n <= 0xf7) {
+          $ord = ($n - 240) * 262144 + (ord($sequence{1}) - 128) * 4096 + (ord($sequence{2}) - 128) * 64 + (ord($sequence{3}) - 128);
         }
-        elseif ($n <= 0xfb) {
-          $ord = ($n - 248) * 16777216 + (ord($sequence[1]) - 128) * 262144 + (ord($sequence[2]) - 128) * 4096 + (ord($sequence[3]) - 128) * 64 + (ord($sequence[4]) - 128);
+        else if ($n <= 0xfb) {
+          $ord = ($n - 248) * 16777216 + (ord($sequence{1}) - 128) * 262144 + (ord($sequence{2}) - 128) * 4096 + (ord($sequence{3}) - 128) * 64 + (ord($sequence{4}) - 128);
         }
-        elseif ($n <= 0xfd) {
-          $ord = ($n - 252) * 1073741824 + (ord($sequence[1]) - 128) * 16777216 + (ord($sequence[2]) - 128) * 262144 + (ord($sequence[3]) - 128) * 4096 + (ord($sequence[4]) - 128) * 64 + (ord($sequence[5]) - 128);
+        else if ($n <= 0xfd) {
+          $ord = ($n - 252) * 1073741824 + (ord($sequence{1}) - 128) * 16777216 + (ord($sequence{2}) - 128) * 262144 + (ord($sequence{3}) - 128) * 4096 + (ord($sequence{4}) - 128) * 64 + (ord($sequence{5}) - 128);
         }
-        $result .= _transliteration_replace($ord, $unknown, $source_langcode);
+        $result .= _transliteration_replace($ord, $unknown, $langcode);
         $head = '';
       }
       elseif ($c < "\x80") {
@@ -161,44 +187,48 @@ function transliteration_process($string, $unknown = '?', $source_langcode = NUL
 }
 
 /**
- * Replace a Unicode character using the transliteration database.
+ * Lookup and replace a character from the transliteration database.
  *
- * @param $ord
- *   An ordinal Unicode character code.
- * @param $unknown
- *   Replacement string for characters that do not have a suitable ASCII
- *   equivalent.
- * @param $langcode
- *   Optional ISO 639 language code that denotes the language of the input and
- *   is used to apply language-specific variations.  Defaults to the current
- *   display language.
- * @return
- *   ASCII replacement character.
+ * @param integer $ord
+ *   A unicode ordinal character code.
+ * @param string $unknown
+ *   Replacement for unknown characters.
+ * @param string $langcode
+ *   Optional ISO 639 language code used to import language specific
+ *   replacements. Defaults to the current display language.
+ *
+ * @return string
+ *   Plain ASCII replacement character.
+ * @see transliteration_get()
  */
 function _transliteration_replace($ord, $unknown = '?', $langcode = NULL) {
-  static $map = array();
-
   if (!isset($langcode)) {
     global $language;
     $langcode = $language->language;
   }
+  static $map = array(), $template = array();
 
   $bank = $ord >> 8;
 
-  if (!isset($map[$bank][$langcode])) {
+  // Check if we need to load a new bank
+  if (!isset($template[$bank])) {
     $file = drupal_get_path('module', 'transliteration') . '/data/' . sprintf('x%02x', $bank) . '.php';
     if (file_exists($file)) {
-      include $file;
-      if ($langcode != 'en' && isset($variant[$langcode])) {
-        // Merge in language specific mappings.
-        $map[$bank][$langcode] = $variant[$langcode] + $base;
-      }
-      else {
-        $map[$bank][$langcode] = $base;
-      }
+      $template[$bank] = include ($file);
     }
     else {
-      $map[$bank][$langcode] = array();
+      $template[$bank] = array('en' => array());
+    }
+  }
+
+  // Check if we need to create new mappings with language specific alterations
+  if (!isset($map[$bank][$langcode])) {
+    if ($langcode != 'en' && isset($template[$bank][$langcode])) {
+      // Merge language specific mappings with the default transliteration table
+      $map[$bank][$langcode] = $template[$bank][$langcode] + $template[$bank]['en'];
+    }
+    else {
+      $map[$bank][$langcode] = $template[$bank]['en'];
     }
   }
 

@@ -1,4 +1,5 @@
 <?php
+// $Id: filefield_widget.inc,v 1.95 2010/04/28 23:27:16 quicksketch Exp $
 
 /**
  * @file
@@ -16,15 +17,14 @@ function filefield_widget_settings_form($widget) {
 
   // Convert the extensions list to be a human-friendly comma-separated list.
   $extensions = is_string($widget['file_extensions']) ? $widget['file_extensions'] : 'txt';
+  $extensions = implode(', ', explode(' ', $extensions));
   $form['file_extensions'] = array(
     '#type' => 'textfield',
     '#title' => t('Permitted upload file extensions'),
     '#default_value' => $extensions,
     '#size' => 64,
-    '#maxlength' => 512,
     '#description' => t('Extensions a user can upload to this field. Separate extensions with a space and do not include the leading dot. Leaving this blank will allow users to upload a file with any extension.'),
     '#element_validate' => array('_filefield_widget_settings_extensions_validate'),
-    '#pre_render' => array('_filefield_widget_settings_extensions_value'),
     '#weight' => 1,
   );
 
@@ -71,7 +71,7 @@ function filefield_widget_settings_form($widget) {
     '#default_value' => is_string($widget['max_filesize_per_file'])
                         ? $widget['max_filesize_per_file']
                          : '',
-    '#description' => t('Specify the size limit that applies to each file separately. Enter a value like "512" (bytes), "80K" (kilobytes) or "50M" (megabytes) in order to restrict the allowed file size. If you leave this empty the file sizes will be limited only by PHP\'s maximum post and file upload sizes (current limit <strong>%limit</strong>).', array('%limit' => format_size(file_upload_max_size()))),
+    '#description' => t('Specify the size limit that applies to each file separately. Enter a value like "512" (bytes), "80K" (kilobytes) or "50M" (megabytes) in order to restrict the allowed file size. If you leave this this empty the file sizes will be limited only by PHP\'s maximum post and file upload sizes (current limit <strong>%limit</strong>).', array('%limit' => format_size(file_upload_max_size()))),
     '#element_validate' => array('_filefield_widget_settings_max_filesize_per_file_validate'),
   );
   $form['max_filesize']['max_filesize_per_node'] = array(
@@ -94,21 +94,9 @@ function filefield_widget_settings_save($widget) {
   return array('file_extensions', 'file_path', 'progress_indicator', 'max_filesize_per_file', 'max_filesize_per_node');
 }
 
-/**
- * A FAPI #pre_render() function to set a cosmetic default value for extensions.
- */
-function _filefield_widget_settings_extensions_value($element) {
-  $element['#value'] = implode(', ', array_filter(explode(' ', str_replace(',', ' ', $element['#value']))));
-  return $element;
-}
-
-/**
- * A FAPI #element_validate callback to strip commas from extension lists.
- */
 function _filefield_widget_settings_extensions_validate($element, &$form_state) {
-  // Remove commas and leading dots from file extensions.
+  // Remove commas from file extensions.
   $value = str_replace(',', ' ', $element['#value']);
-  $value = str_replace(' .', ' ', $value);
   $value = array_filter(explode(' ', $value));
   $value = implode(' ', $value);
   form_set_value($element, $value, $form_state);
@@ -185,7 +173,7 @@ function filefield_widget_file_path($field, $account = NULL) {
  *   The FAPI element whose values are being saved.
  */
 function filefield_save_upload($element) {
-  $upload_name = implode('_', $element['#array_parents']);
+  $upload_name = $element['#field_name'] .'_'. $element['#delta'];
   $field = content_fields($element['#field_name'], $element['#type_name']);
 
   if (empty($_FILES['files']['name'][$upload_name])) {
@@ -216,7 +204,7 @@ function filefield_widget_value($element, $edit = FALSE) {
     $item = $element['#default_value'];
   }
   else {
-    $item = $edit;
+    $item = array_merge($element['#default_value'], $edit);
     $field = content_fields($element['#field_name'], $element['#type_name']);
 
     // Uploads take priority over value of fid text field.
@@ -234,12 +222,11 @@ function filefield_widget_value($element, $edit = FALSE) {
     }
 
     // Load file if the FID has changed so that it can be saved by CCK.
-    $file = isset($item['fid']) ? field_file_load($item['fid']) : NULL;
+    $file = field_file_load($item['fid']);
 
     // If the file entry doesn't exist, don't save anything.
     if (empty($file)) {
       $item = array();
-      $file = array();
     }
 
     // Checkboxes loose their value when empty.
@@ -249,9 +236,6 @@ function filefield_widget_value($element, $edit = FALSE) {
     }
   }
   // Merge file and item data so it is available to all widgets.
-  if (isset($item['data']) && isset($file['data'])) {
-    $file['data'] = array_merge($item['data'], $file['data']);
-  }
   $item = array_merge($item, $file);
 
   return $item;
@@ -264,7 +248,8 @@ function filefield_widget_value($element, $edit = FALSE) {
  * remove buttons, and the description field.
  */
 function filefield_widget_process($element, $edit, &$form_state, $form) {
-  static $settings_added;
+  // The widget is being presented, so apply the JavaScript.
+  drupal_add_js(drupal_get_path('module', 'filefield') .'/filefield.js');
 
   $item = $element['#value'];
   $field_name = $element['#field_name'];
@@ -272,18 +257,6 @@ function filefield_widget_process($element, $edit, &$form_state, $form) {
   $element['#theme'] = 'filefield_widget_item';
 
   $field = $form['#field_info'][$field_name];
-
-  // The widget is being presented, so apply the JavaScript.
-  drupal_add_js(drupal_get_path('module', 'filefield') .'/filefield.js');
-  if (!isset($settings_added[$field_name]) && isset($element['#upload_validators']['filefield_validate_extensions'])) {
-    $settings_added[$field_name] = TRUE;
-    $settings = array(
-      'filefield' => array(
-        $field_name => $element['#upload_validators']['filefield_validate_extensions'][0],
-      ),
-    );
-    drupal_add_js($settings, 'setting');
-  }
 
   // Title is not necessary for each individual field.
   if ($field['multiple'] > 0) {
@@ -430,12 +403,14 @@ function filefield_widget_process($element, $edit, &$form_state, $form) {
       $desc[] = call_user_func_array($help_func, $arguments);
     }
   }
-
   $element['upload'] = array(
-    '#name' => 'files[' . implode('_', $element['#array_parents']) . ']',
+    '#name' => 'files['. $element['#field_name'] .'_'. $element['#delta'] .']',
     '#type' => 'file',
     '#description' => implode('<br />', $desc),
     '#size' => 22,
+    '#attributes' => array(
+      'accept' => implode(',', array_filter(explode(' ', $field['widget']['file_extensions']))),
+    ),
     '#access' => empty($item['fid']),
   );
 
@@ -458,7 +433,10 @@ function filefield_widget_validate(&$element, &$form_state) {
     if ($file = field_file_load($element['fid']['#value'])) {
       $file = (object) $file;
       if ($file->status == FILE_STATUS_PERMANENT) {
-        if (field_file_references($file) == 0) {
+        // TODO: We could use field_file_references() here to reference any file
+        // but hook_file_delete() needs to be implemented first.
+        $references = module_invoke('filefield', 'file_references', $file);
+        if ($references['filefield'] == 0) {
           form_error($element, t('Referencing to the file used in the %field field is not allowed.', array('%field' => $element['#title'])));
         }
       }
@@ -560,12 +538,12 @@ function filefield_node_form_validate($form, &$form_state) {
       }
     }
 
-    if (!$valid && $field['required'] && filefield_edit_access($field['type_name'], $field_name, $form['#node'])) {
+    if (!$valid && $field['required']) {
       form_set_error($field_name, t('%title field is required.', array('%title' => $field['widget']['label'])));
     }
     $max_filesize = parse_size($field['widget']['max_filesize_per_node']);
     if ($max_filesize && $total_filesize > $max_filesize) {
-      form_set_error($field_name, t('Total filesize for %title, %tsize, exceeds field settings of %msize.',
+      form_set_error($field_name, t('Total filesize for %title, %tsize,  exceeds field settings of %msize.',
                                     array(
                                       '%title' => $field['widget']['label'],
                                       '%tsize' => format_size($total_filesize),

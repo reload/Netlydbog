@@ -102,8 +102,7 @@ function lock_acquire($name, $timeout = 30.0) {
   $expire = (float)$usec + (float)$sec + $timeout;
   if (isset($locks[$name])) {
     // Try to extend the expiration of a lock we already acquired.
-    db_query("UPDATE {semaphore} SET expire = %f WHERE name = '%s' AND value = '%s'", $expire, $name, _lock_id());
-    if (!db_affected_rows()) {
+    if (!db_result(db_query("UPDATE {semaphore} SET expire = %f WHERE name = '%s' AND value = '%s'", $expire, $name, _lock_id()))) {
       // The lock was broken.
       unset($locks[$name]);
     }

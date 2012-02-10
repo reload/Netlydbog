@@ -1,4 +1,5 @@
 <?php
+// $Id: features.imagecache.inc,v 1.1.2.13 2009/12/21 22:26:17 yhahn Exp $
 
 /**
  * Implementation of hook_features_api().
@@ -28,7 +29,14 @@ function imagecache_features_export_options() {
  */
 function imagecache_features_export($data, &$export, $module_name = '') {
   // Collect a module to preset map
-  $map = features_get_default_map('imagecache', 'presetname');
+  $map = array();
+  $modules = module_implements('imagecache_default_presets');
+  foreach ($modules as $module) {
+    $presets = module_invoke($module, 'imagecache_default_presets');
+    foreach ($presets as $preset) {
+      $map[$preset['presetname']] = $module;
+    }
+  }
   foreach ($data as $preset) {
     // If another module provides this preset, add it as a dependency
     if (isset($map[$preset]) && $map[$preset] != $module_name) {
@@ -63,7 +71,8 @@ function imagecache_features_export_render($module_name, $data) {
  * Implementation of hook_features_revert().
  */
 function imagecache_features_revert($module) {
-  if ($default_presets = features_get_default('imagecache', $module)) {
+  $default_presets = module_invoke($module, 'imagecache_default_presets');
+  if (!empty($default_presets)) {
     foreach (array_keys($default_presets) as $default_preset) {
       $preset = imagecache_preset_by_name($default_preset);
       if ($preset) {

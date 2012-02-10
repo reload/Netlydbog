@@ -1,4 +1,6 @@
 <?php
+// $Id: conditional_styles.theme.inc,v 1.5 2009/05/25 14:33:03 johnalbin Exp $
+
 /**
  * @file
  * Allows themes to add conditional stylesheets.
@@ -32,11 +34,16 @@ function conditional_styles_paths_to_basetheme($theme) {
  * When the theme registry is rebuilt, we also build the conditional stylesheets.
  */
 function _conditional_styles_theme($existing, $type, $theme, $path) {
+  // @TODO: For PHP 4 compatibility we use foreach (array_keys($array) AS $key).
+  // When PHP 5 becomes required (Drupal 7.x), use the following faster
+  // implementation: foreach ($array AS $key => &$value) {}
+
   // Process the conditional stylesheets for every active theme.
+  global $language;
   $themes = list_themes();
   foreach (array_keys($themes) AS $theme) {
     // We only need to process active themes.
-    if ($themes[$theme]->status || $GLOBALS['theme'] == $theme) {
+    if ($themes[$theme]->status) {
       $paths = conditional_styles_paths_to_basetheme($theme);
 
       // Grab all the conditional stylesheets.
@@ -56,47 +63,38 @@ function _conditional_styles_theme($existing, $type, $theme, $path) {
         }
       }
       // Render the stylesheets to link elements.
-      $conditional_styles = $conditional_styles_rtl = '';
+      $conditional_styles = '';
       if (!empty($stylesheets)) {
         $query_string = '?'. substr(variable_get('css_js_query_string', '0'), 0, 1);
         $base_path = base_path();
         foreach ($stylesheets AS $condition => $css) {
           // Each condition requires its own set of links.
-          $output = $output_rtl = '';
+          $output = '';
           foreach ($css AS $media => $files) {
             foreach ($files AS $file => $path) {
               // Don't allow non-existent stylesheets to clutter the logs with 404.
               if (file_exists("./$path/$file")) {
-                $link = "<link type=\"text/css\" rel=\"stylesheet\" media=\"$media\" href=\"$base_path$path/$file$query_string\" />\n";
-                $output .= $link;
-                $output_rtl .= $link;
-                $file_rtl = str_replace('.css', '-rtl.css', $file);
-                if (file_exists("./$path/$file_rtl")) {
-                  $output_rtl .= "<link type=\"text/css\" rel=\"stylesheet\" media=\"$media\" href=\"$base_path$path/$file_rtl$query_string\" />\n";
+                $output .= "<link type=\"text/css\" rel=\"stylesheet\" media=\"$media\" href=\"$base_path$path/$file$query_string\" />\n";
+                if ($language->direction == LANGUAGE_RTL){
+                  $file_rtl = str_replace('.css', '-rtl.css', $file);
+                  if (file_exists("./$path/$file_rtl")) {
+                    $output .= "<link type=\"text/css\" rel=\"stylesheet\" media=\"$media\" href=\"$base_path$path/$file_rtl$query_string\" />\n";
+                  }
                 }
               }
             }
           }
           if ($output) {
             $conditional_styles .= "<!--[$condition]>\n$output<![endif]-->\n";
-            $conditional_styles_rtl .= "<!--[$condition]>\n$output_rtl<![endif]-->\n";
           }
         }
       }
       // Save the stylesheets for later retrieval.
       if ($conditional_styles) {
-        if (db_is_active()) {
-          variable_set('conditional_styles_' . $theme, $conditional_styles);
-          variable_set('conditional_styles_' . $theme . '_rtl', $conditional_styles_rtl);
-        }
-        else {
-          $GLOBALS['conf']['conditional_styles_' . $theme] = $conditional_styles;
-          $GLOBALS['conf']['conditional_styles_' . $theme . '_rtl'] = $conditional_styles_rtl;
-        }
+        variable_set('conditional_styles_' . $theme, $conditional_styles);
       }
-      elseif (db_is_active()) {
+      else {
         variable_del('conditional_styles_' . $theme);
-        variable_del('conditional_styles_' . $theme . '_rtl');
       }
     }
   }

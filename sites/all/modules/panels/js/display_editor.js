@@ -1,3 +1,4 @@
+// $Id: display_editor.js,v 1.4.4.7 2009/10/07 22:20:29 merlinofchaos Exp $
 /**
  * @file display_editor.js
  *
@@ -410,9 +411,9 @@
       }
       draggable.timeCount = draggable.timeCount + 1;
       var left = $(window).scrollLeft();
-      var right = left + $(window).width();
+      var right = left + $(window).innerWidth();
       var top = $(window).scrollTop();
-      var bottom = top + $(window).height();
+      var bottom = top + $(window).innerHeight();
 
       if (draggable.mousePos.x < left + scrollBuffer && left > 0) {
         window.scrollTo(left - scrollDistance, top);
@@ -452,7 +453,7 @@
     // Show javascript only items.
     $('span#panels-js-only').css('display', 'inline');
 
-    $('#panels-dnd-main div.panel-pane:not(.panel-portlet)')
+    $('div.panel-pane:not(.panel-portlet)', context)
       .addClass('panel-portlet')
       .each(Drupal.Panels.bindPortlet);
 

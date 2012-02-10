@@ -1,4 +1,5 @@
 <?php
+// $Id: comment.views.inc,v 1.33.2.3 2009/12/02 21:51:40 merlinofchaos Exp $
 /**
  * @file
  * Provide views data and handlers for comment.module
@@ -85,7 +86,7 @@ function comment_views_data() {
       'handler' => 'views_handler_sort',
     ),
     'argument' => array(
-      'handler' => 'views_handler_argument_numeric',
+      'handler' => 'views_handler_argument',
     ),
   );
 
@@ -184,14 +185,14 @@ function comment_views_data() {
   // status (approved or not)
   $data['comments']['status'] = array(
     'title' => t('In moderation'),
-    'help' => t('Whether or not the comment is currently in the moderation queue.'),
+    'help' => t('Whether or not the comment is currently in moderation.'),
     'field' => array(
       'handler' => 'views_handler_field_boolean',
       'click sortable' => TRUE,
     ),
     'filter' => array(
       'handler' => 'views_handler_filter_boolean_operator',
-      'label' => t('In the moderation queue'),
+      'label' => t('Moderated'),
       'type' => 'yes-no',
     ),
     'sort' => array(
@@ -307,7 +308,7 @@ function comment_views_data() {
     'title' => t('Last comment time'),
     'help' => t('Date and time of when the last comment was posted.'),
     'field' => array(
-      'handler' => 'views_handler_field_last_comment_timestamp',
+      'handler' => 'views_handler_field_date',
       'click sortable' => TRUE,
     ),
     'sort' => array(
@@ -503,9 +504,6 @@ function comment_views_handlers() {
       ),
       'views_handler_field_node_comment' => array(
         'parent' => 'views_handler_field',
-      ),
-      'views_handler_field_last_comment_timestamp' => array(
-        'parent' => 'views_handler_field_date',
       ),
 
       // sort handlers

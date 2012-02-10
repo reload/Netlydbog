@@ -1,4 +1,5 @@
 <?php
+// $Id: views_plugin_argument_validate_user.inc,v 1.2.4.1 2010/03/11 01:23:39 merlinofchaos Exp $
 
 /**
  * Validate whether an argument is a valid user.
@@ -63,11 +64,7 @@ class views_plugin_argument_validate_user extends views_plugin_argument_validate
     if (is_numeric($argument) && $argument == (int)$argument) {
       if ($type == 'uid' || $type == 'either') {
         if ($argument == $GLOBALS['user']->uid) {
-          // If you assign an object to a variable in PHP, the variable
-          // automatically acts as a reference, not a copy, so we use
-          // drupal_clone() to ensure that we don't actually mess with the
-          // real global $user object.
-          $account = drupal_clone($GLOBALS['user']);
+          $account = $GLOBALS['user'];
         }
         $where = 'uid = %d';
       }
@@ -75,7 +72,7 @@ class views_plugin_argument_validate_user extends views_plugin_argument_validate
     else {
       if ($type == 'name' || $type == 'either') {
         if ($argument == $GLOBALS['user']->name) {
-          $account = drupal_clone($GLOBALS['user']);
+          $account = $GLOBALS['user'];
         }
         $where = "name = '%s'";
       }
@@ -98,7 +95,7 @@ class views_plugin_argument_validate_user extends views_plugin_argument_validate
     // See if we're filtering users based on roles.
     if (!empty($this->argument->options['validate_user_restrict_roles']) && !empty($this->argument->options['validate_user_roles'])) {
       $roles = $this->argument->options['validate_user_roles'];
-      $account->roles = array();
+      $acccont->roles = array();
       $account->roles[] = $account->uid ? DRUPAL_AUTHENTICATED_RID : DRUPAL_ANONYMOUS_RID;
       $result = db_query('SELECT rid FROM {users_roles} WHERE uid = %d', $account->uid);
       while ($role = db_fetch_object($result)) {

@@ -1,4 +1,5 @@
 <?php
+//$Id: user.views.inc,v 1.59.2.3 2010/03/22 20:32:48 merlinofchaos Exp $
 /**
  * @file
  * Provide views data and handlers for user.module
@@ -87,11 +88,6 @@ function user_views_data() {
     ),
     'argument' => array(
       'handler' => 'views_handler_argument_string',
-    ),
-    'filter' => array(
-      'handler' => 'views_handler_filter_string',
-      'title' => t('User raw name'),
-      'help' => t('The user or author name. This filter do not check if the user exists. Only useful for string comparisons.')
     ),
   );
 
@@ -201,7 +197,7 @@ function user_views_data() {
     ),
   );
 
-  // active status
+  // published status
   $data['users']['status'] = array(
     'title' => t('Active'), // The item it appears as on the UI,
     'help' => t('Whether a user is active or blocked.'), // The help that appears on the UI,
@@ -287,7 +283,6 @@ function user_views_data() {
       'name table' => 'role',
       'name field' => 'name',
       'empty field name' => t('No role'),
-      'zero is null' => TRUE,
       'numeric' => TRUE,
     ),
   );
@@ -321,7 +316,7 @@ function user_views_data() {
 
   // ----------------------------------------------------------------------
   // authmap table
-
+  
   $data['authmap']['table']['group']  = t('User');
   $data['authmap']['table']['join'] = array(
      // Directly links to users table.
@@ -376,7 +371,7 @@ function user_views_data() {
       'handler' => 'views_handler_argument_string',
     ),
   );
-
+  
   return $data;
 }
 

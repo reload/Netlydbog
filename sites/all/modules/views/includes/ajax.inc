@@ -1,4 +1,5 @@
 <?php
+// $Id: ajax.inc,v 1.20.2.1 2010/04/07 23:40:35 merlinofchaos Exp $
 
 /**
  * @file ajax.inc
@@ -52,10 +53,8 @@ function views_ajax() {
         $errors = $view->validate();
         if ($errors === TRUE) {
           $object->status = TRUE;
-          $object->display .= $view->preview($display_id, $args);
-          // Get the title after the preview call, to let it set
-          // up both the view's current display and arguments
           $object->title = $view->get_title();
+          $object->display .= $view->preview($display_id, $args);
         }
         else {
           foreach ($errors as $error) {
@@ -112,7 +111,7 @@ function views_ajax_render($output = NULL, $title = NULL, $url = NULL, $js = NUL
 function views_ajax_form_wrapper($form_id, &$form_state) {
   // This won't override settings already in.
   $form_state += array(
-    'rerender' => FALSE,
+    're_render' => FALSE,
     'no_redirect' => !empty($form_state['ajax']),
   );
 

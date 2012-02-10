@@ -1,4 +1,5 @@
 <?php
+// $Id: filefield.theme.inc,v 1.10 2010/04/28 16:32:20 quicksketch Exp $
 
 /**
  * @file
@@ -23,8 +24,9 @@ function theme_filefield_icon($file) {
   $dashed_mime = strtr($mime, array('/' => '-', '+' => '-'));
 
   if ($icon_url = filefield_icon_url($file)) {
-    return '<img class="filefield-icon field-icon-'. $dashed_mime .'"  alt="'. t('@mime icon', array('@mime' => $mime)) .'" src="'. $icon_url .'" />';
+    $icon = '<img class="field-icon-'. $dashed_mime .'"  alt="'. $mime .' icon" src="'. $icon_url .'" />';
   }
+  return '<div class="filefield-icon field-icon-'. $dashed_mime .'">'. $icon .'</div>';
 }
 
 /**
@@ -42,8 +44,8 @@ function theme_filefield_icon($file) {
 function _filefield_icon_url($file, $theme = NULL) {
   global $base_url;
 
-  if ($icon_path = _filefield_icon_path($file, $theme)) {
-    return $base_url .'/'. $icon_path;
+  if ($iconpath = _filefield_icon_path($file, $theme)) {
+    return $base_url .'/'. $iconpath;
   }
   return FALSE;
 }
@@ -62,60 +64,41 @@ function _filefield_icon_url($file, $theme = NULL) {
  */
 function _filefield_icon_path($file, $theme = NULL) {
   if (!isset($theme)) {
-    $theme = variable_get('filefield_icon_theme', 'default');
+    $theme = variable_get('filefield_icon_theme', 'protocons');
   }
 
   // If there's an icon matching the exact mimetype, go for it.
   $dashed_mime = strtr($file['filemime'], array('/' => '-'));
-  if ($icon_path = _filefield_create_icon_path($dashed_mime, $theme)) {
-    return $icon_path;
+  if ($iconpath = _filefield_create_icon_path($dashed_mime, $theme)) {
+    return $iconpath;
   }
   // For a couple of mimetypes, we can "manually" tell a generic icon.
   if ($generic_name = _filefield_generic_icon_map($file)) {
-    if ($icon_path = _filefield_create_icon_path($generic_name, $theme)) {
-      return $icon_path;
+    if ($iconpath = _filefield_create_icon_path($generic_name, $theme)) {
+      return $iconpath;
     }
   }
   // Use generic icons for each category that provides such icons.
   foreach (array('audio', 'image', 'text', 'video') as $category) {
     if (strpos($file['filemime'], $category .'/') === 0) {
-      if ($icon_path = _filefield_create_icon_path($category .'-x-generic', $theme)) {
-        return $icon_path;
+      if ($iconpath = _filefield_create_icon_path($category .'-x-generic', $theme)) {
+        return $iconpath;
       }
     }
   }
   // Try application-octet-stream as last fallback.
-  if ($icon_path = _filefield_create_icon_path('application-octet-stream', $theme)) {
-    return $icon_path;
+  if ($iconpath = _filefield_create_icon_path('application-octet-stream', $theme)) {
+    return $iconpath;
   }
   // Sorry, no icon can be found...
   return FALSE;
 }
 
-/**
- * Internal function to convert a file icon theme name to a directory.
- */
-function _filefield_icon_directory($theme = NULL) {
-  static $sets;
-
-  if (!isset($sets)) {
-    $sets = module_invoke_all('filefield_icon_sets');
-    drupal_alter('filefield_icon_sets', $sets);
-  }
-
-  if (!isset($theme) || !isset($sets[$theme])) {
-    $theme = 'default';
-  }
-
-  return $sets[$theme];
-}
-
-function _filefield_create_icon_path($icon_name, $theme = NULL) {
-  $icons_directory = _filefield_icon_directory($theme);
-  $icon_path = $icons_directory .'/'. $icon_name .'.png';
-
-  if (file_exists($icon_path)) {
-    return $icon_path;
+function _filefield_create_icon_path($iconname, $theme = 'protocons') {
+  $iconpath = drupal_get_path('module', 'filefield')
+    .'/icons/'. $theme .'/16x16/mimetypes/'. $iconname .'.png';
+  if (file_exists($iconpath)) {
+    return $iconpath;
   }
   return FALSE;
 }
@@ -163,7 +146,6 @@ function _filefield_generic_icon_map($file) {
     case 'application/vnd.oasis.opendocument.presentation':
     case 'application/vnd.oasis.opendocument.presentation-template':
     case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
-    case 'application/vnd.openxmlformats-officedocument.presentationml.slideshow':
     case 'application/vnd.stardivision.impress':
     case 'application/vnd.sun.xml.impress':
     case 'application/vnd.sun.xml.impress.template':
@@ -226,15 +208,6 @@ function _filefield_generic_icon_map($file) {
     // HTML aliases.
     case 'application/xhtml+xml':
       return 'text-html';
-
-    // RTF files.
-    case 'application/rtf':
-      return 'text-rtf';
-
-    // Google earth files.
-    case 'application/vnd.google-earth.kml+xml':
-    case 'application/vnd.google-earth.kmz':
-      return 'application-google-earth';
 
     // Executable types.
     case 'application/x-macbinary':

@@ -1,4 +1,5 @@
 <?php
+// $Id: display-layout.inc,v 1.4.2.3 2009/04/30 20:09:57 merlinofchaos Exp $
 
 /**
  * @file
@@ -14,7 +15,7 @@
  * @see panels_edit_layout() for details on the various behaviors of this function.
  */
 function _panels_edit_layout($display, $finish, $destination, $allowed_layouts) {
-  ctools_include('common', 'panels');
+  panels_load_include('common');
   ctools_include('form');
 
   $form_state = array(
@@ -48,7 +49,7 @@ function _panels_edit_layout($display, $finish, $destination, $allowed_layouts) 
     $output = ctools_build_form('panels_change_layout', $change_form_state);
     if (empty($output)) {
       if (isset($change_form_state['back'])) {
-        $_POST = array();
+        unset($_POST);
         return _panels_edit_layout($display, $finish, $destination, $allowed_layouts);
       }
 
@@ -58,7 +59,7 @@ function _panels_edit_layout($display, $finish, $destination, $allowed_layouts) 
       }
 
       if ($destination) {
-        return panels_goto($destination);
+        return drupal_goto($destination);
       }
       return $change_form_state['display'];
     }
@@ -73,76 +74,26 @@ function _panels_edit_layout($display, $finish, $destination, $allowed_layouts) 
  */
 function panels_choose_layout(&$form_state) {
   $display = &$form_state['display'];
-  ctools_include('common', 'panels');
-  ctools_include('cleanstring');
+  panels_load_include('common');
 
   $layouts = panels_common_get_allowed_layouts($form_state['allowed_layouts']);
-  $categories = array();
-  $current = '';
+  
   foreach ($layouts as $id => $layout) {
-    $category = ctools_cleanstring($layout['category']);
-    // Default category to first in case layout doesn't exist or there isn't one.
-    if (empty($current)) {
-      $current = $category;
-    }
-
-    $categories[$category] = $layout['category'];
-    $options[$category][$id] = panels_print_layout_icon($id, $layout, check_plain($layout['title']));
-
-    // Set current category to what is chosen.
-    if ($id == $display->layout) {
-      $current = $category;
-    }
+    $options[$id] = panels_print_layout_icon($id, $layout, check_plain($layout['title']));
   }
 
-  ctools_add_js('layout', 'panels');
-
-  $form['categories'] = array(
-    '#title' => t('Category'),
-    '#type' => 'select',
-    '#options' => $categories,
-    '#default_value' => $current,
-  );
-
+  drupal_add_js(panels_get_path('js/layout.js'));
   $form['layout'] = array(
-    '#prefix' => '<div class="panels-choose-layout panels-layouts-checkboxes clear-block">',
-    '#suffix' => '</div>',
+    '#type' => 'radios',
+    '#title' => t('Choose layout'),
+    '#options' => $options,
+    '#default_value' => in_array($display->layout, array_keys($layouts)) ? $display->layout : NULL,
   );
 
-  // We set up the dependencies manually because these aren't really form
-  // items. It's possible there's a simpler way to do this, but I could not
-  // think of one at the time.
-  $dependencies = array();
-  foreach ($options as $category => $radios) {
-    $dependencies['panels-layout-category-' . $category] = array(
-      'values' => array('edit-categories' => array($category)),
-      'num' => 1,
-      'type' => 'hide',
-    );
-
-    $form['layout'][$category] = array(
-      '#prefix' => '<div id="panels-layout-category-' . $category . '-wrapper"><div id="panels-layout-category-' . $category . '" class="form-checkboxes clear-block"><div class="panels-layouts-category">' . $categories[$category] . '</div>',
-      '#suffix' => '</div></div>',
-    );
-
-    foreach ($radios as $key => $choice) {
-      // Generate the parents as the autogenerator does, so we will have a
-      // unique id for each radio button.
-      $form['layout'][$category][$key] = array(
-        '#type' => 'radio',
-        '#title' => $choice,
-        '#parents' => array('layout'),
-        '#id' => form_clean_id('edit-layout-' . $key),
-        '#return_value' => check_plain($key),
-        '#default_value' => in_array($display->layout, array_keys($layouts)) ? $display->layout : NULL,
-      );
-    }
-  }
-
-  ctools_add_js('dependent');
-  $js['CTools']['dependent'] = $dependencies;
-  drupal_add_js($js, 'setting');
-
+  $form['clearer'] = array(
+    // TODO: Fix this to use clear-block instead
+    '#value' => '<div style="clear: both;"></div>',
+  );
 
   if (empty($form_state['no buttons'])) {
     $form['submit'] = array(
@@ -186,7 +137,7 @@ function panels_change_layout(&$form_state) {
   $display = &$form_state['display'];
 
   $new_layout = panels_get_layout($form_state['layout']);
-  $new_layout_panels = panels_get_regions($new_layout, $display);
+  $new_layout_panels = panels_get_panels($new_layout, $display);
 
   $options = $new_layout_panels;
   $keys = array_keys($options);
@@ -221,7 +172,7 @@ function panels_change_layout(&$form_state) {
     '#suffix' => '</div>',
   );
 
-  $old_layout_panels = panels_get_regions($old_layout, $display);
+  $old_layout_panels = panels_get_panels($old_layout, $display);
   if (empty($display->panels)) {
     $form['old'] = array(
       '#prefix' => '<div>',

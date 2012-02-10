@@ -1,3 +1,4 @@
+// $Id: README.txt,v 1.5 2009/03/16 23:34:17 quicksketch Exp $
 
 ImageField provides an "Image" widget type to CCK. This module leverages the
 functionality of FileField and behaves nearly identically. ImageField widgets

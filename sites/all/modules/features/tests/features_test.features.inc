@@ -1,54 +1,64 @@
 <?php
 
 /**
+ * Implementation of hook_content_default_fields().
+ */
+function features_test_content_default_fields() {
+  module_load_include('inc', 'features_test', 'features_test.defaults');
+  $args = func_get_args();
+  return call_user_func_array('_features_test_content_default_fields', $args);
+}
+
+/**
+ * Implementation of hook_fieldgroup_default_groups().
+ */
+function features_test_fieldgroup_default_groups() {
+  module_load_include('inc', 'features_test', 'features_test.defaults');
+  $args = func_get_args();
+  return call_user_func_array('_features_test_fieldgroup_default_groups', $args);
+}
+
+/**
+ * Implementation of hook_filter_default_formats().
+ */
+function features_test_filter_default_formats() {
+  module_load_include('inc', 'features_test', 'features_test.defaults');
+  $args = func_get_args();
+  return call_user_func_array('_features_test_filter_default_formats', $args);
+}
+
+/**
  * Implementation of hook_imagecache_default_presets().
  */
 function features_test_imagecache_default_presets() {
-  $items = array(
-    'features_test' => array(
-      'presetname' => 'features_test',
-      'actions' => array(
-        '0' => array(
-          'weight' => '0',
-          'module' => 'imagecache',
-          'action' => 'imagecache_scale',
-          'data' => array(
-            'width' => '100%',
-            'height' => '100%',
-            'upscale' => 0,
-          ),
-        ),
-      ),
-    ),
-  );
-  return $items;
+  module_load_include('inc', 'features_test', 'features_test.defaults');
+  $args = func_get_args();
+  return call_user_func_array('_features_test_imagecache_default_presets', $args);
 }
 
 /**
  * Implementation of hook_node_info().
  */
 function features_test_node_info() {
-  $items = array(
-    'features_test' => array(
-      'name' => t('Testing: Features'),
-      'module' => 'features',
-      'description' => t('Content type provided for Features tests.'),
-      'has_title' => '1',
-      'title_label' => t('Title'),
-      'has_body' => '1',
-      'body_label' => t('Body'),
-      'min_word_count' => '0',
-      'help' => '',
-    ),
-  );
-  return $items;
+  module_load_include('inc', 'features_test', 'features_test.features.node');
+  $args = func_get_args();
+  return call_user_func_array('_features_test_node_info', $args);
 }
 
 /**
- * Implementation of hook_views_api().
+ * Implementation of hook_user_default_permissions().
  */
-function features_test_views_api() {
-  return array(
-    'api' => '2',
-  );
+function features_test_user_default_permissions() {
+  module_load_include('inc', 'features_test', 'features_test.defaults');
+  $args = func_get_args();
+  return call_user_func_array('_features_test_user_default_permissions', $args);
+}
+
+/**
+ * Implementation of hook_views_default_views().
+ */
+function features_test_views_default_views() {
+  module_load_include('inc', 'features_test', 'features_test.features.views');
+  $args = func_get_args();
+  return call_user_func_array('_features_test_views_default_views', $args);
 }

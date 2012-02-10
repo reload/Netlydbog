@@ -1,5 +1,5 @@
 <?php
-// $Id: location_handler_filter_location_province.inc,v 1.1.2.2 2010/03/28 21:05:37 ankur Exp $
+// $Id: location_handler_filter_location_province.inc,v 1.1 2008/12/02 22:50:21 bdragon Exp $
 
 /**
  * Filter on province.
@@ -11,7 +11,7 @@ class location_handler_filter_location_province extends views_handler_filter {
 
   function option_definition() {
     $options = parent::option_definition();
-    $options['operator'] = array('default' => 'is');
+    $options['operator'] = array('default' => 'IS');
     return $options;
   }
 
@@ -33,6 +33,7 @@ class location_handler_filter_location_province extends views_handler_filter {
     if (is_array($ac)) {
       $ac = implode(',', $ac);
     }
+
     $form['value'] = array(
       '#type' => 'textfield',
       '#title' => t('State/Province'),
@@ -89,27 +90,20 @@ class location_handler_filter_location_province extends views_handler_filter {
   }
 
   function query() {
-    // Normalize values.
-    $value = $this->value;
-    if (is_array($value)) {
-      // At one point during development, provinces was a select box.
-      // Right now it's an autocomplete textfield.
-      // @@@ Investigate correct fix sometime.
-      //$value = array_keys($value);
-      if (count($value) == 1) {
-        // If multiple is allowed but only one was chosen, use a string instead.
-        $value = reset($value);
-      }
-    }
-    if (empty($value)) {
-      return;
-    }
-
     $country = $this->grovel_country();
 
     $this->ensure_my_table();
     $field = "$this->table_alias.$this->real_field";
 
+    // Normalize values.
+    $value = $this->value;
+    if (is_array($value)) {
+      $value = array_keys($value);
+      if (count($value) == 1) {
+        // If multiple is allowed but only one was chosen, use a string instead.
+        $value = reset($value);
+      }
+    }
 
     if (is_array($value)) {
       // Multiple values

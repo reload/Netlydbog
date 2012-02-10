@@ -1,4 +1,5 @@
 <?php
+// $Id: markitup.inc,v 1.7.2.1 2009/08/03 22:37:15 sun Exp $
 
 /**
  * @file
@@ -13,15 +14,15 @@ function wysiwyg_markitup_editor() {
     'title' => 'markItUp',
     'vendor url' => 'http://markitup.jaysalvat.com',
     'download url' => 'http://markitup.jaysalvat.com/downloads',
-    'library path' => wysiwyg_get_path('markitup'),
+    'library path' => wysiwyg_get_path('markitup') . '/markitup',
     'libraries' => array(
       '' => array(
         'title' => 'Source',
-        'files' => array('markitup/jquery.markitup.js'),
+        'files' => array('jquery.markitup.js'),
       ),
       'pack' => array(
         'title' => 'Packed',
-        'files' => array('markitup/jquery.markitup.pack.js'),
+        'files' => array('jquery.markitup.pack.js'),
       ),
     ),
     'version callback' => 'wysiwyg_markitup_version',
@@ -47,15 +48,7 @@ function wysiwyg_markitup_editor() {
  *   The installed editor version.
  */
 function wysiwyg_markitup_version($editor) {
-  // Changelog was in markitup/markitup/readme.txt <= 1.1.5.
-  $changelog = $editor['library path'] . '/markitup/readme.txt';
-  if (!file_exists($changelog)) {
-    // Changelog was moved up to markitup/CHANGELOG.md after 1.1.5.
-    $changelog = $editor['library path'] . '/CHANGELOG.md';
-    if (!file_exists($changelog)) {
-      return;
-    }
-  }
+  $changelog = $editor['library path'] . '/readme.txt';
   $changelog = fopen($changelog, 'r');
   $line = fgets($changelog);
   if (preg_match('@([0-9\.]+)@', $line, $version)) {
@@ -98,10 +91,10 @@ function wysiwyg_markitup_themes($editor, $profile) {
 function wysiwyg_markitup_settings($editor, $config, $theme) {
   // Whoever is guilty for adding this horrible CSS-file-without-filepath
   // override "feature" to Drupal core... stand in the corner!
-  drupal_add_css($editor['library path'] . '/markitup/skins/' . $theme . '/style.css', 'theme');
+  drupal_add_css($editor['library path'] . '/skins/' . $theme . '/style.css', 'theme');
 
   $settings = array(
-    'root' => base_path() . $editor['library path'] . '/markitup/',
+    'root' => base_path() . $editor['library path'] . '/',
     'nameSpace' => $theme,
     'markupSet' => array(),
   );
@@ -151,7 +144,6 @@ function wysiwyg_markitup_settings($editor, $config, $theme) {
       'call' => 'preview',
     ),
   );
-  $settings['markupSet'] = array();
   if (!empty($config['buttons'])) {
     foreach ($config['buttons'] as $plugin) {
       foreach ($plugin as $button => $enabled) {
@@ -160,6 +152,9 @@ function wysiwyg_markitup_settings($editor, $config, $theme) {
         }
       }
     }
+  }
+  else {
+    $settings['markupSet'] = $default_buttons;
   }
 
   return $settings;

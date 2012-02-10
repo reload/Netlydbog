@@ -1,5 +1,5 @@
 <?php
-// $Id: location.views_default.inc,v 1.5.2.1 2010/05/13 11:04:43 rooby Exp $
+// $Id: location.views_default.inc,v 1.5 2008/10/22 17:28:48 bdragon Exp $
 
 /**
  * @file
@@ -124,8 +124,7 @@ function location_views_default_views() {
     ),
   ));
   $handler->override_option('access', array(
-    'type' => 'perm',
-    'perm' => 'view node location table',
+    'type' => 'none',
   ));
   $handler->override_option('style_plugin', 'table');
   $handler->override_option('style_options', array(
@@ -380,8 +379,7 @@ function location_views_default_views() {
     ),
   ));
   $handler->override_option('access', array(
-    'type' => 'perm',
-    'perm' => 'view location directory',
+    'type' => 'none',
   ));
   $handler->override_option('style_plugin', 'table');
   $handler->override_option('style_options', array(
@@ -558,8 +556,7 @@ function location_views_default_views() {
     ),
   ));
   $handler->override_option('access', array(
-    'type' => 'perm',
-    'perm' => 'view user location table',
+    'type' => 'none',
   ));
   $handler->override_option('style_plugin', 'table');
   $handler->override_option('style_options', array(

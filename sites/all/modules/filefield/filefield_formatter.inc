@@ -1,4 +1,5 @@
 <?php
+// $Id: filefield_formatter.inc,v 1.16 2010/04/24 03:54:59 quicksketch Exp $
 /**
  * @file
  * FileField: Defines a CCK file field type.
@@ -38,7 +39,8 @@ function theme_filefield_formatter_path_plain($element) {
   if (empty($item['filepath']) && !empty($item['fid'])) {
     $item = array_merge($item, field_file_load($item['fid']));
   }
-  return empty($item['filepath']) ? '' : check_plain(file_create_path($item['filepath']));
+
+  return empty($item['filepath']) ? '' : file_create_path($item['filepath']);
 }
 
 /**
@@ -61,11 +63,7 @@ function theme_filefield_formatter_url_plain($element) {
     $item = array_merge($item, field_file_load($item['fid']));
   }
 
-  if (empty($item['filepath'])) {
-    return '';
-  }
-
-  return file_create_url(field_file_urlencode_path($item['filepath']));
+  return empty($item['filepath']) ? '' : file_create_url($item['filepath']);
 }
 
 /**
@@ -132,5 +130,5 @@ function theme_filefield_file($file) {
     $options['attributes']['title'] = $file['filename'];
   }
 
-  return '<div class="filefield-file">'. $icon . l($link_text, $url, $options) .'</div>';
+  return '<div class="filefield-file clear-block">'. $icon . l($link_text, $url, $options) .'</div>';
 }

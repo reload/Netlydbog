@@ -1,4 +1,5 @@
 <?php
+//$Id: taxonomy.views_convert.inc,v 1.4 2009/06/30 19:14:27 merlinofchaos Exp $
 
 /**
  * @file
@@ -15,24 +16,16 @@
 function taxonomy_views_convert($display, $type, &$view, $field, $id = NULL) {
   switch ($type) {
     case 'field':
-      $matches = array();
-      if (preg_match('/term_node(_(\d+))?/', $field['tablename'], $matches)) {
+      if ($field['tablename'] == 'term_node' || !strncmp($field['tablename'], 'term_node_', 10)) {
         switch ($field['field']) {
           case 'name':
             $item = $view->get_item($display, 'field', $id);
-            $item['table'] = 'term_node';
-            $item['field'] = 'tid';
             if ($field['options'] != 'nolink') {
               $item['link_to_taxonomy'] = TRUE;
             }
             if (!empty($field['vocabulary'])) {
               $item['limit'] = TRUE;
               $item['vids'] = array($field['vocabulary']);
-            }
-            // The vocabulary ID might be embedded in the table name.
-            elseif (!empty($matches[2])) {
-              $item['limit'] = TRUE;
-              $item['vids'] = array($matches[2]);
             }
             $view->set_item($display, 'field', $id, $item);
             break;

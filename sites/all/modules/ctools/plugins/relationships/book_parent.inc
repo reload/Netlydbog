@@ -1,5 +1,5 @@
 <?php
-// $Id: book_parent.inc,v 1.2.2.3 2010/07/20 21:57:27 merlinofchaos Exp $
+// $Id: book_parent.inc,v 1.2.2.2 2010/01/29 20:18:26 merlinofchaos Exp $
 
 /**
  * @file
@@ -18,7 +18,6 @@ $plugin = array(
   'context' => 'ctools_book_parent_context',
   'settings form' => 'ctools_book_parent_settings_form',
   'settings form validate' => 'ctools_book_parent_settings_form_validate',
-  'defaults' => array('type' => 'top'),
 );
 
 /**
@@ -30,14 +29,18 @@ function ctools_book_parent_context($context, $conf) {
     return ctools_context_create_empty('node');
   }
 
-  if (isset($context->data->book)) {
+  if (isset($context->data->parent)) {
     if ($conf['type'] == 'top') {
-      $nid = $context->data->book['bid'];
+      // Search through the book tree to load the top level.
+      $result = array('nid' => $context->data->nid, 'vid' => $context->data->vid, 'parent' => $context->data->parent);
+      while (!empty($result['parent'])) {
+        $result = db_fetch_array(db_query("SELECT * FROM {book} b INNER JOIN {node} n ON b.vid = n.nid WHERE b.nid = %d", $result['parent']));
+      }
+      $nid = $result['nid'];
     }
     else {
       // Just load the parent book.
-      $item = book_link_load($context->data->book['plid']);
-      $nid = $item['nid'];
+      $nid = $context->data->parent;
     }
 
     if (!empty($nid)) {

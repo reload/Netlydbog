@@ -1,4 +1,5 @@
 <?php
+// $Id: panels-twocol.tpl.php,v 1.1.2.1 2008/12/16 21:27:58 merlinofchaos Exp $
 /**
  * @file
  * Template for a 2 column panel layout.

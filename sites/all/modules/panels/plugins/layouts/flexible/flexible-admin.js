@@ -1,3 +1,4 @@
+// $Id: flexible-admin.js,v 1.1.2.4 2009/10/07 22:20:29 merlinofchaos Exp $
 
 Drupal.flexible = Drupal.flexible || {};
 
@@ -48,8 +49,6 @@ Drupal.behaviors.flexibleAdmin = function(context) {
         Drupal.flexible.splitters.push(new Drupal.flexible.splitter($(this)));
       });
   }
-
-  Drupal.flexible.fixHeight();
 };
 
 Drupal.flexible.splitter = function($splitter) {
@@ -405,4 +404,3 @@ Drupal.CTools.AJAX.commands.flexible_fix_firstlast = function(data) {
   $(data.selector + ' > div > .' + data.base + ':last')
     .addClass(data.base + '-last');
 };
-

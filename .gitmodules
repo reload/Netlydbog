@@ -1,3 +1,0 @@
-[submodule "sites/all/modules/ting"]
-	path = sites/all/modules/ting
-	url = git@github.com:reload/ting.git

@@ -1,4 +1,5 @@
 <?php
+// $Id: panels_renderer_ipe.class.php,v 1.1.2.21 2010/10/22 19:12:12 merlinofchaos Exp $
 
 /**
  * Renderer class for all In-Place Editor (IPE) behavior.

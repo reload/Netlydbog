@@ -1,5 +1,5 @@
 <?php
-// $Id: term.inc,v 1.6.2.4 2010/07/05 19:22:35 merlinofchaos Exp $
+// $Id: term.inc,v 1.6.2.3 2010/01/29 20:18:25 merlinofchaos Exp $
 
 /**
  * @file
@@ -43,12 +43,10 @@ function ctools_term_context($arg = NULL, $conf = NULL, $empty = FALSE) {
 
     case 'term':
       $terms = taxonomy_get_term_by_name($arg);
-
-      $conf['vids'] = is_array($conf['vids']) ? array_filter($conf['vids']) : NULL;
-      if ((count($terms) > 1) && isset($conf['vids'])) {
+      if (count($terms) != 1) {
         foreach ($terms as $potential) {
           foreach ($conf['vids'] as $vid => $active) {
-            if ($active && $potential->vid == $vid) {
+            if ($active == 1 && $potential->vid == $vid) {
               $term = $potential;
               // break out of the foreaches AND the case
               break 3;
@@ -85,19 +83,6 @@ function ctools_term_settings_form(&$form, &$form_state, $conf) {
     '#default_value' => $conf['input_form'],
     '#prefix' => '<div class="clear-block">',
     '#suffix' => '</div>',
-  );
-
-  $vocabularies = taxonomy_get_vocabularies();
-  $options = array();
-  foreach ($vocabularies as $vid => $vocab) {
-    $options[$vid] = $vocab->name;
-  }
-  $form['settings']['vids'] = array(
-    '#title' => t('Limit to these vocabularies'),
-    '#type' => 'checkboxes',
-    '#options' => $options,
-    '#default_value' => !empty($conf['vids']) ? $conf['vids'] : array(),
-    '#description' => t('If no vocabularies are checked, terms from all vocabularies will be accepted.'),
   );
 
   $form['settings']['breadcrumb'] = array(

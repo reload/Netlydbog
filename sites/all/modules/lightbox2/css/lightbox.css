@@ -1,4 +1,4 @@
-/* $Id: lightbox.css,v 1.1.4.28 2010/09/22 10:47:15 snpower Exp $ */
+/* $Id: lightbox.css,v 1.1.4.23 2009/01/01 14:05:58 snpower Exp $ */
 #lightbox {
   position: absolute;
   top: 40px;
@@ -61,9 +61,8 @@
   margin-left: auto;
   margin-right: auto;
   width: 20%;
-  position: absolute;
-  bottom: 0px;
-  height: 45px;
+  position: relative;
+  top: -60px;
 }
 
 #imageData>#frameHoverNav {
@@ -113,8 +112,9 @@
   width: 45px;
   height: 45px;
   display: block;
-  position: absolute;
-  bottom: 0px;
+  margin-bottom: -60px;
+  position: relative;
+  top: 60px;
 }
 
 #imageDataContainer {
@@ -145,7 +145,7 @@
   padding-bottom: 1.0em;
 }
 
-#imageData #lightbox2-node-link-text {
+#imageData #node_link_text {
   display: block;
   padding-bottom: 1.0em;
 }
@@ -153,12 +153,8 @@
 #imageData #bottomNav {
   height: 66px;
 }
-.lightbox2-alt-layout #imageData #bottomNav,
-.lightbox2-alt-layout-data #bottomNav {
-  margin-bottom: 60px;
-}
 
-#lightbox2-overlay {
+#overlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -258,27 +254,6 @@
   background: url(../images/pause.png) no-repeat;
 }
 
-.lightbox2-alt-layout-data #bottomNavClose,
-.lightbox2-alt-layout #bottomNavClose {
-  margin-top: 93px;
-}
-.lightbox2-alt-layout-data #bottomNavZoom,
-.lightbox2-alt-layout-data #bottomNavZoomOut,
-.lightbox2-alt-layout #bottomNavZoom,
-.lightbox2-alt-layout #bottomNavZoomOut {
-  margin-top: 93px;
-}
-.lightbox2-alt-layout-data #lightshowPlay,
-.lightbox2-alt-layout-data #lightshowPause,
-.lightbox2-alt-layout #lightshowPlay,
-.lightbox2-alt-layout #lightshowPause {
-  margin-top: 102px;
-}
-
 .lightbox_hide_image {
   display: none;
-}
-
-#lightboxImage {
-  -ms-interpolation-mode: bicubic;
 }

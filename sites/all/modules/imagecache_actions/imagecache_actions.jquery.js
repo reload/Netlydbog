@@ -1,5 +1,6 @@
 /* 
- * UI enhancements for the imagecache edit form
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
  */
 
 if(Drupal.jsEnabled){

@@ -1,7 +1,6 @@
 <?php
-
+//$Id: nodequeue_handler_field_links.inc,v 1.3 2010/03/13 21:51:06 ezrag Exp $
 /**
- * @file
  * Views field handler for the nodequeue queue links
  */
 class nodequeue_handler_field_links extends views_handler_field_node_link {

@@ -1,4 +1,5 @@
 <?php
+// $Id: views_plugin_cache.inc,v 1.5.2.1 2010/01/05 01:12:38 merlinofchaos Exp $
 
 /**
  * The base plugin to handle caching.
@@ -58,20 +59,6 @@ class views_plugin_cache extends views_plugin {
    *   The cache type, either 'query', 'result' or 'output'.
    */
    function cache_expire($type) { }
-   
-   /**
-    * Determine expiration time in the cache table of the cache type
-    * or CACHE_PERMANENT if item shouldn't be removed automatically from cache.
-    *
-    * Plugins must override this to implement expiration in the cache table.
-    *
-    * @param $type
-    *   The cache type, either 'query', 'result' or 'output'.
-    */
-  function cache_set_expire($type) {
-    return CACHE_PERMANENT;
-  }
-
 
   /**
    * Save data to the cache.
@@ -89,12 +76,12 @@ class views_plugin_cache extends views_plugin {
           'total_rows' => $this->view->total_rows,
           'pager' => $this->view->pager,
         );
-        cache_set($this->get_results_key(), $data, $this->table, $this->cache_set_expire($type));
+        cache_set($this->get_results_key(), $data, $this->table);
         break;
       case 'output':
         $this->gather_headers();
         $this->storage['output'] = $this->view->display_handler->output;
-        cache_set($this->get_output_key(), $this->storage, $this->table, $this->cache_set_expire($type));
+        cache_set($this->get_output_key(), $this->storage, $this->table);
         break;
     }
   }

@@ -1,4 +1,5 @@
 <?php
+// $Id: filefield_meta_handler_field_samplerate.inc,v 1.1 2010/04/24 06:28:03 quicksketch Exp $
 
 /**
  * @file

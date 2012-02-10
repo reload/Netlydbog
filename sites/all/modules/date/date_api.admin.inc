@@ -1,4 +1,5 @@
 <?php
+// $Id: date_api.admin.inc,v 1.1.2.2 2009/03/19 23:22:32 karens Exp $
 
 /**
  * @file
@@ -44,11 +45,12 @@ function date_api_configure_custom_date_formats() {
 
   }
   else {
-    $output = t('No custom formats configured. Please <a href="@link">add</a> some.', array('@link' => url('admin/settings/date-time/formats/add')));
+    $output = t('No custom formats configured. Please <a href="@link">add</a> some.', array('@link' => base_path() . 'admin/settings/date-time/formats/add'));
   }
 
   return $output;
 }
+
 
 /**
  * Allow users to add additional date formats.
@@ -63,6 +65,7 @@ function date_api_add_date_formats_form($form_state) {
     '#attributes' => array('class' => 'custom-format'),
     '#description' => t('A user-defined date format. See the <a href="@url">PHP manual</a> for available options. This format is currently set to display as <span>%date</span>.', array('@url' => 'http://php.net/manual/function.date.php', '%date' => date_format_date(date_now(), 'custom', '-'))),
   );
+
 
   $form['update'] = array(
     '#type' => 'submit',
@@ -119,8 +122,7 @@ function date_api_date_format_form_elements(&$form) {
     foreach ($formats as $f => $format) {
       $choices[$f] = date_format_date(date_now(), 'custom', $f);
     }
-    $keys = array_keys($formats);
-    $default = variable_get('date_format_' . $type, array_shift($keys));
+    $default = variable_get('date_format_' . $type, array_shift(array_keys($formats)));
 
     // Get format type info for this format type.
     $type_info = date_get_format_types($type);
@@ -186,6 +188,8 @@ function date_api_delete_format_form_submit($form, &$form_state) {
   }
 }
 
+
+
 /**
  * Menu callback; present a form for deleting a date format type.
  */
@@ -247,3 +251,5 @@ function date_api_date_format_select_field(&$form, $type, $type_info, $default, 
     );
   }
 }
+
+

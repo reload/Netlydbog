@@ -1,8 +1,5 @@
 <?php
-// $Id: imagefilter.inc,v 1.1.4.1 2009/08/31 04:12:20 dman Exp $
-/**
- * @file Third-party library to assist image blending on older GD toolkits
- */
+// $Id: imagefilter.inc,v 1.1 2008/05/28 11:45:08 dman Exp $
 
 //include this file whenever you have to use imageconvolution…
 //you can use in your project, but keep the comment below
@@ -11,7 +8,7 @@
 //www.webdevlogs.com
 //V 1.0
 if (!function_exists('imagefilter')) {
-    function imagefilter($source, $var, $arg1 = NULL, $arg2 = NULL, $arg3 = NULL) {
+    function imagefilter($source, $var, $arg1 = null, $arg2 = null, $arg3 = null) {
         #define(’IMAGE_FILTER_NEGATE’, 0);
         #define(’IMAGE_FILTER_GRAYSCALE’, 1);
         #define(’IMAGE_FILTER_BRIGHTNESS’, 2);
@@ -37,7 +34,7 @@ if (!function_exists('imagefilter')) {
                        $b = 255 - ($rgb & 0xFF);
                        $a = $rgb >> 24;
                        $new_pxl = imagecolorallocatealpha($source, $r, $g, $b, $a);
-                       if ($new_pxl == FALSE) {
+                       if ($new_pxl == false) {
                            $new_pxl = imagecolorclosestalpha($source, $r, $g, $b, $a);
                        }
                        imagesetpixel($source, $x, $y, $new_pxl);
@@ -45,7 +42,7 @@ if (!function_exists('imagefilter')) {
                    }
                    ++$y;
                }
-               return TRUE;
+               return true;
            break;
            case 1:
                $y = 0;
@@ -56,7 +53,7 @@ if (!function_exists('imagefilter')) {
                        $a = $rgb >> 24;
                        $r = ((($rgb >> 16) & 0xFF)*0.299)+((($rgb >> 8) & 0xFF)*0.587)+(($rgb & 0xFF)*0.114);
                        $new_pxl = imagecolorallocatealpha($source, $r, $r, $r, $a);
-                       if ($new_pxl == FALSE) {
+                       if ($new_pxl == false) {
                            $new_pxl = imagecolorclosestalpha($source, $r, $r, $r, $a);
                        }
                        imagesetpixel($source, $x, $y, $new_pxl);
@@ -64,7 +61,7 @@ if (!function_exists('imagefilter')) {
                    }
                    ++$y;
                }
-               return TRUE;
+               return true;
            break;
            case 2:
                $y = 0;
@@ -80,7 +77,7 @@ if (!function_exists('imagefilter')) {
                        $g = ($g > 255)? 255 : (($g < 0)? 0:$g);
                        $b = ($b > 255)? 255 : (($b < 0)? 0:$b);
                        $new_pxl = imagecolorallocatealpha($source, $r, $g, $b, $a);
-                       if ($new_pxl == FALSE) {
+                       if ($new_pxl == false) {
                            $new_pxl = imagecolorclosestalpha($source, $r, $g, $b, $a);
                        }
                        imagesetpixel($source, $x, $y, $new_pxl);
@@ -88,7 +85,7 @@ if (!function_exists('imagefilter')) {
                    }
                    ++$y;
                }
-               return TRUE;
+               return true;
            break;
            case 3:
                $contrast = pow((100-$arg1)/100, 2);
@@ -105,7 +102,7 @@ if (!function_exists('imagefilter')) {
                        $g = ($g > 255)? 255 : (($g < 0)? 0:$g);
                        $b = ($b > 255)? 255 : (($b < 0)? 0:$b);
                        $new_pxl = imagecolorallocatealpha($source, $r, $g, $b, $a);
-                       if ($new_pxl == FALSE) {
+                       if ($new_pxl == false) {
                            $new_pxl = imagecolorclosestalpha($source, $r, $g, $b, $a);
                        }
                        imagesetpixel($source, $x, $y, $new_pxl);
@@ -113,7 +110,7 @@ if (!function_exists('imagefilter')) {
                    }
                    ++$y;
                }
-               return TRUE;
+               return true;
            break;
            case 4:
                $x = 0;
@@ -129,7 +126,7 @@ if (!function_exists('imagefilter')) {
                        $g = ($g > 255)? 255 : (($g < 0)? 0:$g);
                        $b = ($b > 255)? 255 : (($b < 0)? 0:$b);
                        $new_pxl = imagecolorallocatealpha($source, $r, $g, $b, $a);
-                       if ($new_pxl == FALSE) {
+                       if ($new_pxl == false) {
                            $new_pxl = imagecolorclosestalpha($source, $r, $g, $b, $a);
                        }
                        imagesetpixel($source, $x, $y, $new_pxl);
@@ -137,7 +134,7 @@ if (!function_exists('imagefilter')) {
                        }
                    ++$x;
                }
-               return TRUE;
+               return true;
            break;
            case 5:
                return imageconvolution($source, array(array(-1, 0, -1), array(0, 4, 0), array(-1, 0, -1)), 1, 127);
@@ -225,13 +222,13 @@ if (!function_exists('imagefilter')) {
                $new_g = ($new_g > 255)? 255 : (($new_g < 0)? 0:$new_g);
                $new_b = ($new_b > 255)? 255 : (($new_b < 0)? 0:$new_b);
                $new_pxl = imagecolorallocatealpha($source, (int)$new_r, (int)$new_g, (int)$new_b, $new_a);
-               if ($new_pxl == FALSE) {
+               if ($new_pxl == false) {
                    $new_pxl = imagecolorclosestalpha($source, (int)$new_r, (int)$new_g, (int)$new_b, $new_a);
                }
                imagesetpixel($source, $x, $y, $new_pxl);
            }
        }
-       return TRUE;
+       return true;
            break;
            case 9:
                return imageconvolution($source, array(array(-1, -1, -1), array(-1, 9, -1), array(-1, -1, -1)), 1, 0);

@@ -1,20 +1,21 @@
 <?php
-
-/**
- * @file
+//$Id: nodequeue_handler_field_all_queues.inc,v 1.1 2008/09/06 15:42:05 ezrag Exp $
+  /**
  * Field handler for all queues.
  *
  * @ingroup views_field_handlers
  */
 class nodequeue_handler_field_all_queues extends views_handler_field_prerender_list {
-  function option_definition() {
-    $options = parent::option_definition();
-    $options['link_to_queue'] = array('default' => TRUE);
-    $options['limit'] = array('default' => FALSE);
-    $options['qids'] = array('default' => array());
-    return $options;
+  /**
+   * Provide meaningful defaults
+   */
+  function options(&$options) {
+    parent::options($options);
+    $options['link_to_queue'] = TRUE;
+    $options['limit'] = FALSE;
+    $options['qids'] = array();
   }
-  
+
   /**
    * Provide "link to term" option.
    */
@@ -29,7 +30,7 @@ class nodequeue_handler_field_all_queues extends views_handler_field_prerender_l
     $form['limit'] = array(
       '#type' => 'checkbox',
       '#title' => t('Limit to queues'),
-      '#default_value' => $this->options['limit'],
+      '#default_value'=> $this->options['limit'],
     );
 
     $options = array();
@@ -75,3 +76,4 @@ class nodequeue_handler_field_all_queues extends views_handler_field_prerender_l
     }
   }
 }
+

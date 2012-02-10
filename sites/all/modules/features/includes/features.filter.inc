@@ -1,4 +1,5 @@
 <?php
+// $Id: features.filter.inc,v 1.1.2.9 2010/02/07 05:12:08 yhahn Exp $
 
 /**
  * Implementation of hook_features_api().
@@ -8,7 +9,6 @@ function filter_features_api() {
     'filter' => array(
       'name' => t('Filter formats'),
       'default_hook' => 'filter_default_formats',
-      'default_file' => FEATURES_DEFAULTS_INCLUDED,
     ),
   );
 }
@@ -41,7 +41,7 @@ function filter_features_export($data, &$export, $module_name = '') {
 /**
  * Implementation of hook_features_export_render().
  */
-function filter_features_export_render($module, $data) {
+function filter_features_export_render($module = 'foo', $data) {
   $code = array();
   $code[] = '  $formats = array();';
   $code[] = '';
@@ -49,11 +49,9 @@ function filter_features_export_render($module, $data) {
   $formats = _filter_get_formats();
   foreach ($formats as $format) {
     if (in_array($format['name'], $data)) {
-      $format_export = features_var_export($format, '  ');
-      $format_identifier = features_var_export($format['name']);
-      $code[] = "  // Exported format: {$format['name']}";
-      $code[] = "  \$formats[{$format_identifier}] = {$format_export};";
-      $code[] = "";
+      $code[] = '  // Exported format: '. $format['name'];
+      $code[] = '  $formats[] = '. features_var_export($format, '  ') .';';
+      $code[] = '';
     }
   }
 
@@ -73,7 +71,8 @@ function filter_features_revert($module) {
  * Implementation of hook_features_rebuild().
  */
 function filter_features_rebuild($module) {
-  if ($defaults = features_get_default('filter', $module)) {
+  $defaults = module_invoke($module, 'filter_default_formats');
+  if (!empty($defaults)) {
     foreach ($defaults as $format) {
       _filter_features_update($format);
     }

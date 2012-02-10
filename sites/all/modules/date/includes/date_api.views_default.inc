@@ -1,6 +1,7 @@
 <?php
+//$Id: date_api.views_default.inc,v 1.1.2.5 2009/02/15 13:31:08 karens Exp $
 function date_api_views_default_views() {
-
+ 
 $view = new view;
 $view->name = 'date_browser';
 $view->description = 'Browse through nodes by year, month, day, or week. Date browser attachment adds back/next navigation to the top of the page.';
@@ -87,6 +88,7 @@ $handler->override_option('displays', array(
   'page' => 'page',
   'default' => 0,
 ));
+
 
   $views[$view->name] = $view;
   return $views;

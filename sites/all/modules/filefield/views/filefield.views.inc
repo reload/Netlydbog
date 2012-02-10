@@ -1,4 +1,5 @@
 <?php
+// $Id: filefield.views.inc,v 1.1 2009/04/12 19:14:02 quicksketch Exp $
 /**
  * @file
  * Provide views data for filefield.module.
@@ -10,27 +11,6 @@
  * Includes the handler for the FileField data column.
  * @{
  */
-
-
-/**
- * Implementation of hook_views_data()
- */
-function filefield_views_data() {
-  $data = array();
-
-  // Extend the files table with an icon field.
-  $data['files']['icon'] = array(
-    'title' => t('Icon'),
-    'help' => t('An icon corresponding to the file MIME type.'),
-    'real field' => 'filemime',
-    'field' => array(
-      'handler' => 'filefield_handler_field_icon',
-      'click sortable' => FALSE,
-     ),
-  );
-
-  return $data;
-}
 
 /**
  * Implementation of hook_views_handlers().
@@ -44,9 +24,6 @@ function filefield_views_handlers() {
       // field handlers
       'filefield_handler_field_data' => array(
         'parent' => 'views_handler_field_node',
-      ),
-      'filefield_handler_field_icon' => array(
-        'parent' => 'views_handler_field',
       ),
     ),
   );

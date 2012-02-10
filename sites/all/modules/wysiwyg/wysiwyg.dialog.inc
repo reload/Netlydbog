@@ -1,4 +1,5 @@
 <?php
+// $Id: wysiwyg.dialog.inc,v 1.1 2009/02/01 09:20:48 sun Exp $
 
 /**
  * @file
@@ -21,11 +22,7 @@ function wysiwyg_dialog($plugin, $instance) {
   // Suppress admin menu.
   module_invoke('admin_menu', 'suppress');
   // Add editor instance id to Drupal.settings.
-  $settings = array(
-    'plugin' => $plugin,
-    'instance' => $instance,
-  );
-  drupal_add_js(array('wysiwyg' => $settings), 'setting');
+  drupal_add_js(array('instance' => $instance), 'setting');
 
   echo theme('wysiwyg_dialog_page', $callback($instance));
 }

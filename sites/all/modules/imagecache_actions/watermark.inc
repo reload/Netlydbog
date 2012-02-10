@@ -1,5 +1,5 @@
 <?php
-// $Id: watermark.inc,v 1.1.4.6 2009/10/30 14:03:54 dman Exp $
+// $ID $
 /**
  * @file routine for image layering
  * 
@@ -24,8 +24,9 @@ class watermark {
     # Should this change to match both images?
     $main_img_obj_w = max($base_img_obj_w, imagesx($watermark_img_obj));
     $main_img_obj_h = max($base_img_obj_h, imagesy($watermark_img_obj));
-    // dman: start with the MAX dimensions, 
-    // then let the caller crop it later according to its own logic.
+    # dman: start with the MAX, then let the caller crop it later according to its own logic.
+    #$main_img_obj_w = imagesx($main_img_obj);
+    #$main_img_obj_h = imagesy($main_img_obj);
     $watermark_img_obj_w = imagesx($watermark_img_obj);
     $watermark_img_obj_h = imagesy($watermark_img_obj);
 
@@ -33,8 +34,8 @@ class watermark {
     $main_img_obj_min_y = $y_ins;
 
     $return_img = imagecreatetruecolor($main_img_obj_w, $main_img_obj_h);
-    imagesavealpha($return_img, TRUE);
-    imagealphablending($return_img, FALSE);
+    imagesavealpha($return_img, true);
+    imagealphablending($return_img, false);
 
     // Support indexed color (gif) if I have to
     $transparent_ix = imagecolortransparent($main_img_obj);
@@ -58,7 +59,7 @@ class watermark {
         $watermark_x = $x - $main_img_obj_min_x;
         $watermark_y = $y - $main_img_obj_min_y;
 
-        if (($x < $base_img_obj_w) && ($y < $base_img_obj_h)) {
+        if(($x < $base_img_obj_w) && ($y < $base_img_obj_h)) {
           // try not to go out of bounds when looking for color.
           $main_rgb = imagecolorsforindex($main_img_obj, imagecolorat($main_img_obj, $x, $y));
         }
@@ -90,19 +91,19 @@ class watermark {
           $return_color = $this->_get_image_color($return_img, $avg_red, $avg_green, $avg_blue, $new_alpha);
         }
         else {
-          // Point is out of bounds from the watermark. Return the normal image color
-
+/*
           // allow watermark to overflow from the image. Rare, but could be useful
           if ($x > imagesx($main_img_obj) || $y > imagesy($main_img_obj)) {
-            // Point is out of bounds from the main image too. Return transparent
             $watermark_rbg = imagecolorsforindex($watermark_img_obj, imagecolorat($watermark_img_obj, $watermark_x, $watermark_y));
             $watermark_alpha = 0;#round(((127 - $watermark_rbg['alpha']) / 127), 2);
             $return_color = $this->_get_image_color($return_img, $watermark_rbg['red'], $watermark_rbg['green'], $watermark_rbg['blue'], $watermark_alpha);
           }
           else {
+*/
             $return_color = imagecolorat($main_img_obj, $x, $y);
+/*
           }
-
+*/
         }
         if ($return_color == $transparent_ix) {
           $return_color = $transparent;

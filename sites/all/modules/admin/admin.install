@@ -1,23 +1,17 @@
 <?php
-// $Id: admin.install,v 1.1.2.7.2.4 2010/07/30 22:48:22 yhahn Exp $
+// $Id: admin.install,v 1.1.2.7.2.1 2009/11/20 02:44:31 yhahn Exp $
 
 /**
  * Implementation of hook_install().
  */
 function admin_install() {
-  if (db_table_exists('menu_custom') && !db_result(db_query("SELECT menu_name FROM {menu_custom} WHERE menu_name = 'admin'"))) {
-    $t = get_t();
-    db_query("INSERT INTO {menu_custom} (menu_name, title, description) VALUES ('%s', '%s', '%s')", 'admin', $t('Admin'), $t('Administrative links.'));
-  }
+  db_query("INSERT INTO {menu_custom} (menu_name, title, description) VALUES ('%s', '%s', '%s')", 'admin', 'Admin', 'Admin links.');
 }
 
 /**
  * Implementation of hook_uninstall().
  */
 function admin_uninstall() {
-  if (db_table_exists('menu_custom')) {
-    db_query("DELETE FROM {menu_custom} WHERE menu_name = 'admin'");
-  }
   variable_del('admin_toolbar');
 }
 
@@ -100,38 +94,4 @@ function admin_update_6201() {
   }
 
   return $return;
-}
-
-/**
- * Update 6202: Update the format of the admin_toolbar variable.
- */
-function admin_update_6202() {
-  $ret = array();
-  $settings = variable_get('admin_toolbar', array());
-  if (isset($settings['blocks'])) {
-    $needs_update = FALSE;
-    // First pass, determine if we need to update these.
-    foreach ($settings['blocks'] as $bid => $status) {
-      if (!is_numeric($status)) {
-        $needs_update = TRUE;
-        break;
-      }
-    }
-    if ($needs_update) {
-      module_load_include('module', 'admin', 'admin');
-      $defaults = admin_get_default_blocks(TRUE);
-      // Second pass, do the update!
-      foreach ($settings['blocks'] as $bid => $status) {
-        if ($status) {
-          $settings['blocks'][$bid] = isset($defaults[$bid]) ? $defaults[$bid] : BLOCK_NO_CACHE;
-        }
-        else {
-          unset($settings['blocks'][$bid]);
-        }
-      }
-      variable_set('admin_toolbar', $settings);
-      $ret[] = array('success' => TRUE, 'query' => 'Updated admin settings.');
-    }
-  }
-  return $ret;
 }

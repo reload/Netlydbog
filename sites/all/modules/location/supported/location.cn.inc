@@ -1,11 +1,10 @@
 <?php
-// $Id: location.cn.inc,v 1.6.4.1 2009/06/29 14:25:49 bdragon Exp $
+// $Id: location.cn.inc,v 1.6 2008/01/24 09:00:02 bdragon Exp $
 
 // China
 
 function location_province_list_cn() {
-  return array(
-    '11' => "Beijing",
+  return array('11' => "Beijing",
     '12' => "Tianjin",
     '13' => "Hebei",
     '14' => "Shanxi",
@@ -29,7 +28,7 @@ function location_province_list_cn() {
     '51' => "Sichuan",
     '52' => "Guizhou",
     '53' => "Yunnan",
-    '54' => "Xizang (Tibet)",
+    '54' => "Xizang Z�zh�qu (Tibet)",
     '61' => "Shaanxi",
     '62' => "Gansu",
     '63' => "Qinghai",
@@ -38,8 +37,7 @@ function location_province_list_cn() {
     '71' => "Taiwan",
     '91' => "Xianggang",
     '92' => "Aomen",
-    '97' => "Chongqing",
+    '97' => "Chongq�ng",
     '98' => "Gaoxiong",
-    '99' => "Taibei",
-  );
+    '99' => "Taibei");
 }

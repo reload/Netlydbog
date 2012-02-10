@@ -1,4 +1,5 @@
 <?php
+// $Id: pathauto_user.inc,v 1.28.2.2 2008/08/05 17:28:13 freso Exp $
 
 /**
  * @file
@@ -8,7 +9,7 @@
  */
 
 /**
- * Implements hook_pathauto().
+ * Implementation of hook_pathauto() for user aliases.
  */
 function user_pathauto($op) {
   switch ($op) {
@@ -16,9 +17,9 @@ function user_pathauto($op) {
       $settings = array();
       $settings['module'] = 'user';
       $settings['token_type'] = 'user';
-      $settings['groupheader'] = t('User paths');
+      $settings['groupheader'] = t('User path settings');
       $settings['patterndescr'] = t('Pattern for user account page paths');
-      $settings['patterndefault'] = 'users/[user-raw]';
+      $settings['patterndefault'] = t('users/[user-raw]');
       $patterns = token_get_list('user');
       foreach ($patterns as $type => $pattern_set) {
         if ($type != 'global') {
@@ -27,6 +28,7 @@ function user_pathauto($op) {
           }
         }
       }
+
       $settings['bulkname'] = t('Bulk generate aliases for users that are not aliased');
       $settings['bulkdescr'] = t('Generate aliases for all existing user account pages which do not already have aliases.');
       return (object) $settings;
@@ -36,7 +38,7 @@ function user_pathauto($op) {
 }
 
 /**
- * Implements hook_pathauto().
+ * Implementation of hook_pathauto() for blog aliases.
  */
 function blog_pathauto($op) {
   switch ($op) {
@@ -44,9 +46,9 @@ function blog_pathauto($op) {
       $settings = array();
       $settings['module'] = 'blog';
       $settings['token_type'] = 'user';
-      $settings['groupheader'] = t('Blog paths');
+      $settings['groupheader'] = t('Blog path settings');
       $settings['patterndescr'] = t('Pattern for blog page paths');
-      $settings['patterndefault'] = 'blogs/[user-raw]';
+      $settings['patterndefault'] = t('blogs/[user-raw]');
       $patterns = token_get_list('user');
       foreach ($patterns['user'] as $pattern => $description) {
         $settings['placeholders']['['. $pattern .']'] = $description;
@@ -69,9 +71,9 @@ function tracker_pathauto($op) {
       $settings = array();
       $settings['module'] = 'tracker';
       $settings['token_type'] = 'user';
-      $settings['groupheader'] = t('User tracker paths');
+      $settings['groupheader'] = t('User-tracker path settings');
       $settings['patterndescr'] = t('Pattern for user-tracker page paths');
-      $settings['patterndefault'] = 'users/[user-raw]/track';
+      $settings['patterndefault'] = t('users/[user-raw]/track');
       $patterns = token_get_list('user');
       foreach ($patterns['user'] as $pattern => $description) {
         $settings['placeholders']['['. $pattern .']'] = $description;
@@ -86,44 +88,18 @@ function tracker_pathauto($op) {
 }
 
 /**
- * Implements hook_pathauto().
- */
-function contact_pathauto($op) {
-  switch ($op) {
-    case 'settings':
-      $settings = array();
-      $settings['module'] = 'contact';
-      $settings['token_type'] = 'user';
-      $settings['groupheader'] = t('User contact forms paths');
-      $settings['patterndescr'] = t('Pattern for the user contact form paths');
-      $settings['patterndefault'] = 'users/[user-raw]/contact';
-      $patterns = token_get_list('user');
-      foreach ($patterns['user'] as $pattern => $description) {
-        $settings['placeholders']['['. $pattern .']'] = $description;
-      }
-      $settings['bulkname'] = t('Bulk generate aliases for user contact form paths that are not aliased');
-      $settings['bulkdescr'] = t('Generate aliases for all existing user contact form pages which do not already have aliases.');
-      return (object) $settings;
-    default:
-      break;
-  }
-}
-
-/**
  * Bulk generate aliases for all users without aliases.
  */
 function user_pathauto_bulkupdate() {
-  $concat = _pathauto_sql_concat("'user/'", 'u.uid');
-  $sql = "SELECT u.uid FROM {users} u LEFT JOIN {url_alias} ua ON $concat = ua.src WHERE u.uid > 0 AND ua.src IS NULL";
-  $query = db_query_range($sql, 0, variable_get('pathauto_max_bulk_update', 50));
+  $query = "SELECT uid, name, src, dst FROM {users} LEFT JOIN {url_alias} ON CONCAT('user/', CAST(uid AS CHAR)) = src WHERE uid > 0 AND src IS NULL";
+  $result = db_query_range($query, 0, variable_get('pathauto_max_bulk_update', 50));
 
   $count = 0;
   $placeholders = array();
-  while ($uid = db_result($query)) {
-    $account = user_load($uid);
-    $placeholders = pathauto_get_placeholders('user', $account);
-    $source = 'user/'. $account->uid;
-    if (pathauto_create_alias('user', 'bulkupdate', $placeholders, $source, $account->uid)) {
+  while ($user = db_fetch_object($result)) {
+    $placeholders = pathauto_get_placeholders('user', $user);
+    $src = 'user/'. $user->uid;
+    if (pathauto_create_alias('user', 'bulkupdate', $placeholders, $src, $user->uid)) {
       $count++;
     }
   }
@@ -137,17 +113,15 @@ function user_pathauto_bulkupdate() {
  * Bulk generate aliases for all blogs without aliases.
  */
 function blog_pathauto_bulkupdate() {
-  $concat = _pathauto_sql_concat("'blog/'", 'u.uid');
-  $sql = "SELECT u.uid FROM {users} u LEFT JOIN {url_alias} ua ON $concat = ua.src WHERE u.uid > 0 AND ua.src IS NULL";
-  $query = db_query_range($sql, 0, variable_get('pathauto_max_bulk_update', 50));
+  $query = "SELECT uid, name, src, dst FROM {users} LEFT JOIN {url_alias} ON CONCAT('blog/', CAST(uid AS CHAR)) = src WHERE uid > 0 AND src IS NULL";
+  $result = db_query_range($query, 0, variable_get('pathauto_max_bulk_update', 50));
 
   $count = 0;
   $placeholders = array();
-  while ($uid = db_result($query)) {
-    $account = user_load($uid);
-    $placeholders = pathauto_get_placeholders('user', $account);
-    $source = 'blog/'. $account->uid;
-    if (pathauto_create_alias('blog', 'bulkupdate', $placeholders, $source, $account->uid)) {
+  while ($user = db_fetch_object($result)) {
+    $placeholders = pathauto_get_placeholders('user', $user);
+    $src = 'blog/'. $user->uid;
+    if (pathauto_create_alias('blog', 'bulkupdate', $placeholders, $src, $user->uid)) {
       $count++;
     }
   }
@@ -161,17 +135,17 @@ function blog_pathauto_bulkupdate() {
  * Bulk generate aliases for user trackers without aliases.
  */
 function tracker_pathauto_bulkupdate() {
-  $concat = _pathauto_sql_concat("'user/'", 'u.uid', "'/track'");
-  $sql = "SELECT u.uid FROM {users} u LEFT JOIN {url_alias} ua ON $concat = ua.src WHERE u.uid > 0 AND ua.src IS NULL";
-  $query = db_query_range($sql, 0, variable_get('pathauto_max_bulk_update', 50));
+  // We do the double CONCAT because Pgsql8.1 doesn't support more than three arguments to CONCAT
+  // Hopefully some day we can remove that.
+  $query = "SELECT uid, name, src, dst FROM {users} LEFT JOIN {url_alias} ON CONCAT(CONCAT('user/', CAST(uid AS CHAR)), '/track') = src WHERE uid > 0 AND src IS NULL";
+  $result = db_query_range($query, 0, variable_get('pathauto_max_bulk_update', 50));
 
   $count = 0;
   $placeholders = array();
-  while ($uid = db_result($query)) {
-    $account = user_load($uid);
-    $placeholders = pathauto_get_placeholders('user', $account);
-    $src = 'user/'. $account->uid .'/track';
-    if (pathauto_create_alias('tracker', 'bulkupdate', $placeholders, $src, $account->uid)) {
+  while ($user = db_fetch_object($result)) {
+    $placeholders = pathauto_get_placeholders('user', $user);
+    $src = 'user/'. $user->uid .'/track';
+    if (pathauto_create_alias('tracker', 'bulkupdate', $placeholders, $src, $user->uid)) {
       $count++;
     }
   }
@@ -179,27 +153,4 @@ function tracker_pathauto_bulkupdate() {
   drupal_set_message(format_plural($count,
     'Bulk generation of user tracker pages completed, one alias generated.',
     'Bulk generation of user tracker pages completed, @count aliases generated.'));
-}
-
-/**
- * Bulk generate aliases for all users without aliases
- */
-function contact_pathauto_bulkupdate() {
-  $sql = "SELECT u.uid FROM {users} u LEFT JOIN {url_alias} ua ON CONCAT(CONCAT('user/', CAST(u.uid AS CHAR)), '/contact') = ua.src WHERE u.uid > 0 AND ua.src IS NULL";
-  $query = db_query_range($sql, 0, variable_get('pathauto_max_bulk_update', 50));
-
-  $count = 0;
-  $placeholders = array();
-  while ($uid = db_result($query)) {
-    $account = user_load($uid);
-    $placeholders = pathauto_get_placeholders('user', $account);
-    $source = 'user/'. $account->uid .'/contact';
-    if (pathauto_create_alias('contact', 'bulkupdate', $placeholders, $source, $account->uid)) {
-      $count++;
-    }
-  }
-
-  drupal_set_message(format_plural($count,
-    'Bulk generation of contact pages completed, one alias generated.',
-    'Bulk generation of contact pages completed, @count aliases generated.'));
 }

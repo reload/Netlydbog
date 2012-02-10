@@ -1,3 +1,4 @@
+// $Id: nodequeue.js,v 1.5 2009/01/11 16:18:31 ezrag Exp $
 
 /**
  * Nodequeue object
@@ -385,10 +386,10 @@ Drupal.nodequeue.autoAttach = function() {
       data: { js: 1 },
       url: href,
       global: true,
-      dataType: 'json',
       success: function (data) {
         // Parse response
         $(a).removeClass('throbbing');
+        data = Drupal.parseJson(data);
         // Change text on success
         if (data.status) {
           // Change label back

@@ -1,4 +1,5 @@
 <?php
+// $Id: imagefield_widget.inc,v 1.43 2010/05/01 22:39:42 quicksketch Exp $
 
 /**
  * @file
@@ -56,7 +57,7 @@ function imagefield_widget_settings_form($widget) {
     '#title' => t('Default ALT text'),
     '#default_value' => !empty($widget['alt']) ? $widget['alt'] : '',
     '#description' => t('This value will be used for alternate text by default.'),
-    '#suffix' => theme('token_help', array('user')),
+    '#suffix' => theme('token_help', 'file'),
   );
 
   $form['title_settings'] = array(
@@ -86,7 +87,7 @@ function imagefield_widget_settings_form($widget) {
     '#title' => t('Default Title text'),
     '#default_value' => !empty($widget['title']) ? $widget['title'] : '',
     '#description' => t('This value will be used as the image title by default.'),
-    '#suffix' => theme('token_help', array('user')),
+    '#suffix' =>  theme('token_help', 'file'),
   );
 
   // Default image settings.
@@ -136,9 +137,8 @@ function imagefield_widget_settings_form($widget) {
  * to the $form_state variable.
  */
 function _imagefield_widget_settings_default_validate($element, &$form_state) {
-  // Skip this validation if there isn't a default file uploaded at all or if
-  // validation has already failed because of another error.
-  if (!is_uploaded_file($_FILES['files']['tmp_name']['default_image_upload']) || form_set_error()) {
+  // Skip this validation if there isn't a default file uploaded at all.
+  if (!is_uploaded_file($_FILES['files']['tmp_name']['default_image_upload'])) {
     return;
   }
 
@@ -159,12 +159,12 @@ function _imagefield_widget_settings_default_validate($element, &$form_state) {
     return;
   }
 
-  // Remove the old default image if any.
+  // Remove old image (if any) & clean up database.
   $old_default = $form_state['values']['default_image'];
   if (!empty($old_default['fid'])) {
-    // Set a flag to not count this instance in hook_file_references().
-    $old_default['imagefield_type_name'] = $form_state['values']['type_name'];
-    field_file_delete($old_default);
+    if (file_delete(file_create_path($old_default['filepath']))) {
+      db_query('DELETE FROM {files} WHERE fid = %d', $old_default['fid']);
+    }
   }
 
   // Make the file permanent and store it in the form.

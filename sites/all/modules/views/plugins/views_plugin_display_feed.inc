@@ -1,4 +1,5 @@
 <?php
+// $Id: views_plugin_display_feed.inc,v 1.7 2009/09/15 22:20:01 merlinofchaos Exp $
 /**
  * @file
  * Contains the feed display plugin.
@@ -29,7 +30,7 @@ class views_plugin_display_feed extends views_plugin_display_page {
   }
 
   function preview() {
-    if (!empty($this->view->live_preview)) {
+    if (!empty($this->live_preview)) {
       return '<pre>' . check_plain($this->view->render()) . '</pre>';
     }
     return $this->view->render();
@@ -192,13 +193,9 @@ class views_plugin_display_feed extends views_plugin_display_page {
       $clone->set_display($this->display->id);
       $clone->build_title();
       $plugin->attach_to($display_id, $this->get_path(), $clone->get_title());
-
-      // Clean up
-      $clone->destroy();
-      unset($clone);
     }
   }
-
+  
   function uses_link_display() {
     return TRUE;
   }

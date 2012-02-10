@@ -1,4 +1,5 @@
 <?php
+// $Id: views_plugin_display_block.inc,v 1.5 2009/06/26 00:23:42 merlinofchaos Exp $
 /**
  * @file
  * Contains the block display plugin.
@@ -73,7 +74,7 @@ class views_plugin_display_block extends views_plugin_display {
     }
 
     if (strlen($block_description) > 16) {
-      $block_description = drupal_substr($block_description, 0, 16) . '...';
+      $block_description = substr($block_description, 0, 16) . '...';
     }
 
     $options['block_description'] = array(
@@ -179,9 +180,9 @@ class views_plugin_display_block extends views_plugin_display {
 
     return FALSE;
   }
-
+  
   /**
-   * Save the block cache setting in the blocks table if this block allready
+   * Save the block cache setting in the blocks table if this block allready 
    * exists in the blocks table. Dirty fix untill http://drupal.org/node/235673 gets in.
    */
   function save_block_cache($delta, $cache_setting) {

@@ -1,5 +1,5 @@
 <?php
-// $Id: page_help.inc,v 1.1.2.2 2010/02/02 21:49:21 merlinofchaos Exp $
+// $Id: page_help.inc,v 1.1.2.1 2010/01/29 20:18:25 merlinofchaos Exp $
 
 /**
  * @file
@@ -17,7 +17,6 @@ $plugin = array(
   'icon' => 'icon_page.png',
   'description' => t('Add the help text of the current page as content.'),
   'category' => t('Page elements'),
-  'render last' => TRUE,
 );
 
 /**
@@ -26,8 +25,11 @@ $plugin = array(
  * Outputs the breadcrumb for the current page.
  */
 function ctools_page_help_content_type_render($subtype, $conf, $panel_args) {
+  $token = '<!-- ctools-page-help -->';
+  ctools_set_page_token($token, 'variable', 'help');
+
   $block = new stdClass();
-  $block->content = theme('help');
+  $block->content = $token;
 
   return $block;
 }

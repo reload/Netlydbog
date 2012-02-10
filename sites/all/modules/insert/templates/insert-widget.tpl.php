@@ -1,4 +1,5 @@
 <?php
+// $Id: insert-widget.tpl.php,v 1.1 2009/10/21 06:23:43 quicksketch Exp $
 
 /**
  * @file
@@ -9,8 +10,8 @@
  * attached.
  */
 ?>
-<?php if (count($insert_styles) > 1): ?>
-  <div class="insert form-item container-inline inline">
+<div class="insert form-item container-inline">
+  <?php if (count($insert_styles) > 1): ?>
     <div class="insert-style-select">
       <label><?php print t('Style') ?>:</label>
       <select class="insert-style">
@@ -19,12 +20,8 @@
         <?php endforeach; ?>
       </select>
     </div>
-<?php else: ?>
-  <input type="hidden" class="insert-style" value="<?php print $default_style ?>" />
-<?php endif; ?>
-
+  <?php else: ?>
+    <input type="hidden" class="insert-style" value="<?php print $default_style ?>" />
+  <?php endif; ?>
   <input type="submit" rel="<?php print $widget_type ?>" class="form-submit insert-button" onclick="return false;" value="<?php print t('Insert'); ?>" />
-
-<?php if (count($insert_styles) > 1): ?>
-  </div>
-<?php endif; ?>
+</div>

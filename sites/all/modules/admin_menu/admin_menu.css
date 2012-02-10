@@ -24,7 +24,7 @@ body.admin-menu { margin-top: 20px !important; }
 /* width needed or else Opera goes nuts */
 #admin-menu li { float: left; height: 100%; margin: 0 !important; padding: 0; list-style-image: none; list-style-type: none; background-image: none; }
 #admin-menu li.admin-menu-tab { padding-bottom: 1px; background: url(images/bkg_tab.png) repeat-x left bottom; }
-#admin-menu li li { width: 160px; background: #202020; filter:Alpha(opacity=88); opacity: 0.88; }
+#admin-menu li li { width: 160px; background: #202020; filter:Alpha(opacity=100); opacity: 1.00; }
 
 /* second-level lists */
 /* Note: Use left instead of display to hide publicly visible menus because display: none isn't read by screen readers */

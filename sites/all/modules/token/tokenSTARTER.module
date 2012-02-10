@@ -1,5 +1,6 @@
 <?php
 
+// $Id: tokenSTARTER.module,v 1.1.2.2 2009/05/14 16:06:47 greggles Exp $
 
 /**
  * @file
@@ -16,8 +17,6 @@
  * Implementation of hook_token_list().
  */
 function tokenSTARTER_token_list($type = 'all') {
-  $tokens = array();
-
   if ($type == 'global' || $type == 'all') {
     $tokens['global']['random-sha1']  = t("A randomly generated SHA1 hash.");
     $tokens['global']['site-date-timestamp'] = t('The current timestamp in seconds past January 1, 1970.');
@@ -38,7 +37,7 @@ function tokenSTARTER_token_list($type = 'all') {
 /**
  * Implementation of hook_token_values().
  */
-function tokenSTARTER_token_values($type, $object = NULL, $options = array()) {
+function tokenSTARTER_token_values($type, $object = NULL) {
   $values = array();
   switch ($type) {
     case 'global':
@@ -66,3 +65,4 @@ function tokenSTARTER_token_values($type, $object = NULL, $options = array()) {
   }
   return $values;
 }
+
