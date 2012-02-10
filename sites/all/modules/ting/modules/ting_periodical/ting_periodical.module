@@ -1,0 +1,134 @@
+<?php
+
+/**
+ * Implementation of hook_theme().
+ */
+function ting_periodical_theme() {
+  return array(
+    'ting_periodical_issues' => array(
+      'arguments' => array('element' => NULL),
+      'template' => 'ting_periodical_issues',
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_requirements().
+ */
+function ting_periodical_requirements($phase) {
+  $requrements = array();
+  if ($phase == 'runtime') {
+    $provider = ding_provider_description('availability');
+    $periodical = ding_provider_supports('availability', 'periodical');
+
+    $requrements['ting_periodical'] = array(
+      'title' => t('Ting periodical'),
+      'severity' => $provider && $periodical ? REQUIREMENT_INFO : REQUIREMENT_WARNING,
+      'value' => $provider,
+      'description' => t('OK'),
+    );
+    if (!$provider) {
+      $requrements['ting_periodical']['description'] = t('No reservation provider active.');
+    }
+    elseif (!$periodical) {
+      $requrements['ting_periodical']['description'] = t("Provider doesn't support periodical info.");
+    }
+  }
+
+  return $requrements;
+}
+
+/**
+ * Template preprocessor for ting objects.
+ */
+function ting_periodical_preprocess_ting_object(&$vars) {
+  $object = $vars['object'];
+  if (ting_object_is($object, 'periodical')) {
+    $vars['additional_content'][] = array(
+      '#type' => 'ting_periodical_issues',
+      '#object' => $object,
+    );
+  }
+}
+
+/**
+ * Preprocessor for the ting_periodical_issues element template.
+ */
+function template_preprocess_ting_periodical_issues(&$vars) {
+  drupal_add_js(drupal_get_path('module', 'ting_periodical') . '/ting_periodical.js');
+
+  $items = ding_provider_invoke('availability', 'periodical', array($vars['element']['#object']->localId));
+  $vars['issues'] = array();
+  // Only show reservation link if ding_reservation is enabled.
+  $reservable = module_exists('ding_reservation');
+  // Also add ding_reservation's js, needed for the buttons to be ajaxified.
+  if ($reservable) {
+    drupal_add_js(drupal_get_path('module', 'ding_reservation') . '/ding_reservation.buttons.js');
+  }
+
+  if (isset($items[$vars['element']['#object']->localId])) {
+    $object_holding = $items[$vars['element']['#object']->localId];
+  }
+  if ($object_holding && isset($object_holding['issues'])) {
+    $single_rendering = FALSE;
+    // Only switch to rendering one item per year, if both first and second
+    // year only contains one issue.
+    if (isset($object_holding['issues'][0]) &&
+      isset($object_holding['issues'][1]) &&
+      sizeof($object_holding['issues'][1]) < 2 &&
+      sizeof($object_holding['issues'][0]) < 2
+    ) {
+      $single_rendering = TRUE;
+    }
+    foreach ($object_holding['issues'] as $year => $issues) {
+      $items = array();
+
+      // Special case for when there’s only one issue per year, we're showing
+      // reservation link and the item is reservable.
+      if ($single_rendering &&  count($issues) == 1 && $reservable && $issues[0]['reservable']) {
+        $issue = array_shift($issues);
+        $vars['issues'][$year] = theme('item_list', array(
+                                   l(t('Reserve now'), 'ding/reservation/' . $object_holding['local_id'] . '/' . $issue['local_id'], array('attributes' => array('class' => 'reserve-now'))),
+                                 ), $year, 'ul', array('class' => 'buttons'));
+      }
+      else {
+        foreach ($issues as $issue_name => $issue) {
+          $output = '<div class="title">' . $issue_name . '</div>';
+          if ($issue['reservable']) {
+            $output .= theme('item_list', array(
+                         l(t('Reserve now'), 'ding/reservation/' . $object_holding['local_id'] . '/' . $issue['local_id'], array('attributes' => array('class' => 'reserve-now'))),
+                       ), NULL, 'ul', array('class' => 'buttons'));
+          }
+          $items[] = array(
+            'data' => $output,
+            'class' => 'issue',
+          );
+        }
+
+        $vars['issues'][$year] = theme('item_list', $items, $year);
+      }
+    }
+  }
+}
+
+/**
+ * Implementation of hook_ting_object_is().
+ */
+function ting_periodical_ting_object_is($object, $class) {
+  if ($class == 'periodical') {
+    // Register certain types as periodicals
+    if (in_array(drupal_strtolower($object->type), array('tidsskrift', 'periodikum', 'årbog'))) {
+      return TRUE;
+    }
+  } elseif ($class = 'limited_availability') {
+    // The main object for a periodical never has limited avaibility.
+    // Periodical availability is handled separatly for the individual issues is this module.
+    if (ting_object_is($object, 'periodical')) {
+      return FALSE;
+    }
+  } elseif ($class == 'reservable' || $class == 'cartable') {
+    if (in_array(drupal_strtolower($object->type), array('årbog'))) {
+      return FALSE;
+    }
+  }
+}

@@ -1,0 +1,83 @@
+<?php
+/**
+ * @file
+ * Install file providing upgrade hooks for ting.
+ */
+
+/**
+ * Migrate from alma_periodical to ting_periodical.
+ */
+function ting_update_6001() {
+  $ret = array();
+  if (module_exists('alma_periodical')) {
+    drupal_install_modules(array('ting_periodical'));
+    $ret[] = array(
+      'success' => TRUE,
+      'query' => t('Replaced alma_periodical with ting_periodical.'),
+    );
+    drupal_uninstall_module('alma_periodical');
+  }
+  return $ret;
+}
+
+/**
+ * Migrate to ting_proxy.
+ */
+function ting_update_6002() {
+
+  // Install ting proxy
+  drupal_install_modules(array('ting_proxy'));
+
+  // Get prefix
+  $proxy = array();
+  $proxy['prefix'] = variable_get('restricted_access_proxy_prefix', '');
+
+  $key = 0;
+  $hostnames = variable_get('restricted_access_proxy_hostnames', array());
+  foreach ($hostnames as $hostname) {
+    $proxy['hostnames'][$key] = array(
+      'url' => $hostname,
+      'regex' => '',
+      'replacement' => '',
+      'no' => 0,
+    );
+    $key++;
+  }
+
+  // Save settings
+  variable_set('ting_proxy', $proxy);
+
+  // Clean up
+  variable_del('restricted_access_proxy_prefix');
+  variable_del('restricted_access_proxy_hostnames');
+
+  // Return message
+  $ret[] = array(
+    'success' => TRUE,
+    'query' => t('Update to ting proxy completed.'),
+  );
+  return $ret;
+}
+
+/**
+ * Correct WSDL typo.
+ *
+ * Variable was named wdsl in place of wsdl.
+ */
+function ting_update_6003() {
+  $url = variable_get('addi_wdsl_url', '');
+
+  if (!empty($url)) {
+    variable_set('addi_wsdl_url', $url);
+  }
+
+  variable_del('addi_wdsl_url', $url);
+}
+
+/**
+ * Installed the new dependency, NanoSOAP.
+ */
+function ting_update_6004() {
+  // Install NanoSOAP and dependencies.
+  drupal_install_modules(array('autoload', 'nanosoap'));
+}

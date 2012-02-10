@@ -1,0 +1,184 @@
+#
+# LANGUAGE translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  ting_result.tpl.php: n/a
+#  ting_search_result_page.tpl.php: n/a
+#  ting_search.pages.inc: n/a
+#  ting_search.module: n/a
+#  ting_search.info: n/a
+#  plugins/content_types/result.inc: n/a
+#  ting_search_collection.tpl.php: n/a
+#  ting_result_pager.tpl.php: n/a
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2011-01-19 14:30+0100\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: ting_result.tpl.php:4
+msgid "Sorted by"
+msgstr ""
+
+#: ting_result.tpl.php:12 ting_search_result_page.tpl.php:22
+msgid "Showing !firstResult-!lastResult of !count results"
+msgstr ""
+
+#: ting_search.pages.inc:191
+msgid "“@title” search results feed"
+msgstr ""
+
+#: ting_search.pages.inc:203;275
+msgid "First @max of @count items found."
+msgstr ""
+
+#: ting_search.pages.inc:209;281
+msgid "No items found."
+msgstr ""
+
+#: ting_search.pages.inc:263
+msgid "“@title” content search results feed"
+msgstr ""
+
+#: ting_search.pages.inc:206;278
+msgid "One item found"
+msgid_plural "@count items found."
+msgstr[0] ""
+msgstr[1] ""
+
+#: ting_search.module:104
+msgid "Ting search box – for page header"
+msgstr ""
+
+#: ting_search.module:112;217
+msgid "Search"
+msgstr ""
+
+#: ting_search.module:178
+msgid "Show more facet terms"
+msgstr ""
+
+#: ting_search.module:179
+msgid "No results found"
+msgstr ""
+
+#: ting_search.module:180
+msgid "Sorry, we could not find any results for your search. Please try again with different keywords or ask a librarian."
+msgstr ""
+
+#: ting_search.module:209
+msgid "Enter your search terms here"
+msgstr ""
+
+#: ting_search.module:221
+msgid "For example:"
+msgstr ""
+
+#: ting_search.module:48 ting_search.info:0
+msgid "Ting search"
+msgstr ""
+
+#: ting_search.module:49
+msgid "Provides a redirect to the Panels search page, if applicable, otherwise 404."
+msgstr ""
+
+#: ting_search.module:57 plugins/content_types/result.inc:17
+msgid "Ting search results"
+msgstr ""
+
+#: ting_search.module:58
+msgid "Lists facets and search results from the Ting database as HTML or JSON."
+msgstr ""
+
+#: ting_search.module:66
+msgid "Content search AJAX page callback"
+msgstr ""
+
+#: ting_search.module:74;84
+msgid "Ting search feed"
+msgstr ""
+
+#: ting_search.module:75
+msgid "Provides an Atom feed of Ting search results"
+msgstr ""
+
+#: ting_search.module:85
+msgid "Provides an Atom feed of content search results"
+msgstr ""
+
+#: plugins/content_types/result.inc:19
+msgid "The search results for a search against the Ting system"
+msgstr ""
+
+#: plugins/content_types/result.inc:20
+msgid "Search keys"
+msgstr ""
+
+#: plugins/content_types/result.inc:21
+msgid "Ting"
+msgstr ""
+
+#: plugins/content_types/result.inc:35
+msgid "Search feed for “@keys”"
+msgstr ""
+
+#: plugins/content_types/result.inc:36
+msgid "Content search feed for “@keys”"
+msgstr ""
+
+#: plugins/content_types/result.inc:65
+msgid "“@s”: Ting search results"
+msgstr ""
+
+#: ting_search_collection.tpl.php:28
+msgid "By %creator_name%"
+msgstr ""
+
+#: ting_search_collection.tpl.php:33
+msgid "(%publication_date%)"
+msgstr ""
+
+#: ting_search_collection.tpl.php:48
+msgid "Subjects:"
+msgstr ""
+
+#: ting_search_result_page.tpl.php:12
+msgid "Materials"
+msgstr ""
+
+#: ting_search_result_page.tpl.php:13
+msgid "Website"
+msgstr ""
+
+#: ting_search_result_page.tpl.php:33
+msgid "Searching"
+msgstr ""
+
+#: ting_search.info:0
+msgid "Displays search results from the Ting database."
+msgstr ""
+
+#: ting_search.info:0
+msgid "Ding!"
+msgstr ""
+
+#: ting_result_pager.tpl.php:10
+msgid "Previous"
+msgstr ""
+
+#: ting_result_pager.tpl.php:11
+msgid "First"
+msgstr ""
+
+#: ting_result_pager.tpl.php:12
+msgid "Next"
+msgstr ""
+
