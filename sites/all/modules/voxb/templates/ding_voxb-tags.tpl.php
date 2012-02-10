@@ -5,7 +5,7 @@
  * Template tag form and tags themselves.
  */
 
-if(($data['voxb_item']->getTags()->getCount() > 0) || ($user->uid != 0 && $data['able'])) {
+if(isset($data['voxb_item']) && (($data['voxb_item']->getTags()->getCount() > 0) || ($user->uid != 0 && $data['able']))) {
 ?>
   <div class="voxb">
     <div class="tagsContainer">

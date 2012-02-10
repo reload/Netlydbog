@@ -36,3 +36,18 @@
 #ting-object .abstract {
   margin-top: 25px;
 }
+
+/** @todo
+ *
+ * This is hidden since ting v1.7.
+ * Remove when needed.
+ */
+
+#ting-object .ui-tabs-nav {
+  display: none;
+}
+
+#ting-object #main {
+  border: 0;
+  padding: 0;
+}

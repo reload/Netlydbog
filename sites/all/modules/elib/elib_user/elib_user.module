@@ -127,7 +127,7 @@ if ($op == 'list') {
 	
         if ($loans->orderitem) {
   	      foreach($loans->orderitem as $book){
-  	        $object = ting_get_object_by_isbn(trim($book->book->attributes()->id));
+  	        $object = elib_get_ting_object_by_isbn(trim($book->book->attributes()->id));
  	          $bookdisplay = elib_displaybook($object,$book);
   	        if(sizeof($loans->orderitem) > 4){
   	        	$size = 4;

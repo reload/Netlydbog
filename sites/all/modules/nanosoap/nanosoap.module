@@ -1,0 +1,11 @@
+<?php
+/**
+ * @file
+ * NanoSOAP module for Drupal.
+ *
+ * This module contains no code besides the the NanoSOAP class provided 
+ * in nanosoap.inc.
+ */
+
+// This space intentionally left blank.
+

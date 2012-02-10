@@ -26,7 +26,7 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
 		    $response = elib_client()->getLatestLoans();  
 		    
 		    foreach($response as $isbn){
-		      $out .= elib_displaybookNEW(ting_get_object_by_isbn($isbn),'','small'); 
+		      $out .= elib_displaybookNEW(elib_get_ting_object_by_isbn($isbn),'','small');
 		    }
 		    $block['subject'] = t('Seneste Lån');	
     		break;
@@ -44,7 +44,7 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
 	    		  
 	    		  //krumo(array($isbn,$title));
 	    		  
-	    		  if(ting_get_object_by_isbn($isbn)){
+	    		  if(elib_get_ting_object_by_isbn($isbn)){
 	    		    $toplist[] = $isbn;
 	    		  //  krumo('hurray'.$isbn);
 	    		  }
@@ -54,7 +54,7 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
 	    		}
 	    		if(is_array($toplist)){  
   	    		foreach($toplist as $isbn){
-  	    		 	$out .= elib_displaybookNEW(ting_get_object_by_isbn($isbn),'','small'); 
+  	    		 	$out .= elib_displaybookNEW(elib_get_ting_object_by_isbn($isbn),'','small');
   	    		}
 	    		}
     		  $block['subject'] = t('Nyeste bøger');
@@ -66,13 +66,13 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
         foreach($response->data->toplistitem as $item){
             
             //print $item['ebookid'].'--';
-            if(ting_get_object_by_isbn(trim($item->ebookid))){
-              $out .= elib_displaybookNEW(ting_get_object_by_isbn(trim($item->ebookid)), array('popular' => 1), 'small', $index);
+            if(elib_get_ting_object_by_isbn(trim($item->ebookid))){
+              $out .= elib_displaybookNEW(elib_get_ting_object_by_isbn(trim($item->ebookid)), array('popular' => 1), 'small', $index);
               $index++;
             }
             else
             {
-              watchdog('elib','eLib Popular books: Could not retrieve data from ting_get_object_by_isbn() "@data"',array('@data' => var_export($item, true), WATCHDOG_DEBUG));
+              watchdog('elib','eLib Popular books: Could not retrieve data from elib_get_ting_object_by_isbn() "@data"',array('@data' => var_export($item, true), WATCHDOG_DEBUG));
             }
           }
           if($out == ''){

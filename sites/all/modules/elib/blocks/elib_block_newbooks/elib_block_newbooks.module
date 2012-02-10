@@ -24,7 +24,7 @@ if ($op == 'list') {
     module_load_include('client.inc', 'ting');
     
     foreach($response as $isbn){
-    $out .= elib_displaybookNEW(ting_get_object_by_isbn($isbn),'','small');	
+    $out .= elib_displaybookNEW(elib_get_ting_object_by_isbn($isbn),'','small');
     	
     }
     

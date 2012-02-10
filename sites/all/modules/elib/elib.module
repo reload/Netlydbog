@@ -1005,3 +1005,27 @@ function elib_check_platform() {
     return PLATFORM_GENERIC;
   }
 }
+
+/**
+ * Fetch single ting object by isbn.
+ *
+ * @param String $isbn
+ *   Item isbn number.
+ * @param Boolean $enrich
+ *   Whether to add additional info to the response.
+ * @return Object
+ *   Ting item object
+ */
+function elib_get_ting_object_by_isbn($isbn, $enrich = FALSE) {
+  $request = ting_get_request_factory()->getSearchRequest();
+  $request->setQuery('(dc.identifier=' . $isbn . ')');
+  $request->setNumResults(1);
+
+  $request = ting_add_agency($request);
+  $request = ting_add_profile($request);
+
+  $r = ting_execute($request);
+  $object = isset($r->collections[0]->objects[0]) ? $r->collections[0]->objects[0] : FALSE;
+
+  return $object;
+}

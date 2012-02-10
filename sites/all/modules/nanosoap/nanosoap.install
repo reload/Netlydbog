@@ -1,0 +1,43 @@
+<?php
+/**
+ * @file
+ * Install file for NanoSOAP module.
+ */
+
+/**
+ * Implementation of hook_requirements().
+ *
+ * This to make sure we have the required PHP extensions enabled.
+ */
+function nanosoap_requirements($phase) {
+  $requirements = array(
+    'nanosoap_curl' => array(
+      'title' => 'PHP cURL extension',
+    ),
+    'nanosoap_dom' => array(
+      'title' => 'PHP DOMDocument class',
+    ),
+  );
+
+  if (function_exists('curl_init')) {
+    $version = curl_version();
+    $requirements['nanosoap_curl']['value'] = $version['version'];
+    $requirements['nanosoap_curl']['severity'] = REQUIREMENT_OK;
+  }
+  else {
+    $requirements['nanosoap_curl']['value'] = t('Missing');
+    $requirements['nanosoap_curl']['severity'] = REQUIREMENT_ERROR;
+  }
+
+  if (class_exists('DOMDocument')) {
+    $requirements['nanosoap_dom']['value'] = t('Available');
+    $requirements['nanosoap_dom']['severity'] = REQUIREMENT_OK;
+  }
+  else {
+    $requirements['nanosoap_dom']['value'] = t('Missing');
+    $requirements['nanosoap_dom']['severity'] = REQUIREMENT_ERROR;
+  }
+
+  return $requirements;
+}
+
