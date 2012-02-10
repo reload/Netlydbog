@@ -200,7 +200,6 @@ if (module_exists('ding_voxb')) {
       </div>
       <?php
       if (module_exists('ding_voxb')) {
-        echo $object->voxb_tags;
         echo $object->voxb_reviews;
       }
       ?>
