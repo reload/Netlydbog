@@ -16,7 +16,6 @@
     <div id="pager_block">
       <?php print $data['pager']; ?>
     </div>
-    <br />
     <div class="addReviewContainer">
       <?php print $data['review_form']; ?>
     </div>

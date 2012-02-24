@@ -4,47 +4,39 @@
  * Markup of the pager.
  */
 
-div#pager_block * {
+#pager_block * {
   outline: none;
 }
 
-div#pager_block {
+#pager_block {
   margin: 0 auto;
-  width: 230px;
+  width: 236px;
 }
 
-div#pager_block ul {
+#pager_block ul {
   list-style-type: none;
 }
 
-div#pager_block ul li {
+#pager_block ul li {
+  border: 1px solid #DDD;
   float: left;
   margin-right: 5px;
+  height: 25px;
   text-align: center;
+  width: 25px;
 }
 
-div#pager_block ul li a {
+#pager_block ul li a {
   width: inherit !important;
-  color: #000000;
 }
 
-div#pager_block ul li.active_page a {
-  font-weight: bold;
-  color: #666666;
+#pager_block ul .active_page {
+  background-color: #CCC;
   font-size: 120%;
+  font-weight: bold;
 }
 
-div#pager_block ul li.next_page a {
-  margin-left: 10px;
-  color: #000000;
-}
-
-div#pager_block ul li.prev_page a {
-  margin-right: 10px;
-  color: #000000;
-}
-
-div#pager_block .ajax-progress {
+#pager_block .ajax-progress {
   display: none;
   width: 1px;
 }

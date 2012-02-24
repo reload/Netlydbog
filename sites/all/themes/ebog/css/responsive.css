@@ -266,7 +266,8 @@
   .panel-panel.panel-col .panel-separator,
   .panel-pane.pane-block.pane-netsound-review-1,
   .panel-pane.pane-block.pane-netsound-review-2,
-  .panel-pane.pane-voxb {
+  .panel-pane.pane-voxb,
+  #ting-object .meta .voxb {
     display: none;
   }
 

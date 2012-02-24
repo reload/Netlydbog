@@ -22,7 +22,7 @@
   height: 100px;
 }
 
-#edit-rating, img.ajax_anim, #voxbItem {
+#edit-rating, .ajax_anim, #voxbItem {
   display: none;
 }
 
