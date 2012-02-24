@@ -47,7 +47,8 @@ h2.pane-title,
 h1#page-title.title,
 #ting-search-results #ting-search-summary,
 .panel-pane.pane-views-panes.pane-user-reviews-panel-pane-1 h2.pane-title,
-.statusBox h3 {
+.statusBox h3,
+.voxb h3 {
   font: 18px/28px 'DroidSerifRegular', Helvetica, Arial, sans-serif;
   font-weight: normal;
   text-transform: uppercase;
@@ -131,7 +132,8 @@ h1#page-title.title,
 .faq h2.pane-title,
 #ting-search-results #ting-search-summary,
 .pane-netsound-0 h2.pane-title,
-.pane-elib-block-lastloans-6 h2.pane-title {
+.pane-elib-block-lastloans-6 h2.pane-title,
+.voxb h3 {
   border-bottom: 2px solid #DBDDDA;
 }
 
