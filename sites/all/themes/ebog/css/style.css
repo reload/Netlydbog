@@ -990,3 +990,12 @@ body.clean h1{
 	border:1px solid #999999;
 }
 
+.panel-pane.pane-views-panes.pane-user-reviews-panel-pane-1 .views-field-created {
+  display: none;
+}
+
+.panel-pane.pane-views-panes.pane-user-reviews-panel-pane-1 .views-field-uid a {
+  text-decoration: none;
+  color: #000000;
+  font-style: italic;
+}
