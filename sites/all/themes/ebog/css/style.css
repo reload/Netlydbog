@@ -999,3 +999,9 @@ body.clean h1{
   color: #000000;
   font-style: italic;
 }
+
+.panel-pane.pane-views-panes.pane-user-reviews-panel-pane-1.grid-9,
+.panel-pane.pane-block.pane-netsound-review-1.grid-9,
+.panel-pane.pane-block.pane-netsound-review-2.grid-9 {
+  margin-bottom: 35px;
+}
