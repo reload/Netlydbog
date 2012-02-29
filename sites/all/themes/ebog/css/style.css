@@ -160,7 +160,8 @@ voxb h3 {
 .panel-pane.pane-latest-news .pane-content,
 .page-anmeldelser .pane-content,
 .section-artikel .pane-content,
-.section-faq .pane-content {
+.section-faq .pane-content,
+.pane-node-content .pane-content {
   padding: 0 !important;
   border: 0 !important;
 }
@@ -713,7 +714,7 @@ div.panel-pane.pane-node-content .pane-content div.submitted {
 
 
 
-.panel-2col .panel-separator {
+.panel-separator {
   margin: 0 0 20px 0;
 }
 
