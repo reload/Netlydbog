@@ -1,0 +1,185 @@
+<?php
+
+/**
+ * @file ting_covers.module
+ * Provide functionality and page callbacks for retrieving covers for Ting objects and collections
+ */
+
+define('TING_COVERS_CACHE_LIFETIME', 86400);
+
+/**
+ * Implementation of hook_menu().
+ */
+function ting_covers_menu() {
+  $items = array();
+
+  $items['ting/covers/object'] = array(
+    'title' => 'Display the cover for a Ting object',
+    'page callback' => 'ting_covers_object',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'ting_covers.pages.inc',
+  );
+
+  $items['ting/covers/collection'] = array(
+    'title' => 'Display the cover for a Ting collection',
+    'page callback' => 'ting_covers_collection',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'ting_covers.pages.inc',
+  );
+
+  $items['ting/covers/faust/%/%'] = array(
+    'title' => 'Display the cover for a FAUST number',
+    'page callback' => 'ting_covers_faust',
+    'page arguments' => array(3, 4),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'ting_covers.pages.inc',
+  );
+
+  $items['admin/settings/ting/covers'] = array(
+    'title' => 'Covers',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ting_covers_admin_settings_form'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'ting_covers.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Return the path to the cover of the object.
+ */
+function ting_covers_object_path($object_id) {
+  return 'ting/covers/object/' . md5($object_id) . '.jpg';
+}
+
+/**
+ *
+ */
+function ting_covers_cache_is_valid($path, $presetname) {
+  $file = file_create_path($path);
+  if (file_exists($file)) {
+    if (filemtime($file) > $_SERVER['REQUEST_TIME'] - variable_get('ting_covers_cache_lifetime', TING_COVERS_CACHE_LIFETIME)) {
+      return TRUE;
+    }
+    else {
+      // Remove imagecache derivatives.
+      $ic_path = imagecache_create_path($presetname, $path);
+      if (file_exists($ic_path)) {
+        unlink($ic_path);
+      }
+    }
+  }
+  return FALSE;
+}
+
+/**
+ * Return the URL to the cover of the object.
+ */
+function ting_covers_object_url(TingClientObject $object, $presetname) {
+  $path = ting_covers_object_path($object->id);
+  if (ting_covers_cache_is_valid($path, $presetname)) {
+    return imagecache_create_url($presetname, $path);
+  }
+  elseif ($cache = cache_get('ting_covers:' . $path)) {
+    return ting_covers_default_image_path($presetname);
+  }
+  else {
+    // Return an absolute URL like imagecache_create_url() does.
+    return url('ting/covers/object/' . $presetname . '/' . $object->id, array('absolute' => TRUE));
+  }
+}
+
+/**
+ * Return the path to a cover from an object in the collection.
+ */
+function ting_covers_collection_path($object_id) {
+  return 'ting/covers/collection/' . md5($object_id) . '.jpg';
+}
+
+/**
+ * Return the URL to a cover from an object in the collection.
+ */
+function ting_covers_collection_url(TingClientObject $object, $presetname) {
+  $path = ting_covers_collection_path($object->id);
+  if (ting_covers_cache_is_valid($path, $presetname)) {
+    return imagecache_create_url($presetname, $path);
+  }
+  elseif ($cache = cache_get('ting_covers:' . $path)) {
+    return ting_covers_default_image_path($presetname);
+  }
+  else {
+    // Return an absolute URL like imagecache_create_url() does.
+    return url('ting/covers/collection/' . $presetname . '/' . $object->id, array('absolute' => TRUE));
+  }
+}
+
+/**
+ * Return the path to the cover of a FAUST number.
+ */
+function ting_covers_faust_path($faust_number) {
+  return 'ting/covers/faust/' . $faust_number . '.jpg';
+}
+
+/**
+ * Return the path to the cover for a FAUST number.
+ *
+ * @param integer $number
+ *    The FAUST number we're fetching cover for.
+ * @param string $presetname
+ *    Name of the imagecache preset we're using here.
+ * @return string
+ *    URL to the cover image.
+ */
+function ting_covers_faust_url($faust_number, $presetname) {
+  $path = ting_covers_faust_path($faust_number);
+  if (ting_covers_cache_is_valid($path, $presetname)) {
+    return imagecache_create_url($presetname, $path);
+  }
+  elseif ($cache = cache_get('ting_covers:' . $path)) {
+    return ting_covers_default_image_path($presetname);
+  }
+  else {
+    // Return an absolute URL like imagecache_create_url() does.
+    return url('ting/covers/faust/' . $presetname . '/' . $faust_number, array('absolute' => TRUE));
+  }
+}
+
+/**
+ * Redirect to default image.
+ */
+function ting_covers_goto_default($preset) {
+  return drupal_goto(ting_covers_default_image_path($preset));
+}
+
+/**
+ * Get the current default image.
+ *
+ * @return
+ *    File object for the image file or FALSE if not set or failure.
+ */
+function ting_covers_default_image() {
+  $fid = variable_get('ting_covers_default_image_fid', FALSE);
+  if ($fid) {
+    // Load file object from database.
+    if ($file = db_fetch_object(db_query('SELECT * FROM {files} WHERE fid = %d', $fid))) {
+      return $file;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+ * Return the path to the default image.
+ */
+function ting_covers_default_image_path($preset) {
+  $default_image = ting_covers_default_image();
+  $filepath = ($default_image) ? $default_image->filepath : drupal_get_path('module', 'ting_covers') . '/img/default.gif';
+
+  return imagecache_create_url($preset, $filepath);
+}

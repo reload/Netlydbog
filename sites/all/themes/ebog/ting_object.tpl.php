@@ -76,7 +76,7 @@ if (module_exists('ding_voxb')) {
       </div>
       <?php } ?>
       <div class="facebook-like">
-        <iframe src="//www.facebook.com/plugins/like.php?href=https%3A%2F%2Fereolen.dk%2Fting%2Fobject%2F150028%3A<?php echo $isbn; ?>&amp;send=false&amp;layout=box_count&amp;width=130&amp;show_faces=false&amp;action=recommend&amp;colorscheme=light&amp;font&amp;height=75" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:130px; height:75px;" allowTransparency="true"></iframe>
+        <iframe src="//www.facebook.com/plugins/like.php?href=https%3A%2F%2Fnetlydbog.dk%2Fting%2Fobject%2F150015%3A<?php echo $isbn; ?>&amp;send=false&amp;layout=box_count&amp;width=130&amp;show_faces=false&amp;action=recommend&amp;colorscheme=light&amp;font&amp;height=75" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:130px; height:75px;" allowTransparency="true"></iframe>
       </div>
       <div class="abstract"><?php print check_plain($object->record['dcterms:abstract'][''][0]); ?></div>
       <div class="description">
@@ -178,16 +178,16 @@ if (module_exists('ding_voxb')) {
           <?php if (!empty($object->record['dc:rights'][''])) { ?>
             <?php print theme('item_list', $object->record['dc:rights'][''], t('Rights'), 'span', array('class' => 'rights'));?>
           <?php } ?>
-          <?php print elib_book_teaser($object) ?>
+          
         </div>
       </div>
       <div class="icons">
         <ul>
-          <li><?php print l(t('Sample'), $object->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) ?></li>
+          <li><?php print l(t('Stream'), $object->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) ?></li>
           <li class="seperator"></li>
-          <li><?php print l(t('Buy'), 'butik', array('html' => true, 'attributes' => array('rel' => 'lightframe')))?></li>
+          <li><?php print l(t('Fetch'), $object->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe')))?></li>
           <li class="seperator"></li>
-          <li><?php print l(t('Loan'), $object->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]', 'class' => 'ting-object-loan'))) ?></li>
+          <li><?php print l(t('Sample'), $object->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) ?><li>
           <?php 
             if($user->uid){
               print '<li class="seperator"></li>';
@@ -200,7 +200,6 @@ if (module_exists('ding_voxb')) {
       </div>
       <?php
       if (module_exists('ding_voxb')) {
-        echo $object->voxb_tags;
         echo $object->voxb_reviews;
       }
       ?>

@@ -80,47 +80,32 @@ function elib_block_categories_block($op = 'list', $delta = 0) {
       $menu = menu_tree_page_data('menu-elib-categories');
 
       $data = '';
-      $addon = '';
+      $addon = '<div class="see-more categories-links">';
       
       $all_text = variable_get('elib_block_categories_all_title', '');
       $all_url = variable_get('elib_block_categories_all_url', '');
 
       if ($all_text && $all_url) {
-        $addon .= '<li class="highlight"><a href="'.url($all_url).'">'.$all_text.'</a></li>';
+        $addon .= '<div class="categories-link"><a href="' . url($all_url) . '">' . $all_text . '</a></div>';
       }
 
       $cat_text = variable_get('elib_block_categories_inspiration_title', '');
       $cat_url = variable_get('elib_block_categories_inspiration_url', '');
 
       if ($cat_text && $cat_url) {
-        $addon .= '<li class="highlight"><a href="'.url($cat_url).'">'.$cat_text.'</a></li>';
+        $addon .= '<div class="categories-link"><a href="' . url($cat_url) . '">' . $cat_text . '</a></div>';
       }
 
-      $count = 0;
+      $addon .= '</div><div class="clear-fix"></div>';
+
+      $data .= '<div class="categories"><ul>';
       foreach ($menu as $x => $item) {
-        $data .= '
-          <ul>
-            <li>
-              <h5>' . $item['link']['title'] . '</h5>
-              <ul>
-        ';
         foreach ($item['below'] as $y => $link) {
-          $data .= '
-                <li><a href="' . url($link['link']['link_path']) . '">' . $link['link']['link_title'] . '</a></li>
-          ';
+          $data .= '<li><a href="' . url($link['link']['link_path']) . '">' . $link['link']['link_title'] . '</a></li>' . "\n";
         }
-
-        if ($count == 1) {
-          $data .= $addon;
-        }
-
-        $data .= '
-              </ul>
-            </li>
-          </ul>
-        ';
-        $count++;
       }
+      $data .= '</ul></div>';
+          $data .= $addon;
       
       cache_set($cache_name, $data, 'cache', CACHE_TEMPORARY);
     }

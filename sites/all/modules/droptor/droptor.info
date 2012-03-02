@@ -1,0 +1,12 @@
+; $Id: droptor.info,v 1.1.2.4 2011/01/16 19:44:46 urbanjustin Exp $
+name = "Droptor"
+description = Plug-in for Droptor.com, Drupal site organization, monitoring, management and best practices
+core = 6.x
+package = Security
+dependencies[] = update
+; Information added by drupal.org packaging script on January 1, 1970 - 00:00
+version = "6.x-2.8"
+core = "6.x"
+project = "droptor"
+datestamp = "1296678395"
+

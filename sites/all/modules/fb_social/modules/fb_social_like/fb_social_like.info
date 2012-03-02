@@ -1,0 +1,13 @@
+name = fb social like
+description = fb social like
+dependencies[] = fb_social
+package = "Facebook Social"
+core = 6.x
+
+
+; Information added by drupal.org packaging script on 2011-09-20
+version = "6.x-1.0-beta9"
+core = "6.x"
+project = "fb_social"
+datestamp = "1316525504"
+

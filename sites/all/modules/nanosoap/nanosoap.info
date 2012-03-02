@@ -1,0 +1,13 @@
+name = NanoSOAP
+description = Provides a small and simple library for accessing SOAP webservices without all the bells and whistles found in many PHP SOAP libraries.
+core = 6.x
+php = 5.2
+files[] = nanosoap.inc
+
+
+; Information added by drupal.org packaging script on 2011-08-16
+version = "6.x-1.0-beta3"
+core = "6.x"
+project = "nanosoap"
+datestamp = "1313494619"
+

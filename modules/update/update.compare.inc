@@ -1,5 +1,4 @@
 <?php
-// $Id: update.compare.inc,v 1.8.2.8 2010/03/01 09:40:45 goba Exp $
 
 /**
  * @file
@@ -690,7 +689,13 @@ function update_filter_project_info($info) {
     'package',
     'project',
     'project status url',
-    'version', 
+    'version',
   );
-  return array_intersect_key($info, drupal_map_assoc($whitelist));
+  $whitelist = array_flip($whitelist);
+  foreach ($info as $key => $value) {
+    if (!isset($whitelist[$key])) {
+      unset($info[$key]);
+    }
+  }
+  return $info;
 }

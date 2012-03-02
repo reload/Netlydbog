@@ -161,7 +161,7 @@ function netsound_review_block($op = 'list', $delta = 0) {
       	 $out = '
       	   <div class="line clear-block rulerafter">
              <div class="unit size1of4 review-title">Anmeldelse fra litteratursiden.dk</div>
-             <div class="unit lastUnit">'.truncate_utf8($review['description'],500,true,true).' '.l('læs hele anmeldelsen på litteratursiden.dk',$review['link']).'</div>
+             <div class="unit lastUnit">'.truncate_utf8($review['description'],500,true,true).' '.l('læs hele anmeldelsen på litteratursiden.dk',$review['link'],array('attributes' => array('target' => '_blank'))).'</div>
            </div>';
       	
       	break;

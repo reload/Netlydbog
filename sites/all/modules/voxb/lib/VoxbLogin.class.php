@@ -26,45 +26,54 @@ class VoxbLogin {
   public function login($account) {
     $obj = new VoxbUser();
 
-    if ($obj->getUserBySSN($account->name, variable_get('voxb_identity_provider', ''), variable_get('voxb_institution_name', ''))) {
-      /**
-       * Each user in Voxb can have several profiles
-       * but we take just the first one
-       */
-      $profiles = $obj->getProfiles();
-      $_SESSION['voxb']['userId'] = $profiles[0]->getUserId();
-      $_SESSION['voxb']['aliasName'] = $profiles[0]->getAliasName();
-      //Fetch user actions and put serialized profile object into session
-      $profiles[0]->fetchMyData();
-      $_SESSION['voxb']['profile'] = serialize($profiles[0]);
-      return TRUE;
-    }
-    else {
-
-      /**
-       * Create a new user
-       *
-       * Use his username as user CPR and aliasName
-       * (we will give the possibility to update it later).
-       * Use user email as profile link.
-       *
-       * @todo Replace profile link with a real linkto users profiles in artesis system.
-       */
-      $userId = $this->createUser($account->name, $account->name, $account->email);
-
-      if ($userId != 0) {
-        $_SESSION['voxb']['userId'] = $userId;
-        $_SESSION['voxb']['aliasName'] = $account->name;
-
+    if (!isset($_SESSION['voxb']['userId']) && !isset($_SESSION['voxb']['aliasName']) && !isset($_SESSION['voxb']['profile'])) {
+      if ($obj->getUserBySSN($account->name, variable_get('voxb_identity_provider', ''), variable_get('voxb_institution_name', ''))) {
+        /**
+         * Each user in Voxb can have several profiles
+         * but we take just the first one
+         */
+        $profiles = $obj->getProfiles();
+        $_SESSION['voxb']['userId'] = $profiles[0]->getUserId();
+        $_SESSION['voxb']['aliasName'] = $profiles[0]->getAliasName();
         //Fetch user actions and put serialized profile object into session
-        $profile = new VoxbProfile();
-        $profile->setUserId($userId);
-        $profile->fetchMyData();
-        $_SESSION['voxb']['profile'] = serialize($profile);
+        $profiles[0]->fetchMyData();
+        $_SESSION['voxb']['profile'] = serialize($profiles[0]);
         return TRUE;
       }
+
       return FALSE;
     }
+
+    return TRUE;
+  }
+
+  /**
+   * Create a new user
+   *
+   * Use his username as user CPR and aliasName
+   *   (we will give the possibility to update it later).
+   * Use user email as profile link.
+   *
+   * @todo Replace profile link with a real linkto users profiles in ding-system.
+   *
+   */
+  public function create($account) {
+    $userId = $this->createUser($account->name, $account->voxb['alias_name'], $account->mail);
+
+    if ($userId != 0) {
+      $_SESSION['voxb']['userId'] = $userId;
+      $_SESSION['voxb']['aliasName'] = $account->voxb['alias_name'];
+
+      //Fetch user actions and put serialized profile object into session.
+      $profile = new VoxbProfile();
+      $profile->setUserId($userId);
+      $profile->fetchMyData();
+      $_SESSION['voxb']['profile'] = serialize($profile);
+
+      return TRUE;
+    }
+
+    return FALSE;
   }
 
   /**

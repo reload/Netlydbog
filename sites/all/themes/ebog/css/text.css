@@ -47,7 +47,8 @@ h2.pane-title,
 h1#page-title.title,
 #ting-search-results #ting-search-summary,
 .panel-pane.pane-views-panes.pane-user-reviews-panel-pane-1 h2.pane-title,
-.statusBox h3 {
+.statusBox h3,
+.voxb h3 {
   font: 18px/28px 'DroidSerifRegular', Helvetica, Arial, sans-serif;
   font-weight: normal;
   text-transform: uppercase;
@@ -73,7 +74,9 @@ h1#page-title.title,
 .feed-and-compare-page .author a,
 #footer a,
 .page-anmeldelser .feed-and-compare-page h3.title a:hover,
-.pane-faq-panel-pane-1 ul li a {
+.pane-faq-panel-pane-1 ul li a,
+.keywords-slider a
+.pane-node-content a {
   color: #5B6574;
   text-decoration: none;
 }
@@ -98,8 +101,10 @@ h1#page-title.title,
 .feed-and-compare-page h3.title a:hover,
 .feed-and-compare-page .author a:hover,
 #footer a:hover,
-.pane-faq-panel-pane-1 ul li a:hover {
-  color: #BE1F24;
+.pane-faq-panel-pane-1 ul li a:hover,
+.keywords-slider a:hover,
+.pane-node-content a:hover {
+  color: #1b75bc;
   text-decoration: underline;
 }
 
@@ -131,7 +136,8 @@ h1#page-title.title,
 .faq h2.pane-title,
 #ting-search-results #ting-search-summary,
 .pane-netsound-0 h2.pane-title,
-.pane-elib-block-lastloans-6 h2.pane-title {
+.pane-elib-block-lastloans-6 h2.pane-title,
+.voxb h3 {
   border-bottom: 2px solid #DBDDDA;
 }
 
@@ -169,6 +175,8 @@ div#sidebar-first div#block-block-12 .content h3 {
 
 #ting-object h1.book-title {
   font: 24px/30px 'DroidSerifRegular', Helvetica, Arial, sans-serif;
+  width: 76%;
+  word-wrap: break-word;
 }
 
 div#sidebar-first div#block-block-12 .content h3 {
@@ -180,7 +188,7 @@ div#sidebar-first div#block-block-12 .content h3 {
   color: #8C938B;
 }
 
-#footer #footer-first #block-block-8.block.block-block h2 {
+#footer #footer-first #block-block-14.block.block-block h2 {
   font: 36px/26px 'BebasNeueRegular', Helvetica, Arial, sans-serif;
   color: #2C2E29;
 }
@@ -234,11 +242,15 @@ div#sidebar-first div#block-block-12 .content h3 {
 
 #sidebar-first #block-elib_block_lastloans-5 a,
 .voxb .recordTagHighlight a {
-  color: #BE1F24;
+  color: #1b75bc;
   text-decoration: none;
 }
 
 #sidebar-first #block-elib_block_lastloans-5 a:hover,
 .voxb .recordTagHighlight a:hover {
   text-decoration: underline;
+}
+
+.pane-node-content h2.pane-title {
+  display: none;
 }

@@ -17,8 +17,8 @@
   <option value="title_descending"><?php print t('Titel Å → A')?></option>
   <option value="creator_ascending"><?php print t('Forfatter A → Å')?></option>
   <option value="creator_descending"><?php print t('Forfatter Å → A')?></option>
-  <option value="date_descending"><?php print t('Udgivelsesår - Nyeste først')?></option>
-  <option value="date_ascending"><?php print t('Udgivelsesår - Ældste først')?></option>
+  <option value="date_descending"><?php print t('Udgivelsesår (netlydbog) - Nyeste først')?></option>
+  <option value="date_ascending"><?php print t('Udgivelsesår (netlydbog) - Ældste først')?></option>
 </select>
 
 </div>

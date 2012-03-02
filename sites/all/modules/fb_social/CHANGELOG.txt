@@ -1,0 +1,83 @@
+
+fb_social 6.x-1.0-BETA9, 2011-09-20
+Issue #1198338 by AdamGerthel Javascript error in IE7: No comma  after the last item in the array
+Issue #1187894
+Issue #1273650 : Comments - no color option
+
+fb_social 6.x-1.0-BETA7, 2011-06-09
+
+Issue #1177776 by Roger Saner  : Add a Custom Channel URL option to FB.init
+Issue #150282 : Retrieving old FB comments with Migrated ="1"
+Added facebook send plugin (http://developers.facebook.com/docs/reference/plugins/send)
+Added "send" option to the like widget
+
+
+fb_social 6.x-1.0-BETA6, 2010-03-26
+
+Issue #1035310 : Don't display comments block on node edit pages.
+Issue #988378 : Wrong closing tag for activityfeed 
+Issue #980638 : Like box creates administrative block in Admin's sidebar
+Issue #1053718 by mrfelton: fb_share + fb_like dont display on full node view when  is false
+Issue #1020828 by mongeron, mr.j : Google Analytics integration
+Issue #1004162 by chia : Only load fb js on pages where its required by any plugin
+Issue #1102356 : Moderate Comments posted through Facebook
+Issue #1104446 by phenaproxima: "fb_social_comments: attribute url changed to href" 
+#995394 by AlexisWilke : Should comment block be hidden when node is unpublished
+#988086 : fb social views error
+changed "pageid" to "page url" (href) for likebox ; please update your settings accordingly
+#941842 Likebox Color Scheme
+
+fb_social 6.x-1.0-BETA5, 2010-11-xx
+ 
+#964618 "Share" widget has no "Widget location and display" options
+#930780 All fb social modules should have .install files
+#974036 by taslett : Spotted a incorrect theme call
+#977674 Hide like button from unpublished content'
+Add facepile, livestream, recommendations, activityfeed plugins
+#930792 fb_social_menu in fb_social.module should not be weighted
+light views support for like widget
+#929700 by AlexisWilke: Menu may not exist in hook_init() function
+#917546 : Add box_count to layout styles for like button
+#930792 fb_social_menu in fb_social.module should not be weighted
+#930798 Add administrative option to not write Open Graph protocol meta tags in fb_social_like
+#907644 Anonymous users cannot see likebox + revert #858156
+#919142, 960258 by chia: meta tag og:title needs html encoding
+#893672 test if object is not empty before testing its properties
+
+fb_social 6.x-1.0-BETA4, 2010-08-08
+
+#852582 by vectoroc: Integrate with fbconnect
+Wrong callback for fb_social_comment_block
+#858156 Support for enabling the Like button through user permissions
+#864022 wrong description of connections textfield
+
+fb_social 6.x-1.0-BETA3, 2010-06-20
+
+#789948 : Fixed incompatibility issues with panels module
+#833392 by egomac: Support for internationalization - part2
+#845276 by ferdi, egomac : Missing hook_theme function in fb_social_share module
+#840406 URL display on facebook
+#844794 Closing quote missing for div id
+#841100 Put a <div> tag around the fb_social_like button
+#833392 by egomac: Support for internationalization - first part
+#848792 Change package name from "fb social" to "Facebook Social"
+#849478 Change "id" by "class" in the div wrapper for like button
+#830854 by amrelwany: new module implementing fb:share widget
+
+fb_social 6.x-1.0-BETA2, 2010-06-20
+
+#821540 test if content module is enabled before calling content_extra_field_wheight
+#826806 div around fb:comments
+rename the machine name of the fb_like node link
+
+fb_social 6.x-1.0-ALPHA4, xxxx-xx-xx
+
+
+#797796 the facebook like is always shown in teaser mode' fb_social_like.module
+#800854 by James Andres missing attribute for "javascript" tag
+#802738 fix likebox options
+fixed attributes for <fb:comments> tag
+improved docs
+
+
+fb_social 6.x-1.0-ALPHA4, xxxx-xx-xx

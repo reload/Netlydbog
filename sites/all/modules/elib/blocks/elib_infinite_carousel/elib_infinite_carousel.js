@@ -11,13 +11,13 @@ $.fn.infiniteCarousel = function () {
             $single = $items.filter(':first'),
 
             singleWidth = $single.outerWidth(),
-            visible = Math.ceil($wrapper.innerWidth() / singleWidth), // note: doesn't include padding or border
+            visible = Math.floor($wrapper.innerWidth() / singleWidth), // note: doesn't include padding or border
             currentPage = 1,
             pages = Math.ceil($items.length / visible);
 
 
         // 1. Pad so that 'visible' number will always be seen, otherwise create empty items
-        if (($items.length % visible) != 0) {
+        if (($items.length % visible) != 0 && visible >= 0) {
             $slider.append(repeat('<li class="empty" />', visible - ($items.length % visible)));
             $items = $slider.find('> li');
         }

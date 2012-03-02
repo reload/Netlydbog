@@ -1,5 +1,4 @@
 <?php
-// $Id: database.pgsql.inc,v 1.68.2.8 2010/02/01 16:32:10 goba Exp $
 
 /**
  * @file
@@ -383,6 +382,12 @@ function db_unlock_tables() {
 
 /**
  * Check if a table exists.
+ *
+ * @param $table
+ *   The name of the table.
+ *
+ * @return
+ *   TRUE if the table exists, and FALSE if the table does not exist.
  */
 function db_table_exists($table) {
   return (bool) db_result(db_query("SELECT COUNT(*) FROM pg_class WHERE relname = '{". db_escape_table($table) ."}'"));
@@ -390,6 +395,14 @@ function db_table_exists($table) {
 
 /**
  * Check if a column exists in the given table.
+ *
+ * @param $table
+ *   The name of the table.
+ * @param $column
+ *   The name of the column.
+ *
+ * @return
+ *   TRUE if the column exists, and FALSE if the column does not exist.
  */
 function db_column_exists($table, $column) {
   return (bool) db_result(db_query("SELECT COUNT(pg_attribute.attname) FROM pg_class, pg_attribute WHERE pg_attribute.attrelid = pg_class.oid AND pg_class.relname = '{". db_escape_table($table) ."}' AND attname = '". db_escape_table($column) ."'"));
@@ -579,20 +592,16 @@ function _db_create_field_sql($name, $spec) {
   if ($spec['type'] == 'serial') {
     unset($spec['not null']);
   }
-  if (!empty($spec['unsigned'])) {
-    if ($spec['type'] == 'serial') {
-      $sql .= " CHECK ($name >= 0)";
-    }
-    else {
-      $sql .= '_unsigned';
-    }
-  }
 
   if (in_array($spec['type'], array('varchar', 'char', 'text')) && isset($spec['length'])) {
     $sql .= '('. $spec['length'] .')';
   }
   elseif (isset($spec['precision']) && isset($spec['scale'])) {
     $sql .= '('. $spec['precision'] .', '. $spec['scale'] .')';
+  }
+
+  if (!empty($spec['unsigned'])) {
+    $sql .= " CHECK ($name >= 0)";
   }
 
   if (isset($spec['not null']) && $spec['not null']) {
@@ -647,12 +656,12 @@ function db_drop_table(&$ret, $table) {
  *   created field will be set to the value of the key in all rows.
  *   This is most useful for creating NOT NULL columns with no default
  *   value in existing tables.
- * @param $keys_new
+ * @param $new_keys
  *   Optional keys and indexes specification to be created on the
  *   table along with adding the field. The format is the same as a
  *   table specification but without the 'fields' element.  If you are
  *   adding a type 'serial' field, you MUST specify at least one key
- *   or index including it in this array. @see db_change_field for more
+ *   or index including it in this array. See db_change_field() for more
  *   explanation why.
  */
 function db_add_field(&$ret, $table, $field, $spec, $new_keys = array()) {
