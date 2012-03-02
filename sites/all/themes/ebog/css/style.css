@@ -571,7 +571,7 @@ voxb h3 {
   display: block;
 }
 
-#voxb textarea,
+.voxb textarea,
 #user-login .form-item input,
 #comment-form textarea,
 #comment-form input {
@@ -579,7 +579,7 @@ voxb h3 {
   border: 1px solid #DBDDDA;
 }
 
-#voxb input[type="submit"],
+.voxb input[type="submit"],
 #user-login input#edit-submit,
 #comment-form input[type="submit"] {
   float: right;
@@ -587,11 +587,11 @@ voxb h3 {
   line-height: 100%;
 }
 
-#voxb .voxbReview {
+.voxb .voxbReview {
   margin-bottom: 20px;
 }
 
-#voxb .voxbReview .views-field-uid {
+.voxb .voxbReview .views-field-uid {
   font-weight: bold;
   text-transform: capitalize;
   font-style: normal;
@@ -776,7 +776,7 @@ div.messages,
 .display-book .icons,
 #ting-object .inner .icons,
 #ting-search-result .record .icons,
-#voxb textarea,
+.voxb textarea,
 #user-login .form-item input,
 .section-faq div.panel-pane.pane-contact,
 #ting-search-form input.form-submit {

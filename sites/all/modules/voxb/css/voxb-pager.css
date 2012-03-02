@@ -18,7 +18,6 @@
 }
 
 #pager_block ul li {
-  border: 1px solid #DDD;
   float: left;
   margin-right: 5px;
   height: 25px;
@@ -30,9 +29,7 @@
   width: inherit !important;
 }
 
-#pager_block ul .active_page {
-  background-color: #CCC;
-  font-size: 120%;
+#pager_block ul .active-page {
   font-weight: bold;
 }
 
