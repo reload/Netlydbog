@@ -320,7 +320,7 @@ function ding_voxb_review_form(&$form_state, $params) {
 
   $form['review_submit'] = array(
     '#type' => 'submit',
-    '#value' => ($params['action'] == 'submit') ? 'Review' : 'Update',
+    '#value' => ($params['action'] == 'submit') ? t('Review') : t('Update'),
   );
 
   return $form;
