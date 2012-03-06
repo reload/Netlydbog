@@ -1,0 +1,8 @@
+name = Litteratursiden Feed and Compare
+description = Get 'recommendations' feed from litteratursiden.dk and make search in ting with it.
+package = INLEAD
+dependencies[] = ctools
+dependencies[] = panels
+dependencies[] = ting
+core = 6.x
+version = 0.1
