@@ -96,3 +96,7 @@
   float: right;
   margin-bottom: 15px;
 }
+
+.feed-icon {
+  display: none;
+}
