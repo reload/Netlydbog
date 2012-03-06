@@ -1,0 +1,7 @@
+name = Ebog Embed Video
+description = Plugin to embed video from youtube or/and vimeo
+package = INLEAD
+dependencies[] = ctools
+dependencies[] = panels
+core = 6.x
+version = 0.1

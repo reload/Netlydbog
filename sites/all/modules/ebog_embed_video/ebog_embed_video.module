@@ -1,0 +1,27 @@
+<?php
+/**
+ * @file
+ *
+ */
+
+
+/**
+ * Implementation of hook_theme().
+ */
+function ebog_embed_video_theme() {
+  return array(
+    'ebog_embed_video' => array(
+      'arguments' => array('conf' => NULL),
+      'template' => 'ebog_embed_video',
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_ctools_plugin_directory().
+ */
+function ebog_embed_video_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'ctools' && !empty($plugin)) {
+    return "plugins/$plugin";
+  }
+}
