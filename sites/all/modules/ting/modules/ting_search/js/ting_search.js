@@ -53,7 +53,7 @@ Drupal.tingSearch.getTingData = function(url, keys) {
       Drupal.tingFacetBrowser("#ting-facet-browser", "#ting-search-result", result);
     }
     else {
-      Drupal.tingSearch.summary.ting = { count: 0, page: 0 };
+      window.location.href = '/nulsoegning/' + vars.query;
     }
     Drupal.tingSearch.updateTabs("ting");
   });
