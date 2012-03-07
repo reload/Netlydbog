@@ -1,1 +1,5 @@
+# Ignore files directory
 sites/default/files
+
+# Ignore local settings file
+sites/default/settings.php
