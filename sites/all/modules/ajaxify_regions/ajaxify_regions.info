@@ -1,0 +1,20 @@
+; $Id: ajaxify_regions.info,v 1.1.2.1 2010/05/13 02:34:15 csevb10 Exp $
+name = Ajaxify Regions
+description = Automatic ajax replacement and loading of user-specific blocks
+package = Cache
+core = 6.x
+
+
+; Information added by drupal.org packaging script on 2009-08-18
+version = "6.x-1.0"
+core = "6.x"
+project = "ajaxify_regions"
+datestamp = "1250629502"
+
+
+; Information added by drupal.org packaging script on 2010-05-14
+version = "6.x-1.1"
+core = "6.x"
+project = "ajaxify_regions"
+datestamp = "1273856703"
+

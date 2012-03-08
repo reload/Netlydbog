@@ -1,0 +1,185 @@
+<?php
+
+/**
+ * Implementation of hook_menu().
+ */
+function ajaxify_regions_menu() {
+  $items['ajaxify_regions/ajax'] = array(
+    'title' => 'Ajaxify Regions',
+    'page callback' => 'ajaxify_regions_ajax_handler',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/settings/performance/ajaxify-regions'] = array(
+    'title' => 'Ajaxify Regions',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ajaxify_regions_admin_settings'),
+    'access arguments' => array('administer ajaxify regions'),
+    'file' => 'ajaxify_regions.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function ajaxify_regions_theme() {
+  return array(
+    'ajaxify_regions_block_loading' => array(
+      'arguments' => array(),
+    ),
+  );
+}
+
+/**
+ * Handles ajax requests and loads appropriate blocks per region
+ */
+function ajaxify_regions_ajax_handler() {
+  $content = array();
+  if (isset($_GET['blocks'])) {
+    global $base_url, $base_path;
+    // we have to initialize the theme so that our block_list can access the global
+    // personally, accessing the global seems wrong, but whatever
+    init_theme();
+    
+    // to get the right blocks for the page and NOT just repeat our ajax calls, 
+    // we need to do some q value swapping (ref_uri must be interal)
+    $base_uri = $_GET['q'];    
+    $ref_uri  = str_replace($base_url . $base_path, '', referer_uri());
+    // this can be done in a much cooler fashion in PHP 5.3
+    $ref_uri  = ($ref_uri ? $ref_uri : drupal_get_normal_path(variable_get('site_frontpage', 'node')));
+    
+    // build the region content and return as json
+    $ajax_blocks = explode('/', $_GET['blocks']);
+    foreach ($ajax_blocks as $block) {
+      $parts = explode("-",$block,2);
+      $blocks_content = module_invoke($parts[0], 'block', 'view', $parts[1]);
+      $content[$block] = $blocks_content;
+    }
+  }
+  print drupal_json($content);
+  exit;
+}
+
+/**
+ * Implementation of hook_preprocess().
+ */
+function ajaxify_regions_preprocess(&$vars, $type) {
+  global $user;
+  static $ajax_blocks = array();
+  
+  // If the user is anonymous or we specifically want to do replacements
+  // for logged in traffic, then proceed
+  $ajaxify = ($user->uid == 0 || variable_get('ajaxify_regions_auth', 0)); 
+  
+  // Verify that we do/do not have page-specific rules that we should obey
+  $page_match = ajaxify_regions_page_compare(variable_get('ajaxify_regions_p_p', ''), variable_get('ajaxify_regions_p_vis', 0));
+  
+  if (arg(1) != 'ajax' && $ajaxify && $page_match) {
+    switch ($type) {
+      case 'block':
+        switch ($vars['block']->cache) {
+          case -1:
+          case 1:
+          case 2:
+            // For this particular block, check block replacement settings
+            $block_match = ajaxify_regions_block_compare($vars['block']->module, $vars['block']->delta);
+            if ($block_match) {
+              $id = $vars['block']->module .'-'. $vars['block']->delta;
+              // Track our ajax regions: anything with dynamic content
+              $ajax_blocks[$id] = TRUE;
+              $vars['block']->content = "<div id='block-". $id ."-ajax-content'>". theme('ajaxify_regions_block_loading') ."</div>";
+            }
+            break; 
+        }
+        break;
+      case 'page':
+        if (!empty($ajax_blocks)) {
+          // swap for keys since that's where the region names exist
+          $ajax_blocks = array_keys($ajax_blocks);
+          
+          // build our ajax callback and pass region names to our ajax handler
+          drupal_add_js(drupal_get_path('module', 'ajaxify_regions'). '/js/ajaxify_regions.js');
+          $url = 'ajaxify_regions/ajax';
+          drupal_add_js('
+          var blocks = "blocks='. implode('/', $ajax_blocks) .'";
+          $(function(){$.ajax({
+            url: Drupal.settings.basePath + "'. $url .'",
+            type: "GET",
+            dataType: "json",
+            data: blocks,
+            success: function(data) { ajaxify_regions_success_block(data); }
+          })});', 'inline');          
+          
+          // rewrite our page-level js
+          $vars['scripts'] = drupal_get_js();
+        }
+        break;
+    }
+  }
+}
+
+/**
+ * Theme function for the default rendering of a block
+ */
+function theme_ajaxify_regions_block_loading() {
+  static $content;
+  if (!isset($content)) {
+    $loader_img = drupal_get_path('module', 'ajaxify_regions') .'/images/ajax-loader.gif';
+    $content = theme('image', $loader_img, '', '', array('style' => 'display:block; margin: 0 auto;'));
+  }
+  return $content;
+}
+
+/**
+ * Do a comparison against our set of pages and visibility to determine
+ * whether the blocks should or should not be ajax-replaced. This is the same
+ * value for the entire page, so the result is statically cached to minimize
+ * processing
+ *
+ * @param string $pages - string containing a set of paths to match
+ * @param int $visibility - 0/1 value dictating whether to or not to do 
+ *  replacements on the set of pages
+ * @return bool $page_match - T/F determining whether to do replacements for this page
+ */
+function ajaxify_regions_page_compare($pages, $visibility) {
+  static $page_match;
+  if (!isset($page_match)) {
+    $path = drupal_get_path_alias($_GET['q']);
+    // Compare with the internal and path alias (if any).
+    $page_match = drupal_match_path($path, $pages);
+    if ($path != $_GET['q']) {
+      $page_match = $page_match || drupal_match_path($_GET['q'], $pages);
+    }
+    
+    // When $block->visibility has a value of 0, the block is displayed on
+    // all pages except those listed in $block->pages. When set to 1, it
+    // is displayed only on those pages listed in $block->pages.
+    $page_match = !($visibility xor $page_match);
+  }
+  return $page_match;
+}
+
+/*
+ * Do a comparison against our block list to determine if the specific block
+ * should/should not be cached.
+ */
+function ajaxify_regions_block_compare($block, $delta) {
+  return _ajaxify_regions_block_compare(variable_get('ajaxify_regions_b_b', ''), variable_get('ajaxify_regions_b_vis', 0), $block, $delta);
+}
+
+/*
+ * Do a comparison against our block list to determine if the specific block
+ * should/should not be cached.
+ */
+function _ajaxify_regions_block_compare($blocks, $block_vis, $block, $delta) {
+  // Compare with the internal and path alias (if any).
+  $block_match = drupal_match_path($block . '-' . $delta, $blocks);
+  
+  // When $block->visibility has a value of 0, the block is not displayed 
+  // if it exists in the list of blocks. When set to 1, it is displayed only 
+  // only if it is listed.
+  $block_match = !($block_vis xor $block_match);
+  return $block_match;
+}
