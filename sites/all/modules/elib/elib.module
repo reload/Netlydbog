@@ -581,7 +581,7 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
   if($displaysize == 'review'){
 
     $u = elib_user_get_cred($elib[1]);
-    $part['text'] = '<div class="clearfix"></div><div class="text">'.truncate_utf8($elib[0],400,true,true).' '.l('LÆS MERE &raquo;',$obj->url).'</div>';
+    $part['text'] = '<div class="clearfix"></div><div class="text">'.truncate_utf8($elib[0],400,true,true).' '.l('LÆS MERE →',$obj->url).'</div>';
 
         $part['icons'] = '
     <div class="icons">
