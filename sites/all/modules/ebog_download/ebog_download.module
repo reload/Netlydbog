@@ -1,0 +1,228 @@
+<?php
+/**
+ * @file
+ *
+ * Ebog download main module file.
+ *
+ * Provides extended download workflow for ebooks.
+ */
+
+/**
+ * Implementation of hook_init.
+ */
+function ebog_download_init() {
+  if (!defined('EBOG_DOWNLOAD_PATH')) {
+    define('EBOG_DOWNLOAD_PATH', drupal_get_path('module', 'ebog_download'));
+  }
+
+  drupal_add_js(EBOG_DOWNLOAD_PATH . '/js/ebog_download_scripts.js', 'file');
+  drupal_add_css(EBOG_DOWNLOAD_PATH . '/css/ebog_download_style.css', 'file');
+  jquery_ui_add(array('ui.dialog', 'ui.draggable'));
+  jquery_ui_theme_load();
+}
+
+/**
+ * Implementation of hook_menu.
+ */
+function ebog_download_menu() {
+  $menu = array();
+
+  $menu['ting/object/%/download/request'] = array(
+    'title' => 'Download ting ebook',
+    'description' => 'Checker for download abilities regarding selected ebook for specific user.',
+    'page callback' => 'ebog_download_loan_initial',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  $menu['ting/object/%/download/popup'] = array(
+    'title' => 'Show a popup before download',
+    'description' => 'Display some user specific text and perform some check before download.',
+    'page callback' => 'ebog_download_loan_popup',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $menu;
+}
+
+/**
+ * Implementation of hook_theme.
+ */
+function ebog_download_theme($existing, $type, $theme, $path) {
+  $hooks = array();
+
+  $hooks['ebog_download_checkboxes'] = array(
+    'arguments' => array('data' => NULL),
+    'template' => 'templates/ebog_download-checkboxes',
+  );
+
+  $hooks['ebog_download_error'] = array(
+    'arguments' => array('data' => NULL),
+    'template' => 'templates/ebog_download-error',
+  );
+
+  $hooks['ebog_download_info'] = array(
+    'arguments' => array('data' => NULL),
+    'template' => 'templates/ebog_download-info',
+  );
+
+  return $hooks;
+}
+
+/**
+ * Provides item loan/check routine for elib service.
+ *
+ * @global $user
+ *   Logged in user data
+ * @param $ting_id
+ *   Ting object id
+ */
+function ebog_download_loan_initial($ting_id) {
+  global $user;
+  $status = array();
+
+  // Whether user authenticated in drupal
+  if ($user->uid) {
+    $isbn = elib_get_isbn_from_object_id($ting_id);
+    $ean = convertToEAN($isbn);
+
+    $userinfo = elib_user_get_cred();
+    $client = elib_client();
+    $client->setLoaner($userinfo['cpr'], $userinfo['pin'], $userinfo['lib']);
+    
+    $book = $client->getBook($ean);
+    $down_link = get_download_url($client->getLoans(), $ean);
+    $download_only = (is_string($down_link)) ? TRUE : FALSE;
+
+    // Whether book fetched well
+    if ((int)$book->status->code == 101) {
+      if ($download_only) {
+        if ($down_link != '') {
+          $status = array(
+            'status' => TRUE,
+            'title' => t('Success'),
+            'content' => theme('ebog_download_info', array('message' => t('Book download url.'), 'link' => $down_link))
+          );
+        }
+        else {
+          $status = array(
+            'status' => FALSE,
+            'title' => t('Error'),
+            'content' => theme('ebog_download_error', array(
+              'message' => t('Failed to fetch download url.'))
+            )
+          );
+        }
+        
+      }
+      else {
+        $loan = elib_client()->makeLoan($ean);
+        // Whether book loaned well
+        if ((int)$loan->status->code == 101) {
+          $down_link = $loan->data->downloadurl;
+
+          $status = array(
+            'status' => TRUE,
+            'title' => t('Success'),
+            'content' => theme('ebog_download_info', array('message' => t('Successfuly loaned this item.'), 'link' => $down_link))
+          );
+        }
+        else {
+          $status = array(
+            'status' => FALSE,
+            'title' => t('Error'),
+            'content' => theme('ebog_download_error', array(
+              'message' => t('@message', array('@message' => $loan->status->message)))
+            )
+          );
+        }
+      }
+    }
+    else {
+      $status = array(
+        'status' => FALSE,
+        'title' => t('Error'),
+        'content' => theme('ebog_download_error', array(
+          'message' => t('@message', array('@message' => $book->status->message)))
+        )
+      );
+    }
+  }
+  else {
+    $status = array(
+      'status' => FALSE,
+      'title' => t('Error'),
+      'content' => theme('ebog_download_error', array('message' => t('Only authenticated users are able to loan.')))
+    );
+  }
+
+  // Send response
+  echo json_encode($status);
+  exit(0);
+}
+
+/**
+ * Fetch specific book download url.
+ *
+ * @param SimpleXMLElement $loans
+ *   User loans object
+ * @param String $ean
+ *   Searched item isbn
+ * @return String
+ *   Download url
+ */
+function get_download_url($loans, $ean) {
+  if ($loans instanceof SimpleXMLElement) {
+    foreach ($loans->data->orderitem as $book) {
+      if ($book->book['id'] == $ean && $book->loanstate == 1) {
+        return (string)$book->data->data->downloadurl;
+      }
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+ * More a dummy method, used only for confirmation dialog retrieval.
+ *
+ * @param $ting_id
+ *   Ting object id.
+ */
+function ebog_download_loan_popup($ting_id) {
+  global $user;
+  $status = array();
+
+  // Whether user is logged in.
+  if ($user->uid) {
+    $user_agent = $_SERVER['HTTP_USER_AGENT'];
+    $reader = t('Adobe Digital Edition');
+    // android - Aldiko Book Reader
+    // iPod, iPad, iPhone - Bluefire Reader
+    // else - Adobe PDF reader
+    if (preg_match('/android/i', $user_agent)) {
+      $reader = t('Aldiko Book Reader');
+    }
+    elseif (preg_match('/(iPod)|(iPad)|(iPhone)/i', $user_agent)) {
+      $reader = t('Bluefire Reader');
+    }
+
+    $status = array(
+      'title' => t('Download ebog'),
+      'content' => theme('ebog_download_checkboxes', array('reader' => $reader)),
+    );
+  }
+  else {
+    $status = array(
+      'status' => FALSE,
+      'title' => t('Error'),
+      'content' => theme('ebog_download_error', array('message' => t('Only authenticated users are able to loan.')))
+    );
+  }
+
+  echo json_encode($status);
+  exit(0);
+}

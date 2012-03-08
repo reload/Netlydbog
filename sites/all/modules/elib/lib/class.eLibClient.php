@@ -111,10 +111,10 @@ class eLibClient{
   	
   }
 
-  public function getPopularBooks(){
-    $params['top'] = 10;
-    $params['listtype'] = 2;
-    $params['fromdate'] = date('Y-m-d', strtotime('-1 month'));
+  public function getPopularBooks($count = 7){
+    $params['top'] = $count;
+    $params['listtype'] = 1;
+    $params['fromdate'] = date('Y-m-d', strtotime('-1 day'));
     $params['todate'] = date('Y-m-d');
     
     $response = $this->soapCall($this->base_url.'getlibrarylist.asmx?WSDL','GetTopList',$params);

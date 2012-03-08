@@ -76,9 +76,9 @@ function elib_form_alter(&$form, $form_state, $form_id) {
   switch ($form_id) {
     case 'user_login':
     case 'user_login_block':
-      $form['name']['#prefix'] = '<h1>Velkommen til netlydbog.dk</h1><p>Vi kan se at du ikke er logget ind endnu.</p><p>Indtast derfor dit CPR nummer + din pinkode for at logge ind</p>';
-      $form['name']['#title'] = 'CPR-nr. / lånerkortnr.';
-      $form['pass']['#title'] = 'Pinkode';
+	$form['name']['#prefix'] = '<h1>' . t('Welcome to Netlydbog.dk') . '</h1><p>' . t('We noticed that you are not logged in.') . '</p><p>' . t('Please fill in your CPR number + pincode to login.') . '</p>';
+	$form['name']['#title'] = t('CPR number');
+	$form['pass']['#title'] = t('Pincode');
       $form['name']['#type'] = 'password';
       unset($form['name']['#description']);
       unset($form['pass']['#description']);
@@ -116,7 +116,7 @@ function elib_get_lydbog($tingObjectID,$format){
 
   if($_GET['downloaded']){
 
-      $out = t('<h1 style="text-align:center;">Hjælp til afspilning</h1>');
+  		$out = t('<h1>Hjælp til afspilning</h1>');
 
       $sql = 'SELECT node.nid AS nid,
      nodequeue_nodes_node.position AS nodequeue_nodes_node_position
@@ -159,9 +159,10 @@ function elib_get_lydbog($tingObjectID,$format){
     exit();
   }
   $userinfo = elib_user_get_cred();
+  
   if(!$userinfo['cpr']){
-    $out = '<h1 style="text-align:center;">Mangler eLIB tilknytning</h1>';
-    $out .= t('<p>Der er ikke knyttet nogle elib informationer til den bruger du er logget ind med. Det er højstsansyneligt fordi du er logget ind som redaktør eller administrator. Hvis dette ikke er tilfældet, kontakt !email</p>',array('!email' => l('info@netlydbog.dk','info@netlydbog.dk')));
+  	$out = '<h1>Mangler eLIB tilknytning</h1>';
+  	$out .= t('<p>Der er ikke knyttet nogle elib informationer til den bruger du er logget ind med. Det er højstsansyneligt fordi du er logget ind som redaktør eller administrator. Hvis dette ikke er tilfældet, kontakt !email</p>',array('!email' => l('info@netlydbog.dk','info@netlydbog.dk')));
 
     return $out;
   }
@@ -220,7 +221,7 @@ function elib_get_lydbog($tingObjectID,$format){
   }*/
   if($alreadyloaned){
 
-    $pretext = '<h1 style="text-align:center;">Din lydbog afspilles nu nedenfor</h1>';
+    $pretext = '<h1>Din lydbog afspilles nu nedenfor</h1>';
     $src = $response->data->downloadurl;
     if($format != 'stream'){
 
@@ -230,7 +231,7 @@ function elib_get_lydbog($tingObjectID,$format){
         // ok ready for download
         $src = $filesrc;
         global $base_root;
-        $pretext = '<h1 style="text-align:center;">Vi er ved at generere din lydbog.<br/> Vent venligst...</h1><div class="loader"></div><p>Vi er ved at pakke din lydbog til en fil</p><p>Problemer med download? Hent filen via <a href="'.$src.'">direkte link</a><p>Når du har gemt filen, tryk næste</p>'.l('Næste',$base_root.request_uri(),array('query'=> 'downloaded=1','attributes' => array('class' => 'nextknap knap')));
+        $pretext = '<h1>Vi er ved at generere din lydbog.<br/> Vent venligst...</h1><div class="loader"></div><p>Vi er ved at pakke din lydbog til en fil</p><p>Problemer med download? Hent filen via <a href="'.$src.'">direkte link</a><p>Når du har gemt filen, tryk næste</p>'.l('Næste',$base_root.request_uri(),array('query'=> 'downloaded=1','attributes' => array('class' => 'nextknap knap')));
 
       }
       else
@@ -244,7 +245,7 @@ function elib_get_lydbog($tingObjectID,$format){
       // this should never happen.
       if(empty($src))
       {
-        $pretext = '<h1 style="text-align:center;">FEJL</h1><p>Der returneres ikke nogen download url fra eLib webservicen.</p>';
+        $pretext = '<h1>FEJL</h1><p>Der returneres ikke nogen download url fra eLib webservicen.</p>';
       }
 
     }
@@ -297,7 +298,7 @@ function elib_get_lydbog($tingObjectID,$format){
 
     $loaned = $loaned ? format_plural($loaned,'en lånt lydbog','@count lånte lydbøger'): t('ikke lånt nogen bøger');
 
-    return '<h1 style="text-align:center;">Lån denne lydbog?</h1><p style="text-align:center;">'.t('Du har %loaned og kan pt. låne %max.',array('%loaned' => $loaned,'%max' => format_plural($max,'en mere', '@count til'))).'</p>'.l('Ok',$base_root.request_uri(),array('query'=> 'confirm=1','attributes' => array('class' => 'okknap'))).l('Fortryd',$base_root.request_uri(),array('attributes' => array('class' => 'annullerknap')));
+    return '<h1>Lån denne lydbog?</h1><p>'.t('Du har %loaned og kan pt. låne %max.',array('%loaned' => $loaned,'%max' => format_plural($max,'en mere', '@count til'))).'</p>'.l('Ok',$base_root.request_uri(),array('query'=> 'confirm=1','attributes' => array('class' => 'okknap'))).l('Fortryd',$base_root.request_uri(),array('attributes' => array('class' => 'annullerknap')));
 
    }
 
@@ -328,11 +329,11 @@ function elib_get_lydbog($tingObjectID,$format){
       //var_dump($response);
       if($response->status->code == 101){
         $src = $response->data->downloadurl;
-        $pretext = '<h1 style="text-align:center;">Din lydbog afspilles nu nedenfor</h1>';
+        $pretext = '<h1>Din lydbog afspilles nu nedenfor</h1>';
         if ($format != 'stream') {
           $src = (trim($response->data[1]->files[0]->file));
           global $base_root;
-          $pretext = '<h1 style="text-align:center;">Vi er ved at generere din lydbog.<br/> Vent venligst...</h1><div class="loader"></div><p>Vi er ved at pakke din lydbog til en fil</p><p>Når du har gemt filen, tryk næste</p>'.l('Næste',$base_root.request_uri(),array('query'=> 'downloaded=1','attributes' => array('class' => 'nextknap knap')));
+          $pretext = '<h1>Vi er ved at generere din lydbog.<br/> Vent venligst...</h1><div class="loader"></div><p>Vi er ved at pakke din lydbog til en fil</p><p>Når du har gemt filen, tryk næste</p>'.l('Næste',$base_root.request_uri(),array('query'=> 'downloaded=1','attributes' => array('class' => 'nextknap knap')));
         }
 
         $content = $pretext;
@@ -360,7 +361,7 @@ function elib_get_lydbog($tingObjectID,$format){
 
   // ellers så hent lokal URL
   if($response->status->code != 101){
-    $content .= '<div class="status" style="position:absolute;bottom:0;">Fejl: '.$status.'</div>';
+    $content .= '<div class="status">Fejl: '.$status.'</div>';
   }
 
   return $content;
@@ -459,6 +460,8 @@ function elib_login_validate($form, &$form_state) {
       // If we have Alma credentials and a user was logged in, cache the
       // credentials in our own cache bin.
       //alma_user_cache_credentials($user, $form_state['values']['name'], $form_state['values']['pass']);
+      // TODO: find propper way of redirecting...
+      echo '<script type="text/javascript">window.location = "/min_side"</script>';
     }
   }
 }
@@ -498,27 +501,43 @@ function elib_displaybook(TingClientObject $object,$elib_data = false){
       $loanlimit = elib_str_to_time($elib_data->loanexpiredate,true);
       $diff = $loanlimit-time();
       $days = floor($diff/86400);
-      $loanperiod_class = 'long';
-      if($days < 14){
-        $loanperiod_class = 'medium';
-      }
-      if($days < 7){
-        $loanperiod_class = 'short';
-      }
-      $out[] = '<div class="loanperiod '.$loanperiod_class.'">'.t('Lånet udløber om <div>%days',array('%days' => format_plural($days, 'en dag', '@count dage'))).'</div></div>';
+      $hours     = floor($diff/3600);
+      $extra     = $hours+24;
     }
 
-    $out[] = '<div class="icons">
-      <ul>
-        <li>' . l(t('Stream'), $object->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
-        <li class="seperator"></li>
-        <li>' . l(t('Fetch'), $object->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
-        <li class="seperator"></li>
-        <li>' . l(t('Sample'), $object->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) . '</li>
-      </ul>
-    </div>';
+    if ($days < 1) {
+      if ($extra <= 24) {
+        $out[] = '
+          <div class="loanperiod short">'.t('Loan expired. You can re-loan.').'</div>
+        ';
+      }
+      else {
+      $out[] = '
+          <div class="loanperiod short">'.t('Loan expires in %hours',array('%hours' => format_plural($hours, 'one hour.', '@count hours.'))).'</div>
+        ';
+      }
+    }
+    else {
+      $out[] = '
+        <div class="loanperiod short">'.t('Loan expires in %days',array('%days' => format_plural($days, 'one day.', '@count days'))).'</div>
+    ';
+    }
 
-  $out[] = '</div>';
+    $out[] = '
+      <div class="icons">
+        <div class="icons">
+          <ul>
+            <li>' . l(t('Stream'), $object->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
+            <li class="seperator"></li>
+            <li>' . l(t('Fetch'), $object->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
+            <li class="seperator"></li>
+            <li>' . l(t('Sample'), $object->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) . '</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  ';
+
 
   return implode($out);
 
@@ -531,6 +550,7 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
   // fetch cover from elib
   elib_book_cover($obj);
   $isbn = convertToEAN($obj->record['dc:identifier']['dkdcplus:ISBN'][0]);
+  $obj->url = 'ting/object/' . $obj->id;
 
   switch($displaysize){
     case 'small':
@@ -545,27 +565,20 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
       break;
   }
 
-  $obj->url = 'ting/object/' . $obj->id;
   //dsm($obj);
-  $alttext = t('@titel af @forfatter',array('@titel' => $obj->record['dc:title'][''][0], '@forfatter' => $obj->record['dc:creator']['dkdcplus:aut'][0]));
+	$alttext = t('@titel af @forfatter',array('@titel' => $obj->record['dc:title'][''][0], '@forfatter' => $obj->record["dc:creator"]["dkdcplus:aut"][0]));
   $part['picture'] = '<div class="picture">' . l(theme('image', $image_url, $alttext, $alttext, null, false), $obj->url, array('html' => true)) . '</div>';
   if($elib_data->loanexpiredate){
     $loanlimit = elib_str_to_time($elib_data->loanexpiredate,true);
     $diff = $loanlimit-time();
     $days = floor($diff / 86400);
-    $loanperiod_class = 'long';
-    if($days < 14){
-      $loanperiod_class = 'medium';
-    }
-    if($days < 7){
     $loanperiod_class = 'short';
-    }
     $part['loginexpire'] = '<div class="loanperiod '.$loanperiod_class.'">'.t('Lånet udløber om <div>%days',array('%days' => format_plural($days, 'en dag', '@count dage'))).'</div></div>';
   }
 
   $part['rating'] = '<div class="rating-for-faust"><div class="'.$obj->localId.'"></div></div>';
   $part['title'] = '<h3 class="title">' . l($obj->record['dc:title'][''][0], $obj->url, array('attributes' => array('class' =>'title'))) . '</h3>';
-  $part['author'] = '<div class="author">' . t('!creator_name', array('!creator_name' => l($obj->record['dc:creator']['dkdcplus:aut'][0],'ting/search/'.$obj->record['dc:creator']['dkdcplus:aut'][0]))) . '</div>';
+  $part['author'] = '<div class="author">' . t('!creator_name', array('!creator_name' => l($obj->record["dc:creator"]["dkdcplus:aut"][0],'ting/search/'.$obj->record["dc:creator"]["dkdcplus:aut"][0]))) . '</div>';
   $part['icons'] = '
     <div class="icons">
       <ul>
@@ -600,8 +613,8 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
 
   if($displaysize == 'textright'){
     #error_log(__FILE__ . ' +' . __LINE__ . ' ' . print_r($obj->record, 1));
-    $part['picture'] = '<div class="left"><div class="picture main size1of2">' . l(theme('image', $image_url, $alttext, $alttext, null, false), $obj->url, array('html' => true)) . '</div></div>';
-    $part['author'] = '<div class="author">' . t('By !creator_name', array('!creator_name' => l($obj->record['dc:creator']['dkdcplus:aut'][0],'ting/search/'.$obj->record['dc:creator']['dkdcplus:aut'][0]))) . '</div>';
+    $part['picture'] = '<div class="picture main size1of2">' . l(theme('image', $image_url, $alttext, $alttext, null, false), $obj->url, array('html' => true)) . '</div>';
+    $part['author'] = '<div class="author">' . t('By !creator_name', array('!creator_name' => l($obj->record["dc:creator"]["dkdcplus:aut"][0],'ting/search/'.$obj->record["dc:creator"]["dkdcplus:aut"][0]))) . '</div>';
 
 // removet pr. ticket: #165
 //    if (!empty($obj->record['dc:contributor']['oss:dkind'])) {
@@ -642,14 +655,14 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
 
 
   if($elib['popular']){
-    if (!empty($obj->record['dc:contributor']['oss:dkind'])) {
-     foreach($obj->record['dc:contributor']['oss:dkind'] as $reader){
+    if (!empty($obj->record['dc:contributor'][''])) {
+     foreach($obj->record['dc:contributor'][''] as $reader){
         $readers[] = l($reader,'ting/search/'.$reader);
       }
       $extras = theme('item_list', $readers, t('Reader'), 'span', array('class' => 'contributor'));
     }
-    if (!empty($obj->subjects)) {
-      foreach($obj->subjects as $subject){
+    if (!empty($obj->record["dc:subject"]["dkdcplus:DBCF"])) {
+      foreach($obj->record["dc:subject"]["dkdcplus:DBCF"] as $subject){
        $subs[] = l($subject,'ting/search/'.$subject);
       }
  //     $extras .= theme('item_list', $subs, t('Subjects'), 'span', array('class' => 'subject'));
@@ -687,6 +700,7 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
 
   }
 
+  $part['icons'] = '<div class="icons">'.$part['icons'].'</div>';
   return '<div class="display-book '.$displaysize.' line ruler-after index-' . $block_index . '">
     <div class="left">'.
     $part['picture'].
@@ -696,10 +710,10 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
     $part['title'].
     $part['author'].
     $part['rating'].
-    $part['icons'].'
-    </div>'.
+    $part['icons'].
     $part['text'].
     '<div class="extras" style="margin-left:80px;">'.$extras.'</div>
+    </div>
   </div>';
 
 }
@@ -752,13 +766,7 @@ function elib_displaybook2(TingClientObject $obj,$fields,$settings='',$displaysi
     $loanlimit = elib_str_to_time($elib_data->loanexpiredate,true);
     $diff = $loanlimit-time();
     $days = floor($diff/86400);
-    $loanperiod_class = 'long';
-    if($days < 15){
-      $loanperiod_class = 'medium';
-    }
-    if($days < 5){
-      $loanperiod_class = 'short';
-    }
+    $loanperiod_class = 'short';
     $part['loginexpire'] = '<div class="loanperiod '.$loanperiod_class.'">'.t('Lånet udløber om <div>%days',array('%days' => format_plural($days, 'en dag', '@count dage'))).'</div></div>';
   }
 

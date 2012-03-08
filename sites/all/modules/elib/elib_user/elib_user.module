@@ -108,41 +108,36 @@ if ($op == 'list') {
     $block = array();
     
     $userinfo = elib_user_get_cred();
-      // verify user
-      elib_client()->setLoaner($userinfo['cpr'],$userinfo['pin'],$userinfo['lib']);
-      try{
-      	$loans = elib_client()->getLoans();
+    // verify user
+    elib_client()->setLoaner($userinfo['cpr'],$userinfo['pin'],$userinfo['lib']);
+    try{
+      $loans = elib_client()->getLoans();
+    }
+    catch(Exception $e){
+      elib_display_error($e);
+    }
+
+    $out = array();
+    module_load_include('client.inc', 'ting');
+    $loans = $loans->data;
+
+    if ($loans->orderitem) {
+      foreach ($loans->orderitem as $book) {
+        $object = elib_get_ting_object_by_isbn(trim($book->book->attributes()->id));
+        $bookdisplay[elib_str_to_time((string)$book->loanexpiredate[0], TRUE)] = elib_displaybook($object,$book);
       }
-      catch(Exception $e){
-      	elib_display_error($e);
+
+      ksort($bookdisplay);
+
+      foreach ($bookdisplay as $book) {
+        $out[] = '<div class="display-book biglist">' . $book . '</div>';
       }
-      
-      $out = array();
-      module_load_include('client.inc', 'ting');
-	    $loans = $loans->data;
-	    
-	    if(sizeof($loans->orderitem)){
-	      elib_user_cleanuploans($loans->orderitem);
-	    }
-	
-        if ($loans->orderitem) {
-  	      foreach($loans->orderitem as $book){
-  	        $object = elib_get_ting_object_by_isbn(trim($book->book->attributes()->id));
- 	          $bookdisplay = elib_displaybook($object,$book);
-  	        if(sizeof($loans->orderitem) > 4){
-  	        	$size = 4;
-  	        }
-  	        else{
-  	        	$size = sizeof($loans->orderitem);
-  	        }
-  	        $out[] = '<div class="display-book biglist">'.$bookdisplay.'</div>';
-  	      }
-	      }
-	      else {
-	        $out[] = t('Du har ingen aktive netlydbog lån.');
-	      }
-      
-      $block['content'] = implode($out);
+    }
+    else {
+      $out[] = t('Du har ingen aktive netlydbogslån.');
+    }
+
+    $block['content'] = implode($out);
     
     
     $block['subject'] = t('Mine lån');   
