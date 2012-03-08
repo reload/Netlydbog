@@ -1,5 +1,4 @@
 <?php
-// $Id: destinations.file.inc,v 1.1.2.1.2.13 2009/12/09 22:07:42 ronan Exp $
 
 
 /**
@@ -61,6 +60,17 @@ class backup_migrate_destination_files extends backup_migrate_destination {
       backup_migrate_include('files');
       return new backup_file(array('filepath' => $filepath));
     }
+  }
+
+  /**
+   * Get the file object for the given file.
+   */
+  function get_file($file_id) {
+    $files = $this->list_files();
+    if (isset($files[$file_id])) {
+      isset($files[$file_id]);
+    }
+    return NULL;
   }
 
   /**
@@ -135,7 +145,7 @@ class backup_migrate_destination_files extends backup_migrate_destination {
     }
     return $form;
   }
- 
+
   /**
    * Validate the form for the settings for the files destination.
    */
@@ -164,18 +174,22 @@ class backup_migrate_destination_files extends backup_migrate_destination {
   function check_dir($directory) {
     $out = TRUE;
     $dirs = array();
-    foreach (explode('/', $directory) as $dir) {
-      $dirs[] = $dir;
-      $path = implode($dirs, '/');
-      if ($path && !is_dir(realpath($path)) && !file_check_directory($path, FILE_CREATE_DIRECTORY)) {
-        $out = FALSE;
-      }
-    }
 
-    if (!$out || !file_check_directory($directory)) {
-      // Unable to create destination directory.
-      _backup_migrate_message("Unable to create or write to the save directory '%directory'. Please check the file permissions that directory and try again.", array('%directory' => $directory), "error");
-      return FALSE;
+    // If the directory doesn't exist try to create it.
+    if (!is_dir($directory)) {
+      foreach (explode('/', $directory) as $dir) {
+        $dirs[] = $dir;
+        $path = implode($dirs, '/');
+        if ($path && !is_dir(realpath($path)) && !file_check_directory($path, FILE_CREATE_DIRECTORY)) {
+          $out = FALSE;
+        }
+      }
+
+      if (!$out || !file_check_directory($directory)) {
+        // Unable to create destination directory.
+        _backup_migrate_message("Unable to create or write to the save directory '%directory'. Please check the file permissions that directory and try again.", array('%directory' => $directory), "error");
+        return FALSE;
+      }
     }
 
     // If the destination directory is within the webroot, then secure it as best we can.
@@ -215,7 +229,7 @@ class backup_migrate_destination_files extends backup_migrate_destination {
     }
 
     // Check to see if the destination is publicly accessible
-    $test_contents = "this file should not be publicly accesible";
+    $test_contents = "this file should not be publicly accessible";
     // Create the the text.txt file if it's not already there.
     if (!is_file($directory .'/test.txt') || file_get_contents($directory .'/test.txt') != $test_contents) {
       if ($fp = fopen($directory .'/test.txt', 'w')) {
@@ -256,7 +270,7 @@ class backup_migrate_destination_files extends backup_migrate_destination {
   function test_file_readable_remotely($path, $contents) {
     $url = $GLOBALS['base_url'] .'/'. file_directory_path() .'/'. str_replace('\\', '/', $path);
     $result = drupal_http_request($url);
-    if (strpos($result->data, $contents) !== FALSE) {
+    if (!empty($result->data) && strpos($result->data, $contents) !== FALSE) {
       return TRUE;
     }
     return FALSE;

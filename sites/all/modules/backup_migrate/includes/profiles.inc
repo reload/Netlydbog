@@ -1,5 +1,4 @@
 <?php
-// $Id: profiles.inc,v 1.1.2.1.2.20 2009/11/27 19:29:40 ronan Exp $
 
 
 /**
@@ -100,7 +99,7 @@ function _backup_migrate_ui_backup_settings_form($profile) {
       '#collapsed' => TRUE,
     );
     $form['file']['token_help']['help'] = array(
-      '#value' => theme('token_help', ''),
+      '#value' => theme('token_help', 'global'),
     );
     $form['file']['filename']['#description'] = t('You can use tokens in the file name.');
   }
@@ -130,9 +129,26 @@ function _backup_migrate_ui_backup_settings_form($profile) {
     $form['advanced']['#collapsible'] = true;
   }
 
+  $form['#validate'][]  = '_backup_migrate_ui_backup_settings_form_validate';
+  $form['#submit'][]    = '_backup_migrate_ui_backup_settings_form_submit';
+
   return $form;
 }
 
+/**
+ * Validate the profile form.
+ */
+function _backup_migrate_ui_backup_settings_form_validate($form, &$form_state) {
+  backup_migrate_filters_settings_form_validate('backup', $form, $form_state);
+}
+
+/**
+ * Submit the profile form.
+ */
+function _backup_migrate_ui_backup_settings_form_submit($form, &$form_state) {
+  backup_migrate_filters_settings_form_submit('backup', $form, $form_state);
+}
+  
 /**
  * Get the default profile.
  */
@@ -143,7 +159,6 @@ function _backup_migrate_profile_default_profile() {
     'filename' => _backup_migrate_default_filename(),
     'append_timestamp' => 1,
     'timestamp_format' => 'Y-m-d\TH-i-s',
-    'compression' => "none",
     'filters' => backup_migrate_filters_settings_default('backup'),
   );
 }
@@ -243,7 +258,7 @@ class backup_migrate_profile extends backup_migrate_item {
    */
   function get_source() {
     backup_migrate_include('destinations');
-    if (empty($this->source) && !empty($this->source_id)) {
+    if (!empty($this->source_id) && (empty($this->source) || $this->source->destination_id !== $this->source_id)) {
       $this->source = backup_migrate_get_destination($this->source_id);
     }
     return empty($this->source) ? NULL : $this->source;
@@ -264,7 +279,7 @@ class backup_migrate_profile extends backup_migrate_item {
    */
   function get_destination() {
     backup_migrate_include('destinations');
-    if (empty($this->destination) && !empty($this->destination_id)) {
+    if (!empty($this->destination_id) && (empty($this->destination) || $this->destination->destination_id !== $this->destination_id)) {
       $this->destination = backup_migrate_get_destination($this->destination_id);
     }
     return empty($this->destination) ? NULL : $this->destination;

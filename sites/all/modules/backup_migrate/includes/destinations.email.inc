@@ -1,5 +1,4 @@
 <?php
-// $Id: destinations.email.inc,v 1.1.2.1.2.8 2009/10/17 19:53:20 ronan Exp $
 
 
 /**

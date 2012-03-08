@@ -13,22 +13,25 @@ class NanoSOAPClient {
    *
    * @var string
    */
-  var $endpoint;
+  public $endpoint;
 
   /**
    * DOMDocument instance for the request body.
    *
    * @var DOMDocument
    */
-  var $doc;
+  public $doc;
 
   /**
    * The XML string sent as part of a request. For debugging purposes.
    *
    * @var string
    */
-  var $requestBodyString;
+  public $requestBodyString;
 
+  /**
+   * Construct the SOAP client, using the specified options.
+   */
   function __construct($endpoint, $options = array()) {
     $this->endpoint = $endpoint;
     if (isset($options['namespaces']) && $options['namespaces']) {
@@ -42,7 +45,7 @@ class NanoSOAPClient {
   /**
    * Make a cURL request.
    *
-   * This is usually a SOAP request, but could ostensibly be used for 
+   * This is usually a SOAP request, but could ostensibly be used for
    * other things.
    *
    * @param string $url
@@ -53,16 +56,17 @@ class NanoSOAPClient {
    *   The request body, ie. the SOAP envelope for SOAP requests.
    * @param array $headers
    *   Array of headers to be sent with the request.
+   *
    * @return string
    *   The response for the server, or FALSE on failure.
    */
   function curlRequest($url, $method = 'GET', $body = '', $headers = array()) {
-    // Array of cURL options. See the documentation for curl_setopt for 
+    // Array of cURL options. See the documentation for curl_setopt for
     // details on what options are available.
     $curl_options = array(
       CURLOPT_URL => $url,
       CURLOPT_USERAGENT => self::USER_AGENT,
-      CURLOPT_RETURNTRANSFER => TRUE
+      CURLOPT_RETURNTRANSFER => TRUE,
     );
 
     if ($method == 'POST') {
@@ -99,6 +103,7 @@ class NanoSOAPClient {
    *   The SOAP action to perform/call.
    * @param array $parameters
    *   The parameters to send with the SOAP request.
+   *
    * @return string
    *   The SOAP response.
    */
@@ -111,11 +116,11 @@ class NanoSOAPClient {
 
     // Make a DOM document from the envelope and get the Body tag so we
     // can add our request data to it.
-    $this->doc = new DOMDocument;
+    $this->doc = new DOMDocument();
     $this->doc->loadXML($this->generateSOAPenvelope());
     $body = $this->doc->getElementsByTagName('Body')->item(0);
 
-    // Convert the parameters into XML elements and add them to the 
+    // Convert the parameters into XML elements and add them to the
     // body. The root element of this structure will be the action.
     $elem = $this->convertParameter($action, $parameters);
     $body->appendChild($elem);
@@ -134,6 +139,7 @@ class NanoSOAPClient {
    *   The parameter name.
    * @param mixed $value
    *   Value of the parameter as array or string-compatible.
+   *
    * @return DOMElement
    *   The generated element.
    */
@@ -151,7 +157,7 @@ class NanoSOAPClient {
         foreach ($value as $key => $subvalue) {
           $subelem = $this->convertParameter($key, $subvalue);
 
-          // If we get an array of elements back, append them all to 
+          // If we get an array of elements back, append them all to
           // the parent element.
           if (is_array($subelem)) {
             foreach ($subelem as $sub) {
@@ -165,7 +171,7 @@ class NanoSOAPClient {
         }
       }
     }
-    // If name is numeric, it's just a simple value. We create an 
+    // If name is numeric, it's just a simple value. We create an
     // element with the value only.
     elseif (is_numeric($name)) {
       $elem = $this->doc->createElement($value);
@@ -173,7 +179,7 @@ class NanoSOAPClient {
     else {
       $elem = $this->doc->createElement($name, htmlspecialchars($value, ENT_QUOTES, 'UTF-8', FALSE));
     }
-    
+
     return $elem;
   }
 
@@ -220,5 +226,4 @@ class NanoSOAPClient {
   }
 }
 
-class NanoSOAPcURLException extends Exception { }
-
+class NanoSOAPcURLException extends Exception {}

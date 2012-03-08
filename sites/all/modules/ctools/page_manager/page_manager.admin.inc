@@ -1,5 +1,5 @@
 <?php
-// $Id: page_manager.admin.inc,v 1.27.2.8 2010/02/01 21:11:15 merlinofchaos Exp $
+// $Id: page_manager.admin.inc,v 1.27.2.18 2010/10/29 22:40:52 merlinofchaos Exp $
 
 /**
  * @file
@@ -199,12 +199,14 @@ function page_manager_get_pages($tasks, &$pages, $task_id = NULL) {
         $operations[] = array(
           'title' => t('Enable'),
           'href' => 'admin/build/pages/nojs/enable/' . $task_name,
+          'query' => array('token' => drupal_get_token($task_name)),
         );
       }
       else {
         $operations[] = array(
           'title' => t('Disable'),
           'href' => 'admin/build/pages/nojs/disable/' . $task_name,
+          'query' => array('token' => drupal_get_token($task_name)),
         );
       }
     }
@@ -528,6 +530,7 @@ function page_manager_get_operations($page, $operations = NULL) {
       'form' => 'page_manager_enable_form',
       'ajax' => FALSE,
       'silent' => TRUE,
+      'no update and save' => TRUE,
       'form info' => array(
         'finish text' => t('Enable'),
       ),
@@ -541,6 +544,7 @@ function page_manager_get_operations($page, $operations = NULL) {
       'form' => 'page_manager_disable_form',
       'ajax' => FALSE,
       'silent' => TRUE,
+      'no update and save' => TRUE,
       'form info' => array(
         'finish text' => t('Disable'),
       ),
@@ -553,16 +557,20 @@ function page_manager_get_operations($page, $operations = NULL) {
     'form' => 'page_manager_handler_add',
     'ajax' => FALSE,
     'silent' => TRUE, // prevents a message about updating and prevents this item from showing as changed.
+    'no update and save' => TRUE, // get rid of update and save button which is bad here.
     'form info' => array(
       'finish text' => t('Create variant'),
     ),
   );
 
-  $result['actions']['children']['import'] = array(
-    'title' => t('Import variant'),
-    'description' => t('Add a new variant to this page from code exported from another page.'),
-    'form' => 'page_manager_handler_import',
-  );
+  // Restrict variant import to users who can already execute arbitrary PHP
+  if (user_access('use PHP for block visibility')) {
+    $result['actions']['children']['import'] = array(
+      'title' => t('Import variant'),
+      'description' => t('Add a new variant to this page from code exported from another page.'),
+      'form' => 'page_manager_handler_import',
+    );
+  }
 
   if (count($page->handlers) > 1) {
     $result['actions']['children']['rearrange'] = array(
@@ -581,6 +589,7 @@ function page_manager_get_operations($page, $operations = NULL) {
       'title' => t('Configure'),
       'description' => t('Configure a newly created variant prior to actually adding it to the page.'),
       'ajax' => FALSE,
+      'no update and save' => TRUE, // get rid of update and save button which is bad here.
       'form info' => array(
         // We use our own cancel and finish callback to handle the fun stuff.
         'finish callback' => 'page_manager_handler_add_finish',
@@ -610,6 +619,7 @@ function page_manager_get_operations($page, $operations = NULL) {
       'description' => t('Break the lock on this page so that you can edit it.'),
       'form' => 'page_manager_break_lock',
       'ajax' => FALSE,
+      'no update and save' => TRUE, // get rid of update and save button which is bad here.
       'form info' => array(
         'finish text' => t('Break lock'),
        ),
@@ -618,6 +628,7 @@ function page_manager_get_operations($page, $operations = NULL) {
     );
   }
 
+  drupal_alter('page_manager_operations', $result, $page);
   return $result;
 }
 
@@ -691,6 +702,7 @@ function page_manager_get_handler_operations(&$page) {
         'title' => t('Revert'),
         'description' => t('Remove all changes to this variant and revert to the version in code.'),
         'form' => 'page_manager_handler_delete',
+        'no update and save' => TRUE,
         'form info' => array(
           'finish text' => t('Revert'),
         ),
@@ -703,6 +715,7 @@ function page_manager_get_handler_operations(&$page) {
         'form' => 'page_manager_handler_delete',
         'form info' => array(
           'finish text' => t('Delete'),
+          'save text' => t('Delete and save'),
         ),
       );
     }
@@ -714,6 +727,7 @@ function page_manager_get_handler_operations(&$page) {
         'silent' => TRUE,
         'form info' => array(
           'finish text' => t('Enable'),
+          'save text' => t('Enable and save'),
         ),
       );
     }
@@ -725,9 +739,12 @@ function page_manager_get_handler_operations(&$page) {
         'silent' => TRUE,
         'form info' => array(
           'finish text' => t('Disable'),
+          'save text' => t('Disable and save'),
         ),
       );
     }
+
+    drupal_alter('page_manager_variant_operations', $operations[$id], $handler);
   }
   if (empty($operations)) {
     $operations['empty'] = array(
@@ -876,7 +893,6 @@ function _page_manager_get_operation_content($js, &$page, $active, $operation, $
       'type' => 'edit',
       'ajax' => $js && (!isset($operation['ajax']) || !empty($operation['ajax'])),
       'rerender' => TRUE,
-      'no_redirect' => $js,
       'trail' => $active,
       'task_name' => $page->task_name,
       'task_id' => $page->task_id,
@@ -943,10 +959,10 @@ function _page_manager_get_operation_content($js, &$page, $active, $operation, $
 }
 
 function page_manager_operation_wrapper(&$form, &$form_state) {
-  if (!empty($form['buttons']['return']['#wizard type']) && $form['buttons']['return']['#wizard type']) {
+  if (empty($form_state['operation']['no update and save']) && !empty($form['buttons']['return']['#wizard type']) && $form['buttons']['return']['#wizard type']) {
     $form['buttons']['save'] = array(
       '#type' => 'submit',
-      '#value' => t('Update and save'),
+      '#value' => !empty($form_state['form_info']['save text']) ? $form_state['form_info']['save text'] : t('Update and save'),
       '#wizard type' => 'finish',
       '#attributes' => $form['buttons']['return']['#attributes'],
       '#save' => TRUE,
@@ -955,7 +971,7 @@ function page_manager_operation_wrapper(&$form, &$form_state) {
 }
 
 /**
- * Callback generated when the add page process is finished.
+ * Callback generated when the an operation edit finished.
  */
 function page_manager_edit_page_finish(&$form_state) {
   if (empty($form_state['operation']['silent'])) {
@@ -987,8 +1003,8 @@ function page_manager_edit_page_finish(&$form_state) {
   // If the 'Update and Save' button was selected, write our cache out.
   if (!empty($form_state['clicked_button']['#save'])) {
     page_manager_save_page_cache($form_state['page']);
-    $form_state['page']->changed = FALSE;
-//    $form_state['page'] = page_manager_get_page_cache($form_state['task_name']);
+    page_manager_clear_page_cache($form_state['page']->task_name);
+    $form_state['page'] = page_manager_get_page_cache($form_state['page']->task_name);
   }
   else {
     if (empty($form_state['do not cache'])) {
@@ -996,9 +1012,19 @@ function page_manager_edit_page_finish(&$form_state) {
     }
   }
 
+  // We basically always want to force a rerender when the forms
+  // are finished, so make sure there is a new trail.
+  if (empty($form_state['new trail'])) {
+    // force a rerender to get rid of old form items that may have changed
+    // during save.
+    $form_state['new trail'] = $form_state['trail'];
+  }
+
   if (isset($form_state['new trail']) && empty($form_state['ajax'])) {
     $form_state['redirect'] = page_manager_edit_url($form_state['page']->task_name, $form_state['new trail']);
   }
+
+  $form_state['complete'] = TRUE;
 }
 
 /**
@@ -1377,6 +1403,9 @@ function page_manager_handler_add_form(&$form, $form_state, $features = array())
         '#type' => 'checkbox',
         '#title' => $feature,
       );
+      if (!empty($form_state['page']->forms) && in_array($feature_id, $form_state['page']->forms)) {
+        $form['features'][$plugin][$feature_id]['#default_value'] = TRUE;
+      }
 
       if ($plugin != 'default') {
         $form['features'][$plugin][$feature_id] += array(
@@ -1398,17 +1427,30 @@ function page_manager_handler_import(&$form, &$form_state) {
     '#description' => t('Enter the name of the new variant.'),
   );
 
-  $form['object'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Paste variant code here'),
-    '#rows' => 15,
-  );
+  if (user_access('use PHP for block visibility')) {
+    $form['object'] = array(
+      '#type' => 'textarea',
+      '#title' => t('Paste variant code here'),
+      '#rows' => 15,
+    );
+  }
+  // Users ordinarily can't get here without the PHP block visibility perm.
+  // In case they somehow do, though, disable the form widget for extra safety.
+  else {
+    $form['shoveoff'] = array(
+      '#value' => '<div>' . t('You do not have sufficient permissions to perform this action.') . '</div>',
+    );
+  }
 }
 
 /**
  * Make sure that an import actually provides a handler.
  */
 function page_manager_handler_import_validate($form, &$form_state) {
+  if (!user_access('use PHP for block visibility')) {
+    form_error($form['shoveoff'], t('You account permissions do not permit you to import.'));
+    return;
+  }
   ob_start();
   eval($form_state['values']['object']);
   ob_end_clean();
@@ -1461,6 +1503,7 @@ function page_manager_handler_rearrange(&$form, &$form_state) {
     $form['handlers'][$id]['weight'] = array(
       '#type' => 'weight',
       '#default_value' => $info['weight'],
+      '#delta' => 30,
     );
   }
 }
@@ -1640,6 +1683,8 @@ function page_manager_break_lock_submit(&$form, &$form_state) {
   ctools_object_cache_clear_all('page_manager_page', $page->task_name);
   $form_state['do not cache'] = TRUE;
   drupal_set_message(t('The lock has been cleared and all changes discarded. You may now make changes to this page.'));
+
+  $form_state['new trail'] = array('summary');
 }
 
 /**
@@ -1753,6 +1798,9 @@ function page_manager_page_summary(&$form, &$form_state) {
  * Menu callback to enable or disable a page
  */
 function page_manager_enable_page($disable, $js, $page) {
+  if (!isset($_GET['token']) || !drupal_valid_token($_GET['token'], $page->task_name)) {
+    return MENU_ACCESS_DENIED;
+  }
   if ($page->locked) {
     if ($disable) {
       drupal_set_message(t('Unable to disable due to lock.'));

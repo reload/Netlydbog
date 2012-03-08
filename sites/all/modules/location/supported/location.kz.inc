@@ -1,5 +1,5 @@
 <?php
-// $Id: location.kz.inc,v 1.6 2008/01/24 09:00:03 bdragon Exp $
+// $Id: location.kz.inc,v 1.6.4.1 2009/02/04 20:04:10 bdragon Exp $
 
 // Kazakhstan
 
@@ -17,7 +17,7 @@ function location_province_list_kz() {
     'KAR' => "Qaraghandy",
     'KUS' => "Qustanay",
     'KZY' => "Qyzylorda",
-    'VOS' => "Shyghys Qazaqstan ",
-    'SEV' => "Soltustik Qazaqstan ",
+    'VOS' => "Shyghys Qazaqstan",
+    'SEV' => "Soltustik Qazaqstan",
     'ZHA' => "Zhambyl");
 }

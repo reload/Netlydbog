@@ -4,9 +4,9 @@ package = Location
 description = The location module allows you to associate a geographic location with content and users. Users can do proximity searches by postal code.  This is useful for organizing communities that have a geographic presence.
 core = 6.x
 
-; Information added by drupal.org packaging script on 2008-12-12
-version = "6.x-3.0"
+; Information added by drupal.org packaging script on 2010-07-06
+version = "6.x-3.1"
 core = "6.x"
 project = "location"
-datestamp = "1229117725"
+datestamp = "1278427508"
 

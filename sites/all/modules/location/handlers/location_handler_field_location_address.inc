@@ -1,5 +1,5 @@
 <?php
-// $Id: location_handler_field_location_address.inc,v 1.1 2008/09/18 16:20:14 bdragon Exp $
+// $Id: location_handler_field_location_address.inc,v 1.1.2.1 2009/02/24 20:59:05 bdragon Exp $
 
 /**
  * @file
@@ -19,7 +19,7 @@ class location_handler_field_location_address extends views_handler_field {
     $form['hide'] = array(
       '#type' => 'checkboxes',
       '#title' => t('Hide fields from display'),
-      '#options' => location_field_names(),
+      '#options' => location_field_names(TRUE),
       '#default_value' => $this->options['hide'],
     );
   }

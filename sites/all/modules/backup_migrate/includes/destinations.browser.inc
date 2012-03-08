@@ -1,5 +1,4 @@
 <?php
-// $Id: destinations.browser.inc,v 1.1.2.1.2.6 2009/07/06 04:02:48 ronan Exp $
 
 
 /**

@@ -1,5 +1,4 @@
 <?php
-// $Id: faq-category-questions-top.tpl.php,v 1.1.2.6 2009/02/08 17:24:49 snpower Exp $
 
 /**
  * @file
@@ -70,7 +69,7 @@ else {
 
 ?>
 <a name="top"></a>
-<div class="faq-category-menu line">
+<div class="faq-category-menu">
 
   <!-- category header with title, link, image, description, and count of questions inside -->
   <div class="faq-qa-header">
@@ -114,8 +113,8 @@ else {
   </div> <!-- Close div: item-list -->
   <?php endif; ?>
 
-  <div class="<?php print $container_class; ?> unit size1of2">
-  <div class="m-r">
+  <div class="<?php print $container_class; ?>">
+
   <?php // include subcategories ?>
   <?php if (count($subcat_body_list)): ?>
     <?php foreach ($subcat_body_list as $i => $subcat_html): ?>
@@ -135,26 +134,9 @@ else {
     </<?php print $question_list_style; ?>>
   </div> <!-- Close div: item-list -->
   <?php endif; ?>
-  </div>
 
   <?php if (!$group_questions_top && $category_display != 'hide_qa'): ?>
     </div> <!-- Close div: faq-qa / faq-qa-hide -->
-    
-    <?php 
-    
-    
-    
-    $n = netsound_show_videolink(arg(1));
-    
-    //krumo($n);
-    
-    //$video = ;
-    $video = l(theme('imagecache', 'help_video_big', $n->field_cover[0]['filepath']),'node/'.$n->nid.'/lightbox2',array('html' => true,'attributes' => array('rel' => 'lightframe')));
-    
-    ?>
-    
-    
-    <div class="unit size1of2"><div class="m-l"><?php print $video?></div></div>
     </div> <!-- Close div: faq-category-menu -->
   <?php endif; ?>
 
