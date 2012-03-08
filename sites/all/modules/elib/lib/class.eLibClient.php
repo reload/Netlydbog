@@ -141,8 +141,8 @@ class eLibClient{
   	
     if(($xml->data->orderinformationitem)){
       foreach($xml->data->orderinformationitem as $line){
-        if(!in_array(trim($line->ebookid),$ids)){
-          $ids[] = trim($line->ebookid);
+        if(!in_array(trim($line->identifier),$ids)){
+          $ids[] = trim($line->identifier);
         }
       }
   	}
