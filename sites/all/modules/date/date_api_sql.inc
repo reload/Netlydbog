@@ -1,5 +1,4 @@
 <?php
-// $Id: date_api_sql.inc,v 1.9.2.3.2.37 2009/09/16 11:13:01 karens Exp $
 
 /**
  *  A helper function to do cross-database concatation of date parts
@@ -10,10 +9,10 @@
 function date_sql_concat($array) {
   global $db_type;
   switch ($db_type) {
-    case('mysql'):
-    case('mysqli'):
+    case ('mysql'):
+    case ('mysqli'):
       return "CONCAT(". implode(",", $array) .")";
-    case('pgsql'):
+    case ('pgsql'):
       return implode(" || ", $array);
   }
 }
@@ -27,9 +26,9 @@ function date_sql_concat($array) {
 function date_sql_coalesce($array) {
   global $db_type;
   switch ($db_type) {
-    case('mysql'):
-    case('mysqli'):
-    case('pgsql'):
+    case ('mysql'):
+    case ('mysqli'):
+    case ('pgsql'):
       return "COALESCE(". implode(',', $array) .")";
   }  
 }
@@ -44,7 +43,7 @@ function date_sql_coalesce($array) {
  */
 function date_sql_pad($str, $size = 2, $pad = '0', $side = 'l') {
   switch ($side) {
-  case('r'):
+  case ('r'):
     return "RPAD($str, $size, '$pad')";
   default:
     return "LPAD($str, $size, '$pad')";
@@ -62,7 +61,7 @@ class date_sql_handler {
   var $db_timezone_field = NULL; // Use if the db timezone is stored in a field.
   var $local_timezone_field = NULL; // Use if the local timezone is stored in a field.
   var $offset_field = NULL; // Use if the offset is stored in a field.
-  
+
   function construct($date_type = DATE_DATETIME, $local_timezone = NULL) {
     $this->db_type = $GLOBALS['db_type'];
     $this->date_type = $date_type;
@@ -93,7 +92,7 @@ class date_sql_handler {
           }
           break;
         case 'pgsql':
-          $test = db_result(db_query("'2008-02-15 12:00:00 UTC' AT TIME ZONE 'US/Central'"));
+          $test = db_result(db_query("SELECT '2008-02-15 12:00:00 UTC' AT TIME ZONE 'US/Central'"));
           if ($test == '2008-02-15 06:00:00') {
             $has_support = TRUE;
           }
@@ -103,7 +102,7 @@ class date_sql_handler {
     }
     return $has_support;
   }
-  
+
   /**
    * Set the database timzone offset.
    * 
@@ -133,7 +132,7 @@ class date_sql_handler {
       $already_set = true;
     }
   }
-  
+
   /**
    * Return timezone offset for the date being processed.
    */
@@ -147,7 +146,7 @@ class date_sql_handler {
     }
     return 0;
   }
-  
+
   /**
    * Helper function to create cross-database SQL dates.
    *
@@ -222,7 +221,7 @@ class date_sql_handler {
     }
     return $field;
   }
-  
+
   /**
    * Adjust a field value by time interval.
    * 
@@ -247,7 +246,7 @@ class date_sql_handler {
           case 'SUB':
             return "DATE_SUB($field, INTERVAL $count $granularity)";
           }
-      
+
       case 'pgsql':
         $granularity .= 'S';
         switch ($direction) {
@@ -259,7 +258,7 @@ class date_sql_handler {
      }
      return $field;
   }  
-  
+
   /**
    * Select a date value from the database, adjusting the value
    * for the timezone.
@@ -278,7 +277,7 @@ class date_sql_handler {
     // if they are field names they do not.
     $db_zone   = $this->db_timezone_field ? $this->db_timezone_field : "'{$this->db_timezone}'";
     $localzone = $this->local_timezone_field ? $this->local_timezone_field : "'{$this->local_timezone}'"; 
-     
+
     // If a fixed offset is required, use it.
     if ($offset !== NULL) {
       return $this->sql_offset($field, $offset);
@@ -306,11 +305,11 @@ class date_sql_handler {
         case 'pgsql':
           // WITH TIME ZONE assumes the date is using the system
           // timezone, which should have been set to UTC.
-          return "TIMESTAMP WITH TIME ZONE $field AT TIME ZONE $localzone";
+          return "$field::timestamp with time zone AT TIME ZONE $localzone";
       }
     }
   }
-  
+
   /**
    * Helper function to create cross-database SQL date formatting.
    *
@@ -366,50 +365,50 @@ class date_sql_handler {
     // Note there is no space after FROM to avoid db_rewrite problems
     // see http://drupal.org/node/79904.
     switch (strtoupper($extract_type)) {
-    case('DATE'):
+    case ('DATE'):
       return $field;
-    case('YEAR'):
+    case ('YEAR'):
       return "EXTRACT(YEAR FROM($field))";
-    case('MONTH'):
+    case ('MONTH'):
       return "EXTRACT(MONTH FROM($field))";
-    case('DAY'):
+    case ('DAY'):
       return "EXTRACT(DAY FROM($field))";
-    case('HOUR'):
+    case ('HOUR'):
       return "EXTRACT(HOUR FROM($field))";
-    case('MINUTE'):
+    case ('MINUTE'):
       return "EXTRACT(MINUTE FROM($field))";
-    case('SECOND'):
+    case ('SECOND'):
       return "EXTRACT(SECOND FROM($field))";
-    case('WEEK'):  // ISO week number for date
+    case ('WEEK'):  // ISO week number for date
       switch ($this->db_type) {
-        case('mysql'):
-        case('mysqli'):
+        case ('mysql'):
+        case ('mysqli'):
           // WEEK using arg 3 in mysql should return the same value as postgres EXTRACT
           return "WEEK($field, 3)";
-        case('pgsql'):
+        case ('pgsql'):
           return "EXTRACT(WEEK FROM($field))";
       }
-    case('DOW'):
+    case ('DOW'):
       switch ($this->db_type) {
-        case('mysql'):
-        case('mysqli'):
+        case ('mysql'):
+        case ('mysqli'):
           // mysql returns 1 for Sunday through 7 for Saturday
           // php date functions and postgres use 0 for Sunday and 6 for Saturday
           return "INTEGER(DAYOFWEEK($field) - 1)";
-        case('pgsql'):
+        case ('pgsql'):
           return "EXTRACT(DOW FROM($field))";
       }
-    case('DOY'):
+    case ('DOY'):
       switch ($this->db_type) {
-        case('mysql'):
-        case('mysqli'):
+        case ('mysql'):
+        case ('mysqli'):
           return "DAYOFYEAR($field)";
-        case('pgsql'):
+        case ('pgsql'):
           return "EXTRACT(DOY FROM($field))";
       }
     }
   }
-  
+
   /**
    * Create a where clause to compare a complete date field to a complete date value.
    *
@@ -456,7 +455,7 @@ class date_sql_handler {
     }
     return "$field $operator $value";
   }
-  
+
   /**
    * Create a where clause to compare an extracted part of a field to an integer value.
    *
@@ -471,16 +470,11 @@ class date_sql_handler {
    * @return 
    *   SQL for the where clause for this operation.
    */
-  function sql_where_extract($part, $field, $operator, $value) {
-    if ($this->local_timezone != $this->db_timezone) {
-      $field = $this->sql_field($field);
-    }
-    else {
-      $field = $this->sql_field($field, 0);
-    }
+  function sql_where_extract($part, $field, $operator, $value, $adjustment = 0) {
+    $field = $this->sql_field($field, $adjustment);
     return $this->sql_extract($part, $field) ." $operator $value";
   }
-  
+
   /**
    * Create a where clause to compare a formated field to a formated value.
    *
@@ -496,13 +490,8 @@ class date_sql_handler {
    * @return 
    *   SQL for the where clause for this operation.
    */
-  function sql_where_format($format, $field, $operator, $value) {
-    if ($this->local_timezone != $this->db_timezone) {
-      $field = $this->sql_field($field);
-    }
-    else {
-      $field = $this->sql_field($field, 0);
-    }
+  function sql_where_format($format, $field, $operator, $value, $adjustment = 0) {
+    $field = $this->sql_field($field, $adjustment);
     return $this->sql_format($format, $field) ." $operator '$value'";
   }
 
@@ -601,7 +590,7 @@ class date_sql_handler {
           return;
       }
     }
-    
+
     $compare = array_merge($this->part_info('empty_'. $type), $selected);
     // If this is a max date, make sure the last day of 
     // the month is the right one for this date.
@@ -659,38 +648,38 @@ class date_sql_handler {
     // Start with the site long date format and add seconds to it
     $long = str_replace(':i', ':i:s', variable_get('date_format_long',  'l, F j, Y - H:i'));
     switch ($granularity) {
-      case('year'):
+      case ('year'):
         $formats['display'] = 'Y';
         $formats['sql'] = 'Y';
         break;
-      case('month'):
+      case ('month'):
         $formats['display'] = date_limit_format($long, array('year', 'month'));
         $formats['sql'] = 'Y-m';
         break;
-      case('day'):
+      case ('day'):
         $formats['display'] = date_limit_format($long, array('year', 'month', 'day'));
         $formats['sql'] = 'Y-m-d';
         break;
-      case('hour'):
+      case ('hour'):
         $formats['display'] = date_limit_format($long, array('year', 'month', 'day', 'hour'));
         $formats['sql'] = 'Y-m-d\TH';
         break;
-      case('minute'):
+      case ('minute'):
         $formats['display'] = date_limit_format($long, array('year', 'month', 'day', 'hour', 'minute'));
         $formats['sql'] = 'Y-m-d\TH:i';
         break;
-      case('second'):
+      case ('second'):
         $formats['display'] = date_limit_format($long, array('year', 'month', 'day', 'hour', 'minute', 'second'));
         $formats['sql'] = 'Y-m-d\TH:i:s';
         break;
-      case('week'):
+      case ('week'):
         $formats['display'] = 'F j Y (W)';
         $formats['sql'] = 'Y-\WW';
         break;
     }
     return $formats[$type];
   }
-  
+
   function granularity_form($granularity) {
     $form = array(
       '#title' => t('Granularity'),
@@ -775,7 +764,7 @@ class date_sql_handler {
     $direction = $results[1];
     $count = $results[2];
     $item = $results[3];
-      
+
     $replace = array(
       'now' => '@',
       '+' => 'P',
@@ -800,7 +789,7 @@ class date_sql_handler {
     $prefix = in_array($item, array('hours', 'hour', 'minutes', 'minute', 'seconds', 'second')) ? 'T' : '';  
     return $prefix . strtr($direction, $replace) . $count . strtr($item, $replace);  
   }
-  
+
   /**
    * Use the parsed values from the ISO argument to determine the
    * granularity of this period.
@@ -822,7 +811,7 @@ class date_sql_handler {
   function arg_range($arg) {
     // Parse the argument to get its parts
     $parts = $this->arg_parts($arg);
-        
+
     // Build a range from a period-only argument (assumes the min date is now.)
     if (empty($parts[0]['date']) && !empty($parts[0]['period']) && (empty($parts[1]))) {
       $min_date = date_now();

@@ -1,5 +1,4 @@
 <?php
-// $Id: backup_migrate.module,v 1.1.2.25.2.1.2.31 2009/12/09 22:07:42 ronan Exp $
 
 
 /**
@@ -7,6 +6,9 @@
  * Create (manually or scheduled) and restore backups of your Drupal MySQL
  * database with an option to exclude table data (e.g. cache_*)
  */
+
+define('BACKUP_MIGRATE_MENU_PATH', 'admin/content/backup_migrate');
+define('BACKUP_MIGRATE_MENU_DEPTH', 3);
 
 /* Drupal Hooks */
 
@@ -19,41 +21,47 @@ function backup_migrate_help($section, $arg) {
       'body' => 
        t('Backup and Migrate makes the task of backing up your Drupal database and migrating data from one Drupal install to another easier. It provides a function to backup the entire database to file or download, and to restore from a previous backup. You can also schedule the backup operation. Compression of backup files is also supported.  The database backup files created with this module can be imported into this or any other Drupal installation with the !restorelink, or you can use a database tool such as <a href="!phpmyadminurl">phpMyAdmin</a> or the mysql command line command.',
          array(
-            '!restorelink' => user_access('restore from backup') ? l(t('restore feature'), 'admin/content/backup_migrate/restore') : t('restore feature'), 
+            '!restorelink' => user_access('restore from backup') ? l(t('restore feature'), BACKUP_MIGRATE_MENU_PATH . '/restore') : t('restore feature'), 
             '!phpmyadminurl' => 'http://www.phpmyadmin.net'
           )
         )
     ),
-    'admin/content/backup_migrate' => array(
+    BACKUP_MIGRATE_MENU_PATH => array(
       'title' => t('Quick Backup Tab'),
       'body' => t('Use this form to run simple manual backups of your database. Visit the !helppage for more help using this module', 
                   array('!helppage' => l(t('help page'), 'admin/help/backup_migrate'))),
+      'access arguments' => array('perform backup'),
     ),
-    'admin/content/backup_migrate/export/advanced' => array(
+    BACKUP_MIGRATE_MENU_PATH . '/export/advanced' => array(
       'title' => t('Advanced Backup Tab'),
       'body' => t('Use this form to run manual backups of your database with more advanced options. If you have any !profilelink saved you can load those settings. You can save any of the changes you make to these settings as a new settings profile.', 
-                  array("!profilelink" => user_access('administer backup and migrate') ? l(t('settings profiles'), 'admin/content/backup_migrate/profile') : t('settings profiles'), '!restorelink' => user_access('restore from backup') ? l(t('restore feature'), 'admin/content/backup_migrate/restore') : t('restore feature'), '!phpmyadminurl' => 'http://www.phpmyadmin.net')),
+                  array("!profilelink" => user_access('administer backup and migrate') ? l(t('settings profiles'), BACKUP_MIGRATE_MENU_PATH . '/profile') : t('settings profiles'), '!restorelink' => user_access('restore from backup') ? l(t('restore feature'), BACKUP_MIGRATE_MENU_PATH . '/restore') : t('restore feature'), '!phpmyadminurl' => 'http://www.phpmyadmin.net')),
+      'access arguments' => array('perform backup'),
     ),
-    'admin/content/backup_migrate/restore' => array(
+    BACKUP_MIGRATE_MENU_PATH . '/restore' => array(
       'title' => t('Restore Tab'),
       'body' => t('Upload a backup and migrate backup file. The restore function will not work with database dumps from other sources such as phpMyAdmin.'),
+      'access arguments' => array('restore from backup'),
     ),
-    'admin/content/backup_migrate/destination' => array(
+    BACKUP_MIGRATE_MENU_PATH . '/destination' => array(
       'title' => t('Destinations'),
       'body' => t('Destinations are the places you can save your backup files to or them load from.'),
       'more' => t('Files can be saved to a directory on your web server, downloaded to your desktop or emailed to a specified email account. From the Destinations tab you can create, delete and edit destinations or list the files which have already been backed up to the available destinations.'),
+      'access arguments' => array('administer backup and migrate'),
     ),
-    'admin/content/backup_migrate/profile' => array(
+    BACKUP_MIGRATE_MENU_PATH . '/profile' => array(
       'title' => t('Profiles'),
       'body' => t('Profiles are saved backup settings. Profiles store your table exclusion settings as well as your backup file name, compression and timestamp settings. You can use profiles in !schedulelink and for !manuallink.',
-                  array('!schedulelink' => user_access('administer backup and migrate') ? l(t('schedules'), 'admin/content/backup_migrate/schedule') : t('settings profiles'), '!manuallink' => user_access('perform backups') ? l(t('manual backups'), 'admin/content/backup_migrate') : t('manual backups'))),
+                  array('!schedulelink' => user_access('administer backup and migrate') ? l(t('schedules'), BACKUP_MIGRATE_MENU_PATH . '/schedule') : t('settings profiles'), '!manuallink' => user_access('perform backups') ? l(t('manual backups'), BACKUP_MIGRATE_MENU_PATH) : t('manual backups'))),
       'more' => t('You can create new profiles using the add profiles tab or by checking the "Save these settings" button on the advanced backup page.'),
+      'access arguments' => array('administer backup and migrate'),
     ),
-    'admin/content/backup_migrate/schedule' => array(
+    BACKUP_MIGRATE_MENU_PATH . '/schedule' => array(
       'title' => t('Scheduling'),
       'body' => t('Automatically backup up your database on a regular schedule using <a href="!cronurl">cron</a>.', 
                   array('!cronurl' => 'http://drupal.org/cron')),
       'more' => t('Each schedule will run a maximum of once per cron run, so they will not run more frequently than your cron is configured to run. If you specify a number of backups to keep for a schedule, old backups will be deleted as new ones created. <strong>If specifiy a number of files to keep other backup files in that schedule\'s destination will get deleted</strong>.'),
+      'access arguments' => array('administer backup and migrate'),
     ),
   );
 
@@ -64,6 +72,13 @@ function backup_migrate_help($section, $arg) {
   if ($section == 'admin/help#backup_migrate') {
     $out = "";
     foreach ($help as $key => $section) {
+      if (isset($section['access arguments'])) {
+        foreach($section['access arguments'] as $access) {
+          if (!user_access($access)) {
+            continue 2;
+          }
+        }
+      }
       if (@$section['title']) {
         if (!is_numeric($key)) {
           $section['title'] = l($section['title'], $key);
@@ -85,7 +100,7 @@ function backup_migrate_help($section, $arg) {
 function backup_migrate_menu() {
   $items = array();
 
-  $items['admin/content/backup_migrate'] = array(
+  $items[BACKUP_MIGRATE_MENU_PATH] = array(
     'title' => 'Backup and Migrate',
     'description' => 'Backup/restore your database or migrate data to or from another Drupal site.',
     'page callback' => 'backup_migrate_menu_callback',
@@ -93,7 +108,7 @@ function backup_migrate_menu() {
     'access arguments' => array('access backup and migrate'),
     'type' => MENU_NORMAL_ITEM,
   );
-  $items['admin/content/backup_migrate/export'] = array(
+  $items[BACKUP_MIGRATE_MENU_PATH . '/export'] = array(
     'title' => 'Backup',
     'description' => 'Backup the database.',
     'page callback' => 'backup_migrate_menu_callback',
@@ -102,7 +117,7 @@ function backup_migrate_menu() {
     'weight' => 0,
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
-  $items['admin/content/backup_migrate/export/quick'] = array(
+  $items[BACKUP_MIGRATE_MENU_PATH . '/export/quick'] = array(
     'title' => 'Quick Backup',
     'description' => 'Backup the database.',
     'page callback' => 'backup_migrate_menu_callback',
@@ -111,7 +126,7 @@ function backup_migrate_menu() {
     'weight' => 0,
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
-  $items['admin/content/backup_migrate/export/advanced'] = array(
+  $items[BACKUP_MIGRATE_MENU_PATH . '/export/advanced'] = array(
     'title' => 'Advanced Backup',
     'description' => 'Backup the database.',
     'page callback' => 'backup_migrate_menu_callback',
@@ -120,7 +135,7 @@ function backup_migrate_menu() {
     'weight' => 1,
     'type' => MENU_LOCAL_TASK,
   );
-  $items['admin/content/backup_migrate/restore'] = array(
+  $items[BACKUP_MIGRATE_MENU_PATH . '/restore'] = array(
     'title' => 'Restore',
     'description' => 'Restore the database from a previous backup',
     'page callback' => 'backup_migrate_menu_callback',
@@ -152,6 +167,9 @@ function backup_migrate_cron() {
 
   backup_migrate_include('schedules');
   backup_migrate_schedules_run();
+
+  backup_migrate_include('files');
+  _backup_migrate_temp_files_delete();
 }
 
 /**
@@ -232,8 +250,8 @@ function backup_migrate_ui_manual_backup_quick() {
  */
 function backup_migrate_ui_manual_backup_advanced() {
   backup_migrate_include('profiles');
-  $out = "";
-  $profile_id = arg(5);
+  $out = '';
+  $profile_id = arg(BACKUP_MIGRATE_MENU_DEPTH + 2);
   $profile = _backup_migrate_profile_saved_default_profile($profile_id);
   $out .= drupal_get_form('backup_migrate_ui_manual_backup_load_profile_form', $profile);
   $out .= drupal_get_form('backup_migrate_ui_manual_backup_form', $profile);
@@ -277,7 +295,7 @@ function backup_migrate_ui_manual_backup_load_profile_form(&$form_state, $profil
 function backup_migrate_ui_manual_backup_load_profile_form_submit($form, &$form_state) {
   if ($profile = backup_migrate_get_profile($form_state['values']['profile_id'])) {
     variable_set("backup_migrate_profile_id", $profile->get_id());
-    $form_state['redirect'] = 'admin/content/backup_migrate/export/advanced';
+    $form_state['redirect'] = BACKUP_MIGRATE_MENU_PATH . '/export/advanced';
   }
   else {
     variable_set("backup_migrate_profile_id", NULL);
@@ -332,7 +350,6 @@ function backup_migrate_ui_manual_quick_backup_form(&$form_state) {
   return $form;
 }
 
-
 /**
  * Validate the quick backup form.
  */
@@ -346,6 +363,7 @@ function backup_migrate_ui_manual_quick_backup_form_validate($form, &$form_state
  * Submit the quick backup form.
  */
 function backup_migrate_ui_manual_quick_backup_form_submit($form, &$form_state) {
+  backup_migrate_include('profiles', 'destinations');
   if (user_access('perform backup')) {
     // For a quick backup use the default settings.
     $settings = _backup_migrate_profile_saved_default_profile($form_state['values']['profile_id']);
@@ -362,7 +380,7 @@ function backup_migrate_ui_manual_quick_backup_form_submit($form, &$form_state) 
     // Do the backup.
     backup_migrate_ui_manual_backup_perform($settings);
   }
-  $form_state['redirect'] = "admin/content/backup_migrate";
+  $form_state['redirect'] = BACKUP_MIGRATE_MENU_PATH;
 }
 
 /**
@@ -396,7 +414,7 @@ function theme_backup_migrate_ui_manual_quick_backup_form($form) {
 /**
  * The backup/export form.
  */
-function backup_migrate_ui_manual_backup_form(&$form_state, $profile = array()) {
+function backup_migrate_ui_manual_backup_form(&$form_state, $profile) {
   drupal_add_js(drupal_get_path('module', 'backup_migrate') .'/backup_migrate.js');
 
   $form = array();
@@ -428,7 +446,7 @@ function backup_migrate_ui_manual_backup_form(&$form_state, $profile = array()) 
     "#default_value" => variable_get("backup_migrate_destination_id", "download"),
   );
   if (user_access('administer backup and migrate')) {
-    $form['destination']['destination_id']['#description'] = l(t("Create new destination"), "admin/content/backup_migrate/destination/add");
+    $form['destination']['destination_id']['#description'] = l(t("Create new destination"), BACKUP_MIGRATE_MENU_PATH . "/destination/add");
   }
 
   if (user_access('administer backup and migrate')) {
@@ -465,7 +483,7 @@ function backup_migrate_ui_manual_backup_form(&$form_state, $profile = array()) 
     }
     else {
       $name["#title"] = t('Save the settings as');
-      $name["#description"] = t('Pick a name for the settings. Your settings will be saved as a profile and will appear in the <a href="!url">Profiles Tab</a>.', array('!url' => url('admin/content/backup_migrate/profile')));
+      $name["#description"] = t('Pick a name for the settings. Your settings will be saved as a profile and will appear in the <a href="!url">Profiles Tab</a>.', array('!url' => url(BACKUP_MIGRATE_MENU_PATH . '/profile')));
       $name["#default_value"] = t('Untitled Profile');
     }
     $form['save_options']['name'] = $name;
@@ -474,7 +492,8 @@ function backup_migrate_ui_manual_backup_form(&$form_state, $profile = array()) 
       '#value' => t('Save Without Backing Up'),
     );
   }
-  $form['#validate'] = array('backup_migrate_ui_manual_quick_backup_form_validate');
+  $form['#validate'][] = 'backup_migrate_ui_manual_quick_backup_form_validate';
+  $form['#submit'][] = 'backup_migrate_ui_manual_backup_form_submit';
 
   $form[] = array(
     '#type' => 'submit',
@@ -489,15 +508,15 @@ function backup_migrate_ui_manual_backup_form(&$form_state, $profile = array()) 
  * Submit the form. Save the values as defaults if desired and output the backup file.
  */
 function backup_migrate_ui_manual_backup_form_submit($form, &$form_state) {
-  // Save the settings profile if the save box is checked.
-//  $form_state['values']['nodata_tables'] = array_filter((array)$form_state['values']['nodata_tables']);
-//  $form_state['values']['exclude_tables'] = array_filter((array)$form_state['values']['exclude_tables']);
-
+  // Create a profile with the gien settings.
   $profile = backup_migrate_crud_create_item('profile', $form_state['values']);
 
+  // Save the settings profile if the save box is checked.
   if ($form_state['values']['save_settings'] && user_access('administer backup and migrate')) {
     if (@$form_state['values']['create_new']) {
+      // Reset the id and storage so a new item will be saved.
       $profile->set_id(NULL);
+      $profile->storage = BACKUP_MIGRATE_STORAGE_NONE;
     }
     $profile->save();
     variable_set("backup_migrate_profile_id", $profile->get_id());
@@ -508,7 +527,7 @@ function backup_migrate_ui_manual_backup_form_submit($form, &$form_state) {
   if ($form_state['values']['op'] == t('Backup now') && user_access('perform backup')) {
     backup_migrate_ui_manual_backup_perform($profile);
   }
-  $form_state['redirect'] = "admin/content/backup_migrate/export/advanced";
+  $form_state['redirect'] = BACKUP_MIGRATE_MENU_PATH . "/export/advanced";
 }
 
 /**
@@ -590,7 +609,7 @@ function backup_migrate_ui_manual_restore_form_submit($form, &$form_state) {
     backup_migrate_include('destinations');
     backup_migrate_perform_restore('upload', $file->filepath, $form_state['values']);
   }
-  $form_state['redirect'] = 'admin/content/backup_migrate/restore';
+  $form_state['redirect'] = BACKUP_MIGRATE_MENU_PATH . '/restore';
 }
 
 /**
@@ -617,12 +636,13 @@ function backup_migrate_perform_backup(&$settings) {
     set_time_limit(variable_get('backup_migrate_backup_max_time', 1200));
   }
 
+  $timestamp = '';
   if ($settings->append_timestamp && $settings->timestamp_format) {
-    $settings->filename .= "-". date($settings->timestamp_format);
+    $timestamp = format_date(time(), 'custom', $settings->timestamp_format);
   }
-  $settings->filename = _backup_migrate_clean_filename($settings->filename);
+  $filename = _backup_migrate_construct_filename($settings->filename, $timestamp);
 
-  $file = new backup_file(array('filename' => $settings->filename));
+  $file = new backup_file(array('filename' => $filename));
   if (!$file) {
     backup_migrate_backup_fail("Could not run backup because a temporary file could not be created.", array(), $settings);
     return FALSE;
@@ -652,7 +672,7 @@ function backup_migrate_perform_backup(&$settings) {
   $time = timer_stop('backup_migrate_backup');
   $message = '%source backed up successfully to %file in destination %dest in !time ms. !action';
   $params = array(
-    '%file' => $settings->filename,
+    '%file' => $filename,
     '%dest' => $settings->get_destination_name(),
     '%source' => $settings->get_source_name(),
     '!time' => $time['time'],
@@ -722,7 +742,7 @@ function backup_migrate_perform_restore($destination_id, $file, $settings = arra
       '!action' => !empty($settings->performed_action) ? $settings->performed_action : '',
     );
     if ($destination && $destination->op('list files')) {
-      $params['!links'] = t('<a href="!restoreurl">Restore again</a>', array('!restoreurl' => url('admin/content/backup_migrate/destination/list/restorefile/'. $destination_id ."/". $file->filename())));
+      $params['!links'] = t('<a href="!restoreurl">Restore again</a>', array('!restoreurl' => url(BACKUP_MIGRATE_MENU_PATH . '/destination/list/restorefile/'. $destination_id ."/". $file->filename())));
     }
     backup_migrate_restore_succeed($message, $params, $settings);
   }
@@ -801,7 +821,7 @@ function backup_migrate_shutdown($settings) {
     // The session will have already been written and closed, so we need to write any changes directly.
     sess_write(session_id(), session_encode());
     // Add a redirect or we'll just get whitescreened.
-    drupal_goto('admin/content/backup_migrate');
+    drupal_goto(BACKUP_MIGRATE_MENU_PATH);
   }
 }
 
@@ -811,7 +831,6 @@ function backup_migrate_shutdown($settings) {
 
 /**
  * Action to backup the drupal site. Requires actions.module.
- */
 function action_backup_migrate_backup($op, $edit = array()) {
   switch ($op) {
     case 'do':
@@ -843,10 +862,10 @@ function action_backup_migrate_backup($op, $edit = array()) {
       return '';
   }
 }
+ */
 
 /*
  * Implementation of hook_action_info().
- */
 function backup_migrate_action_info() {
   return array(
     'backup_migrate_action_backup' => array(
@@ -856,6 +875,7 @@ function backup_migrate_action_info() {
     ),
   );
 }
+ */
 
 /*
  * Action callback.
@@ -897,7 +917,7 @@ function _backup_migrate_message($message, $replace = array(), $type = 'status')
 function _backup_migrate_messages($message = NULL, $replace = array(), $type = 'status') {
   static $messages = array();
   if ($message) {
-    $messages[] = array('message' => $message, 'replace' => $replace, 'type' => 'status');
+    $messages[] = array('message' => $message, 'replace' => $replace, 'type' => $type);
   }
   return $messages;
 }
@@ -940,6 +960,11 @@ function _backup_migrate_message_callback($callback = NULL) {
 
 function _backup_migrate_check_timeout() {
   static $timeout;
+
+  // Max execution of 0 means unlimited.
+  if (ini_get('max_execution_time') == 0) {
+    return false;
+  }
   // Figure out when we should stop execution.
   if (!$timeout) {
     $timeout = (!empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time()) + ini_get('max_execution_time') - variable_get('backup_migrate_timeout_buffer', 5);

@@ -1,5 +1,4 @@
 <?php
-// $Id: filters.inc,v 1.1.2.7 2009/08/22 19:58:13 ronan Exp $
 
 
 /**
@@ -72,7 +71,25 @@ function backup_migrate_filters_invoke_all() {
   $filters = backup_migrate_get_filters($op);
   foreach ($filters as $filter) {
     if (method_exists($filter, $op)) {
-      $out = array_merge_recursive($out, (array)call_user_func_array(array($filter, $op), $args));
+      /* call_user_func_array() ignores the function signature, so we cannot
+       * use it to pass references. (Call-time pass-by-reference is deprecated
+       * in PHP5.3.) Work around it, since we have unknown function signatures.
+       */
+      switch (count($args)) {
+        case 1:
+          $ret = $filter->$op($args[0]);
+          break;
+
+        case 2:
+          $ret = $filter->$op($args[0], $args[1]);
+          break;
+
+        default:
+          // This assumes that no functions with more than 2 arguments expect a
+          // reference as argument. If so, add another 'case block'.
+          $ret = call_user_func_array(array($filter, $op), $args);
+      }
+      $out = array_merge_recursive($out, (array) $ret);
     }
   }
   return $out;
@@ -118,13 +135,29 @@ function backup_migrate_filters_settings_form($settings, $op) {
  */
 function backup_migrate_filters_settings_form_set_parents($form) {
   foreach (element_children($form) as $key) {
-    $form[$key] = backup_migrate_filters_settings_form_set_parents($form[$key]);
     if (!isset($form[$key]['#parents'])) {
       $form[$key]['#parents'] = array('filters', $key);
+      $form[$key] = backup_migrate_filters_settings_form_set_parents($form[$key]);
     }
   }
   return $form;
 }
+
+
+/**
+ * Validate all the filters.
+ */
+function backup_migrate_filters_settings_form_validate($op, $form, &$form_state) {
+  backup_migrate_filters_invoke_all($op .'_settings_form_validate', $form, $form_state);
+}
+
+/**
+ * Submit all of the filters.
+ */
+function backup_migrate_filters_settings_form_submit($op, $form, &$form_state) {
+  backup_migrate_filters_invoke_all($op .'_settings_form_submit', $form, $form_state);
+}
+
 
 /**
  * Get the default settings for the filters.
@@ -174,14 +207,13 @@ class backup_migrate_filter {
   /**
    * Get the form for the settings for this filter.
    */
-  function backup_settings_form_validate($form_values) {
+  function backup_settings_form_validate($form, &$form_state) {
   }
 
   /**
    * Submit the settings form. Any values returned will be saved.
    */
-  function backup_settings_form_submit($form_values) {
-    return $form_values;
+  function backup_settings_form_submit($form, &$form_state) {
   }
 
   /**

@@ -1,5 +1,4 @@
 <?php
-// $Id: filters.statusnotify.inc,v 1.1.2.4 2009/08/03 02:06:11 ronan Exp $
 
 
 /**

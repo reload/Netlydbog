@@ -1,61 +1,88 @@
 <?php
+/**
+ * @file webtrends.module
+ */
 
 /**
- * Implementation of hook_menu().
+ * Implementation of hook_menu()
+ *
+ * @return array $items
  */
 function webtrends_menu() {
   $items = array();
 
   $items['admin/settings/webtrends'] = array(
-    'title' => 'WebTrends',
-    'description' => 'Settings for the WebTrends analytics tool.',
+    'title' => 'Webtrends',
+    'description' => 'Configure the Webtrends tracking integration settings.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('webtrends_admin_settings_form'),
     'access arguments' => array('administer site configuration'),
-    'file' => 'webtrends.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'webtrends_admin.inc',
   );
 
   return $items;
 }
 
 /**
- * Implementation of hook_footer().
+ * Implementation of hook_init() to check roles and add the Webtrends javascript file
+ *
+ * @return null
  */
-function webtrends_footer() {
-  $domain = variable_get('webtrends_domain', FALSE);
-  $dcs_id = variable_get('webtrends_dcs_id', FALSE);
+function webtrends_init() {
+  global $user;
+  global $webtrends_init;
+  $webtrends_init = false;
 
-  if (!$domain || !$dcs_id) {
-    watchdog('webtrends', 'Webtrends module not configured.', array(), WATCHDOG_NOTICE);
-    return;
-  }
+  $webtrends_enabled_roles = explode('_', variable_get('webtrends_enabled_roles', ''));
 
-    $script = <<<EOT
-var _tag=new WebTrends();
-_tag.fpcdom = ".$domain";
-_tag.dcsid = "$dcs_id";
-_tag.dcsGetId();
+  if (is_array($webtrends_enabled_roles) && count($webtrends_enabled_roles)) {
 
-_tag.dcsCustom=function(){
-  if (typeof Drupal.settings.tingSearch != 'undefined') {
-    _tag.WT.oss = encodeURIComponent(Drupal.settings.tingSearch.keys);
-    // The result count is unknown when the page is loaded, so we just say 1.
-    _tag.WT.oss_r = 1;
+    $show_for_role = (bool) array_uintersect($webtrends_enabled_roles, array_keys($user->roles), "strcasecmp");
+
+    if ($show_for_role) {
+      $webtrends_init = true;
+      drupal_add_js(drupal_get_path('module', 'webtrends').'/js/webtrends.js');
+    }
   }
 }
-_tag.dcsCollect();
-EOT;
 
-    $html = <<<EOT
-<noscript>
-<div><img alt="DCSIMG" id="DCSIMG" width="1" height="1" src="http://visionize10.visionize.dk/$dcs_id/njs.gif?dcsuri=/nojavascript&amp;WT.js=No&amp;WT.tv=9.3.0&amp;WT.dcssip=$domain"/></div>
-</noscript>
-EOT;
+/**
+ * Implementation of hook_footer() to insert Webtrends initialization script at the end of the page
+ *
+ * @return string $script
+ */
+function webtrends_footer() {
+  $script = '';
+  $webtrends_values = array();
+  
+  foreach (module_list() as $module) {
+    $function = $module .'_wt_values';
+    if (function_exists($function)) {
+      $webtrends_values = $function();
+    }
+  }
 
-  // We're relying on Drupal inserting inline js after references to
-  // external files.
-  drupal_add_js($script, 'inline', 'footer');
-  drupal_add_js(drupal_get_path('module', 'webtrends') . '/webtrends.js', 'module', 'footer');
+  global $webtrends_init;
 
-  return $html;
+  if ($webtrends_init) {
+    $script  = '<script type="text/javascript">'."\n";
+    $script .= '//<![CDATA['."\n";
+    $script .= 'var _tag=new WebTrends();'."\n";
+    $script .= '_tag.dcsGetId();'."\n";
+    $script .= '//]]>'."\n";
+    $script .= '</script>'."\n";
+    $script .= '<script type="text/javascript">'."\n";
+    $script .= '//<![CDATA['."\n";
+    $script .= '_tag.dcsCollect();'."\n";
+    $script .= '//]]>'."\n";
+    $script .= '</script>'."\n";
+    $script .= '<noscript>'."\n";
+    $script .= '<div>'."\n";
+    $script .= '<img alt="DCSIMG" id="DCSIMG" width="1" height="1" src="https://visionize10.visionize.dk/dcspimbaa10000oqojwrx2td2_1c3r/njs.gif?dcsuri=/nojavascript&amp;WT.js=No&amp;WT.tv=9.4.0&amp;dcssip=www.ereolen.dk"/>'."\n";
+    $script .= '</div>'."\n";
+    $script .= '</noscript>'."\n";
+  }
+  
+  return $script;
 }

@@ -1,0 +1,207 @@
+<?php
+
+// $Id: droptor.module,v 1.1.2.15 2011/02/02 20:21:14 urbanjustin Exp $ 
+
+/* 
+ * The Droptor bridge module  
+ * Droptor.com - Drupal site organization, monitoring, management and best practices
+ *
+ * For more information, see:
+ * - http://www.droptor.com
+ * - http://drupal.org/project/droptor
+ * 
+ * Variables used:
+ * - droptor_memory_monitoring
+ * 		whether to track how much scripts capture in memory usage
+ * 		default: off
+ * - droptor_debug_mode: 
+ * 		captures a little extra information we can use for debugging connectivity problems to droptor
+ * 		default: off
+ * - droptor_ssl_feed: 
+ * 		whether to force the feed to connect to droptor over SSL
+ * 		default: on
+ * - droptor_domain:
+ * 		the domain that can make requests to the feed
+ * - droptor_hash:
+ * 		the unique secret key that gets passed from droptor.com to this module for security reasons
+ * 		see http://www.droptor.com/support#droptor-monitoring-module-security for more information
+ */
+
+/**
+ * Startup routine for module; Droptor should never cache b/c if it did the data would be out of sync
+ *
+ * @param n/a
+ *
+ * @return n/a
+ */
+function droptor_init() {
+  global $script_start_time;
+  $script_start_time = microtime(true);
+}
+
+/**
+ * Builds menu entries for droptor feed and droptor configuration screen
+ *
+ * @param n/a
+ *
+ * @return
+ *   The menu system array
+ */
+function droptor_menu() {
+  // settings page for entering hash, domain, SSL settings
+  $items['admin/settings/droptor'] = array(
+    'title' => 'Droptor', 
+    'description' => 'Plug-in for Droptor.com, the Drupal monitoring service.', 
+    'page callback' => 'droptor_settings', 
+    'access arguments' => array('administer site configuration'), 
+    'type' => MENU_NORMAL_ITEM, 
+    'file' => 'droptor_form.inc'
+  );
+  
+  // the actual data feed that Droptor.con consumes
+  $items['droptorfeed'] = array(
+    'title' => 'Droptor.com Feed', 
+    'description' => 'Data feed for Droptor.com, the Drupal monitoring service.', 
+    'page callback' => 'droptor_feed', 
+    'access callback' => TRUE, 
+    'type' => MENU_CALLBACK, 
+    'file' => 'droptor_feed.inc'
+  );
+  
+  return $items;
+}
+
+/**
+ * Make sure that if they are focrcing SSL that the current connection is SSL
+ *
+ * @param n/a
+ *
+ * @return
+ *   True if OK false if not OK (not OK is SSL is enabled and SSL isn't used)
+ */
+function droptor_check_connection_security() {
+  $ok = TRUE;
+  
+  if (variable_get('droptor_ssl_feed', FALSE) == 1) {
+    if ( !(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' ) )
+      $ok = FALSE;
+  }
+  
+  return $ok;
+}
+
+/**
+ * Pull the hash from the URl and compare to what is on file
+ *
+ * @param n/a
+ *
+ * @return
+ *   TRUE if the hash matches our internal records
+ */
+function droptor_check_hash() {
+  $url_data = explode('/', $_GET['q']);
+  return (!empty($url_data[1]) && $url_data[1] != '' && $url_data[1] == variable_get('droptor_hash', FALSE)) ? TRUE : FALSE;
+}
+
+/**
+ * Verify the incoming domain of the feed request matches our allowed domain settings
+ *
+ * @param n/a
+ *
+ * @return
+ *   TRUE if the domain matches
+ */
+function droptor_check_domain() {
+  return ip_address() == gethostbyname(variable_get('droptor_domain', NULL)) ? TRUE : FALSE;
+}
+
+/**
+ * At the end of the script we capture the max memory used for the routine to load the page.
+ * This gives us valuable memory profiling data. This routine is wrriten to be as lean as possible
+ * and it disabled by default.
+ * 
+ * This isn't perfect because we can't ensure we are running last.
+ * 
+ * @todo - Can we make sure we are running last? Take a loko @ devel
+ * 
+ * See http://www.droptor.com/support#memory-monitoring
+ *
+ * @param n/a
+ *
+ * @return n/a
+ */
+function droptor_exit() {
+  global $script_start_time;
+  
+  if(variable_get('droptor_memory_monitoring', 0) == 1) {
+    $diff = round(((microtime(true)-$script_start_time)*1000));
+    
+    if($diff < 2147483648) {    
+      	$data = array(
+      	   'q'=>$_GET['q'],
+      	   'memory'=>memory_get_peak_usage(),
+      	   'dt'=>time(),
+      	   'execution_time'=>$diff
+      	);
+      	
+      	// we can't use db_insert as that isn't reliably loaded in hook_exit() 
+      	db_query("INSERT INTO {droptor_memory} (q,memory,dt,execution_time) VALUES ('%s',%d,%d,%d)", $data['q'],$data['memory'],$data['dt'],$data['execution_time']);
+      	}
+     }
+}
+
+/**
+ * Does the site support SSL. If the current connection is SSL, then it does.
+ * If not, then we hit the site over SSL and see if we get a response. The result
+ * of this module is used to empower the check mark in the form settings page.
+ *
+ * @param n/a
+ *
+ * @return
+	TRUE if the site supports SSL
+ */
+function droptor_ssl_enabled() {
+  // thank you secure pages module
+  $secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' ? TRUE : FALSE;
+  
+  $ok_response_codes = array(200, 301, 302);
+  
+  if (!$secure) {
+    $url = 'https://'. preg_replace(';^http[s]?://;s', '', url('', array('absolute' => TRUE)));
+    $response = drupal_http_request($url);
+    $secure = in_array($response->code, $ok_response_codes) ? TRUE : FALSE;
+  }
+
+  return $secure ? 1 : 0;
+}
+
+/**
+ * An internal helper function for dumping data to the screen. CakePHP's PR function is 
+ * the inspiration.
+ *
+ * @param 
+ *  Anything you want
+ *
+ * @return
+ * 	Nicely printed structured data dumped to screen
+ */
+function droptor_pr() {
+  $args = func_get_args();
+  foreach ($args as $obj) {
+    echo "<pre>";
+    print_r($obj);
+    echo "</pre>";
+  }
+}
+
+/**
+ * Determines if this server support memory management feature
+ *
+ * @param n/a
+ *
+ * @return
+ *   True if this site has PHP 5.2 and thus the function we need: memory_get_peak_usage()
+ */
+function droptor_has_memory_management() {
+	return function_exists('memory_get_peak_usage');
+}

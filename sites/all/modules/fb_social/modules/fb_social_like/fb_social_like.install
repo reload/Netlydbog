@@ -1,0 +1,9 @@
+<?php
+
+
+function fb_social_like_uninstall(){
+  $vars = db_query("SELECT * FROM {variable} WHERE name LIKE 'fb_social_like_%'");
+  while ($var = db_fetch_object($vars)) {
+    variable_del($var->name);
+  }
+}

@@ -84,7 +84,7 @@ function convertToEAN($isbn10)
   $prefix = "978";
   if($isbn10==null)
   {
-    return false;
+    return $isbn10;
   }
     
   $isbn10 = str_replace("-","",$isbn10);
@@ -92,7 +92,7 @@ function convertToEAN($isbn10)
     
   if($len<9 || $len>10){
     //Invalid Length
-    return false;
+    return $isbn10;
   }
   //remove the last digit
   if($len==10)
@@ -155,3 +155,4 @@ function formatISBN13($isbn13)
     return $isbn13Fmt;
 }
 ?>
+

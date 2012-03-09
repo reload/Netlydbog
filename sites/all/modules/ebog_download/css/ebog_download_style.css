@@ -1,0 +1,41 @@
+.ui-dialog .ui-dialog-content {
+  width: 300px !important;
+  height: auto !important;
+  margin-bottom: 60px !important;
+  padding-bottom: 0 !important;
+}
+.ui-dialog .ebog-download-confirm p {
+  margin-bottom: 20px;
+}
+.ebog-download-confirm label {
+  display: block;
+  overflow: hidden;
+}
+.ebog-download-confirm input[type=checkbox],
+.ebog-download-confirm input[type=radio] {
+  display: block;
+  float: left;
+  margin-right: 5px;
+}
+.ui-dialog-buttonpane {
+  text-align: center !important;
+}
+.ebog-download-error,
+.ebog-download-info {
+  text-align: center;
+}
+
+.ajax-loader {
+  background-image: url('../images/throbber.gif');
+  background-position: 10px -14px;
+  background-repeat: no-repeat;
+  height: 24px;
+  width: 37px;
+}
+
+.ui-dialog-buttonpane .ajax-loader {
+  left: 50%;
+  margin-left: -18px;
+  position: absolute;
+  top: 10px;
+}

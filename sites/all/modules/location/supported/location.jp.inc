@@ -1,5 +1,5 @@
 <?php
-// $Id: location.jp.inc,v 1.6 2008/01/24 09:00:03 bdragon Exp $
+// $Id: location.jp.inc,v 1.6.4.1 2009/02/04 20:04:10 bdragon Exp $
 
 // Japan
 
@@ -11,12 +11,12 @@ function location_province_list_jp() {
     '05' => "Akita",
     '06' => "Yamagata",
     '07' => "Hukusima (Fukushima) ",
-    '08' => "Ibaraki ",
+    '08' => "Ibaraki",
     '09' => "Totigi (Tochigi) ",
     '10' => "Gunma",
     '11' => "Saitama",
     '12' => "Tiba (Chiba) ",
-    '13' => "Tokyo ",
+    '13' => "Tokyo",
     '14' => "Kanagawa",
     '15' => "Niigata",
     '16' => "Toyama",
@@ -34,7 +34,7 @@ function location_province_list_jp() {
     '28' => "Hyogo",
     '29' => "Nara",
     '30' => "Wakayama",
-    '31' => "Tottori ",
+    '31' => "Tottori",
     '32' => "Simane (Shimane) ",
     '33' => "Okayama",
     '34' => "Hirosima (Hiroshima)",

@@ -1,5 +1,5 @@
 <?php
-// $Id: location.tw.inc,v 1.6 2008/01/24 09:00:03 bdragon Exp $
+// $Id: location.tw.inc,v 1.6.4.1 2009/02/04 20:04:10 bdragon Exp $
 
 // Taiwan, Province of China
 
@@ -27,6 +27,6 @@ function location_province_list_tw() {
     'HC' => "Hsin-chu",
     'TH' => "T'ai-chung",
     'TN' => "T'ai-nan",
-    'KC' => "Kao-hsiung city ",
-    'TC' => "T'ai-pei city ");
+    'KC' => "Kao-hsiung city",
+    'TC' => "T'ai-pei city");
 }

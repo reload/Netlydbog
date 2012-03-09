@@ -1,5 +1,5 @@
 <?php
-// $Id: term_vocabulary.inc,v 1.4.2.2 2009/11/13 00:44:16 merlinofchaos Exp $
+// $Id: term_vocabulary.inc,v 1.4.2.4 2010/07/14 01:30:19 merlinofchaos Exp $
 
 /**
  * @file
@@ -12,13 +12,13 @@
  */
 $plugin = array(
   'title' => t("Taxonomy: vocabulary"),
-  'description' => t('Control access by term vocabulary.'),
+  'description' => t('Control access by vocabulary.'),
   'callback' => 'ctools_term_vocabulary_ctools_access_check',
   'default' => array('vids' => array()),
   'settings form' => 'ctools_term_vocabulary_ctools_access_settings',
   'settings form submit' => 'ctools_term_vocabulary_ctools_access_settings_submit',
-  'summary' => 'ctools_term_vocabulary_ctools_acesss_summary',
-  'required context' => new ctools_context_required(t('Term'), array('term', 'terms')),
+  'summary' => 'ctools_term_vocabulary_ctools_access_summary',
+  'required context' => new ctools_context_required(t('Vocabulary'), array('term', 'terms', 'vocabulary')),
 );
 
 /**
@@ -35,7 +35,7 @@ function ctools_term_vocabulary_ctools_access_settings(&$form, &$form_state, $co
     '#type' => 'checkboxes',
     '#title' => t('Vocabularies'),
     '#options' => $options,
-    '#description' => t('Only terms in the checked vocabularies will be valid.'),
+    '#description' => t('Only the checked vocabularies will be valid.'),
     '#default_value' => $conf['vids'],
   );
 }
@@ -67,7 +67,7 @@ function ctools_term_vocabulary_ctools_access_check($conf, $context) {
 /**
  * Provide a summary description based upon the checked term_vocabularys.
  */
-function ctools_term_vocabulary_ctools_acesss_summary($conf, $context) {
+function ctools_term_vocabulary_ctools_access_summary($conf, $context) {
   if (!isset($conf['type'])) {
     $conf['type'] = array();
   }

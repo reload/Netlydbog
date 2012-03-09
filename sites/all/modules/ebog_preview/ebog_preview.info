@@ -1,0 +1,4 @@
+name = Ebog preview
+description = Provides an ebook preview using Monocle.
+version = 0.1
+core = 6.x

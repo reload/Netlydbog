@@ -1,5 +1,4 @@
 <?php
-// $Id: filters.encryption.inc,v 1.1.2.5 2009/08/22 19:58:13 ronan Exp $
 
 
 /**
@@ -33,7 +32,7 @@ class backup_migrate_filter_encryption extends backup_migrate_filter {
    * Get the form for the settings for this filter.
    */
   function backup_settings_default() {
-    return array('compression' => 'none');
+    return array('encryption' => 'none');
   }
 
   /**
@@ -60,13 +59,6 @@ class backup_migrate_filter_encryption extends backup_migrate_filter {
     }
 
     return $form;
-  }
-
-  /**
-   * Submit the settings form. Any values returned will be saved.
-   */
-  function backup_settings_form_submit($form_values) {
-    return $form_values;
   }
 
   /**

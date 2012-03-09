@@ -1,0 +1,5 @@
+name = Ebog Download
+description = Implements alternative download flow for ebooks.
+version = 0.1
+core = 6.x
+dependencies[] = jquery_ui

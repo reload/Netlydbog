@@ -1,5 +1,4 @@
 <?php
-// $Id: destinations.ftp.inc,v 1.1.2.5 2009/10/17 18:47:19 ronan Exp $
 
 
 /**
@@ -19,7 +18,7 @@ class backup_migrate_destination_ftp extends backup_migrate_destination_remote {
   /**
    * Save to the ftp destination.
    */
-  function save_file($file, $settings) {
+  function _save_file($file, $settings) {
     $ftp = $this->ftp_object();
     if (drupal_ftp_file_to_ftp($file->filepath(), $file->filename(), '.', $ftp)) {
       return $file;
@@ -43,12 +42,12 @@ class backup_migrate_destination_ftp extends backup_migrate_destination_remote {
   /**
    * Delete from the ftp destination.
    */
-  function delete_file($file_id) {
+  function _delete_file($file_id) {
     $this->ftp_object();
     drupal_ftp_delete_file($file_id, $this->ftp);
   }
 
-  function list_files() {
+  function _list_files() {
     backup_migrate_include('files');
     $files = array();
     $this->ftp_object();
@@ -72,13 +71,28 @@ class backup_migrate_destination_ftp extends backup_migrate_destination_remote {
       "#default_value" => @$this->dest_url['port'] ? $this->dest_url['port'] : '21',
       "#weight" => 15,
     );
+    $form['pasv'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Use PASV transfers'),
+      '#default_value' => $this->get_pasv(),
+      '#weight' => 50,
+    );
     return $form;
+  }
+
+  function set_pasv($value) {
+    $this->settings['pasv'] = (bool)$value;
+  }
+
+  function get_pasv() {
+    return isset($this->settings['pasv']) ? $this->settings['pasv'] : FALSE;
   }
 
   function ftp_object() {
     if (!$this->ftp) {
       $this->dest_url['port'] = empty($this->dest_url['port']) ? '21' : $this->dest_url['port'];
-      $this->ftp = drupal_ftp_ftp_object($this->dest_url['host'], $this->dest_url['port'], $this->dest_url['user'], $this->dest_url['pass'], $this->dest_url['path']);
+      $this->dest_url['pasv'] = $this->get_pasv();
+      $this->ftp = drupal_ftp_ftp_object($this->dest_url['host'], $this->dest_url['port'], $this->dest_url['user'], $this->dest_url['pass'], $this->dest_url['path'], $this->dest_url['pasv']);
     }
     return $this->ftp;
   }
@@ -96,7 +110,7 @@ define('DRUPAL_FTP_FT_FILE', 1);
 /**
  *  creates a new ftp object. if any elements of ftp_map are missing, they'll be filled with the server defaults.
  */
-function drupal_ftp_ftp_object($server, $port, $user, $pass, $dir) {
+function drupal_ftp_ftp_object($server, $port, $user, $pass, $dir, $pasv) {
   $ftp = new stdClass();
 
   $ftp->__server = $server;
@@ -104,6 +118,7 @@ function drupal_ftp_ftp_object($server, $port, $user, $pass, $dir) {
   $ftp->__user = $user;
   $ftp->__password = $pass;
   $ftp->__directory = $dir;
+  $ftp->__pasv = $pasv;
 
   return $ftp;
 }
@@ -141,6 +156,15 @@ function drupal_ftp_connect(&$ftp) {
     if (!$chdir) {
       _backup_migrate_message('FTP Error: Couldn\'t change into the @directory directory', array('@directory' => $ftp->__directory), 'error');
       return FALSE;
+    }
+
+    // Set PASV - if needed
+    if ($ftp->__pasv) {
+      $pasv = @ftp_pasv($ftp->__conn, TRUE);
+      if (!$pasv) {
+        _backup_migrate_message('FTP Error: Couldn\'t set PASV mode', array(), 'error');
+        return FALSE;
+      }
     }
   }
 
@@ -205,6 +229,8 @@ function drupal_ftp_ftp_to_file($file, $filename, $directory, &$ftp) {
     _backup_migrate_message('FTP Error: Unable to download file: @filename from @directory', array('@filename' => $filename, '@directory' => $directory), 'error');
     return FALSE;
   }
+  
+  return TRUE;
 }
 
 /**
@@ -220,7 +246,7 @@ function drupal_ftp_file_to_ftp($file, $ftp_filename, $ftp_directory, &$ftp) {
     $complete_filename = $ftp_directory .'/'. $ftp_filename;
     $put_file = @ftp_put($ftp->__conn, $complete_filename, $source, FTP_BINARY);
     if (!$put_file) {
-      _backup_migrate_message('FTP Error: Couldn\'t write to @complete_filename when trying to save file on the ftp server.', array('@complete_filename', $complete_filename), 'error');
+      _backup_migrate_message('FTP Error: Couldn\'t write to @complete_filename when trying to save file on the ftp server.', array('@complete_filename' => $complete_filename), 'error');
       return FALSE;
     }
 

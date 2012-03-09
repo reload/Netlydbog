@@ -1,0 +1,199 @@
+<?php
+/**
+ * @file
+ *
+ */
+
+/**
+ * Implementation of hook_menu().
+ */
+function litteratursiden_feed_compare_menu() {
+  $items = array();
+  $items['admin/settings/litteratursiden_feed_compare'] = array(
+    'title' => 'Litteratursiden feed compare',
+    'description' => 'Litteratursiden feed compare',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('litteratursiden_feed_compare_admin'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'litteratursiden_feed_compare.admin.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function litteratursiden_feed_compare_theme() {
+  return array(
+    'litteratursiden_feed_compare_front' => array(
+      'arguments' => array('items' => NULL, 'conf' => NULL),
+      'template' => 'litteratursiden_feed_compare_front'
+    ),
+    'litteratursiden_feed_compare_page' => array(
+      'arguments' => array('items' => NULL, 'conf' => NULL),
+      'template' => 'litteratursiden_feed_compare_page'
+    ),
+  );
+}
+
+/**
+ * Get cached search result from feed-to-TING search/parse process.
+ */
+function litteratursiden_feed_compare_get_cached_feed($items) {
+
+  $items = variable_get('litteratursiden_feed_compare_items_on_page', '10');
+
+  $lifetime = variable_get('litteratursiden_feed_compare_cache_lifetime', '360');
+
+  $cache = cache_get('litteratursiden_feed_compare_cache');
+  $ret = unserialize($cache->data);
+
+  if (empty($ret)) {
+    $ret = litteratursiden_feed_compare_get_feed($items);
+    cache_set('litteratursiden_feed_compare_cache', serialize($ret), 'cache', time() + $lifetime);
+  }
+
+  shuffle($ret['data']);
+
+  return $ret;
+
+}
+
+/**
+ * Convert TING object to array for serializing in cache.
+ */
+function litteratursiden_feed_compare_object_to_array($object) {
+  $array=array();
+  foreach ($object as $member => $data) {
+    $array[$member] = $data;
+  }
+  return $array;
+}
+
+
+/**
+ * Gets feed from litteratursiden.dk and performs search in TING datawell.
+ */
+function litteratursiden_feed_compare_get_feed($items) {
+
+  module_load_include('client.inc', 'ting');
+  module_load_include('isbn_static_func.inc', 'elib');
+
+  $c = elib_client();
+  $c->setLibrary(variable_get('elib_retailer_id', ''));
+
+  $ret = array();
+  $i = 0;
+  $amo = 0;
+  $feed_main_url = variable_get('litteratursiden_feed_compare_feed_url', 'http://www.litteratursiden.dk/service/recommendations');
+
+  while ($i != 25) {
+    $feed_url = $feed_main_url . '?count=20&offset=' . $i*25;
+    $feed_json_data = _litteratursiden_feed_compare_file_get_contents_curl($feed_url);
+    $feed = json_decode($feed_json_data, TRUE);
+    foreach ($feed as $key => $val) {
+      if (is_numeric($key)) {
+        $a = explode(' af ', $val['title']);
+        $query = $a[0];
+        $search = ting_do_search($query, 1, 25);
+        if ($search->numTotalObjects > 0) {
+          foreach ($search->collections as $collection) {
+            foreach ($collection->objects as $object) {
+              $isbn = $object->record['dc:identifier']['dkdcplus:ISBN'][0];
+              $litteratursiden_item = litteratursiden_feed_compare_get_litteratursiden_item($object->title, $object->creators[0]);
+              if (!empty($isbn) && !$litteratursiden_item['error'] && $litteratursiden_item['nid'] == $val['nid']) {
+                // Title from feed consists of title+author.
+                // Combine title and author from TING to perform reasonable search.
+                try {
+                  $book = $c->getBook($isbn);
+                }
+                catch (Exception $e) {
+                  $ret['status'] = 'error';
+                  $ret['message'] = $e;
+                  return $ret;
+                }
+                if (!empty($book->data)) {
+                  $ret['data'][] = array(
+                    'title' => (string)$book->data->title,
+                    'isbn' => (string)$book->data->external_ids->id,
+                    'author' => (string)$book->data->contributors->first_name . ' ' . (string)$book->data->contributors->family_name,
+                    'abstract' => (string)$litteratursiden_item['description'],
+                    'image' => (string)$book->data->coverimage,
+                    'url' => $object->url
+                  );
+                  $amo++;
+                }
+              }
+            }
+          }
+        }
+      }
+      if ($amo != $items && $amo > 0) {
+        $ret['status'] = 'notfull';
+      }
+      elseif ($amo == $items) {
+        $ret['status'] = 'ok';
+        break 2;
+      }
+      else {
+        $ret['status'] = 'empty';
+      }
+    }
+    $i++;
+  }
+
+  return $ret;
+}
+
+/**
+ * Implementation of hook_ctools_plugin_directory().
+ */
+function litteratursiden_feed_compare_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'ctools' && !empty($plugin)) {
+    return "plugins/$plugin";
+  }
+}
+
+/**
+ * Get item data from litteratursiden service.
+ *
+ * @return array
+ *  Item data.
+ */
+function litteratursiden_feed_compare_get_litteratursiden_item($title, $author, $encoded = FALSE) {
+  if (!$encoded) {
+    $title_enc = urlencode($title);
+    $author_enc = urlencode($author);
+  }
+  $request_url = "http://www.litteratursiden.dk/service/netlydbog?title=$title_enc&author=$author_enc";
+  $json_responce = _litteratursiden_feed_compare_file_get_contents_curl($request_url);
+  $item_data = json_decode($json_responce, TRUE);
+  return $item_data;
+}
+
+/**
+ * Check if item exists in litteratursiden.
+ *
+ * @return boolean
+ */
+function litteratursiden_feed_compare_litteratursiden_item_exists($title, $author, $encoded = FALSE) {
+  $item = litteratursiden_feed_compare_get_litteratursiden_item($title, $author, $encoded);
+  return !$item['error'];
+}
+
+/**
+ * Replacement for file_get_contents().
+ */
+function _litteratursiden_feed_compare_file_get_contents_curl($url) {
+  $ch = curl_init();
+
+  curl_setopt($ch, CURLOPT_HEADER, 0);
+  //Set curl to return the data instead of printing it to the browser.
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+  curl_setopt($ch, CURLOPT_URL, $url);
+
+  $data = curl_exec($ch);
+  curl_close($ch);
+
+  return $data;
+}

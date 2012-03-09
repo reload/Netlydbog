@@ -1,0 +1,18 @@
+.pane-faq-panel-pane-1 .view-content .item-list {
+  margin-bottom: 35px;
+}
+
+#main-content .pane-faq-panel-pane-1 .view-content .item-list ul {
+  padding: 10px;
+  margin: 0;
+}
+
+.faq-content .faq a.top,
+.faq-content .faq .faq-category-menu.line {
+  display: none;
+}
+
+.faq-content .faq .faq-category-menu .faq-answer {
+  margin-bottom: 25px;
+}
+

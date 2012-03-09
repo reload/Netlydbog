@@ -1,5 +1,5 @@
 <?php
-// $Id: location.vc.inc,v 1.6 2008/01/24 09:00:03 bdragon Exp $
+// $Id: location.vc.inc,v 1.6.4.1 2009/02/04 20:04:10 bdragon Exp $
 
 // Saint Vincent and the Grenadines
 
@@ -8,6 +8,6 @@ function location_province_list_vc() {
     'R' => "Grenadines",
     'A' => "Saint Andrew",
     'D' => "Saint David",
-    'G' => "Saint George ",
+    'G' => "Saint George",
     'P' => "Saint Patrick");
 }

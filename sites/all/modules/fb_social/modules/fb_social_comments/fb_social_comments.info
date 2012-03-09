@@ -1,0 +1,12 @@
+name = fb social comments
+description = fb social comments
+package = "Facebook Social"
+dependencies[] = fb_social
+core = 6.x
+
+; Information added by drupal.org packaging script on 2011-09-20
+version = "6.x-1.0-beta9"
+core = "6.x"
+project = "fb_social"
+datestamp = "1316525504"
+

@@ -1,0 +1,302 @@
+<?php
+
+/**
+ * @file
+ * Common settings for all fb social plugins
+ */
+
+/**
+ * Implementation of hook_init
+ */
+function fb_social_init(){
+  // like box or comments widget may want to admin like/comments
+  if (module_exists('fb_social_like') || module_exists('fb_social_comments')) {
+    $data = '<meta property="fb:app_id" content="' . check_plain(variable_get('fb_social_appid', '')) . '"/>' . "\n";
+    drupal_set_html_head($data);
+  }
+}
+
+/**
+ * Implementation of hook_menu
+ */
+function fb_social_menu(){
+  $items = array();
+  $items['fb_social/channel'] = array(
+    'type' => MENU_CALLBACK,
+    'description' => 'Facebook Custom Channel URL',
+    'page callback' => 'fb_social_custom_channel_url',
+    'access callback' => TRUE,
+  );
+  $items['admin/settings/fb/social'] = array(
+    'type' => MENU_NORMAL_ITEM,
+    'title' => 'Facebook social',
+    'description' => 'Settings for facebook social plugins.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('fb_social_settings_form'),
+    'file' => 'fb_social.admin.inc',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer site configuration'),
+  );
+  
+  $items['admin/settings/fb/social/settings'] = array(
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'title' => 'Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('fb_social_settings_form'),
+    'file' => 'fb_social.admin.inc',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer site configuration'),
+    'weight' => -10,
+  );  
+  
+  $extra_settings = array('recommendations', 'livestream', 'activityfeed', 'facepile');
+  foreach($extra_settings as $extra){
+  $items["admin/settings/fb/social/$extra"] = array(
+    'type' => MENU_LOCAL_TASK,
+    'title' => $extra,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array("fb_social_${extra}_settings_form"),
+    'file' => 'fb_social.widgets.inc',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer site configuration'),
+    'weight' => 1,
+  );  
+  }
+  
+  return $items;
+}
+
+/**
+ * Implementation of hook_block().
+ */
+function fb_social_block($op = 'list', $delta = 0) {
+  switch ($op) {
+    case 'list':
+      $info = array(
+        'recommendations' => array('info' => t('fb social: Recommendations')),
+        'livestream' => array('info' => t('fb social: Live stream')),
+        'activityfeed' => array('info' => t('fb social: Activity feed')),
+        'facepile' => array('info' => t('fb social: Facepile')),
+      );
+      return $info;
+    case 'view':
+      $function = "_fb_social_{$delta}_block";
+      if (function_exists($function)) {
+      	return call_user_func($function);
+      }
+      break;
+  }
+}
+
+
+function _fb_social_recommendations_block(){
+  $block['subject'] = '';
+  $block['content'] = theme('fb_social_recommendations');
+  return $block;
+}
+
+function _fb_social_activityfeed_block(){
+  $block['subject'] = '';
+  $block['content'] = theme('fb_social_activityfeed');
+  return $block;
+}
+
+function _fb_social_livestream_block(){
+  $block['subject'] = '';
+  $block['content'] = theme('fb_social_livestream');
+  return $block;
+}
+
+function _fb_social_facepile_block(){
+  $block['subject'] = '';
+  $block['content'] = theme('fb_social_facepile');
+  return $block;
+}
+/**
+ * Implementation of hook_theme
+ */
+function fb_social_theme() {
+  return array(
+    'fb_social_recommendations' => array(),
+    'fb_social_livestream' => array(),
+    'fb_social_activityfeed' => array(),
+    'fb_social_facepile' => array(),
+  );
+}
+
+
+function theme_fb_social_recommendations(){
+  global $_fb_script_init;
+  $_fb_script_init = TRUE;
+  $attrs = array(
+      'site' => variable_get('fb_social_recommendation_site', ''), 
+      'width' => variable_get('fb_social_recommendation_width', 300),
+      'height' => variable_get('fb_social_recommendation_height', 300),
+      'colorscheme' => variable_get('fb_social_recommendation_colorscheme', 'light'),
+      'font' => variable_get('fb_social_recommendation_font', ''), 
+      'border_coler' => variable_get('fb_social_recommendation_border_color', ''), 
+      'header' => variable_get('fb_social_recommendation_header', 1) ? 'true' : 'false', 
+  );
+  
+  $attrs = drupal_attributes($attrs);
+  
+  return '<div id="fb-social-recommendation-widget"><fb:recommendations ' . $attrs . '></fb:recommendations></div>';
+}
+
+function theme_fb_social_activityfeed(){
+  global $_fb_script_init;
+  $_fb_script_init = TRUE;
+  $attrs = array(
+      'site' => variable_get('fb_social_activityfeed_site', ''), 
+      'width' => variable_get('fb_social_activityfeed_width', 300),
+      'height' => variable_get('fb_social_activityfeed_height', 300),
+      'colorscheme' => variable_get('fb_social_activityfeed_colorscheme', 'light'),
+      'font' => variable_get('fb_social_activityfeed_font', ''), 
+      'border_coler' => variable_get('fb_social_activityfeed_border_color', ''), 
+      'header' => variable_get('fb_social_activityfeed_header', 1) ? 'true' : 'false', 
+      'recommendations' => variable_get('fb_social_recommendations_header', 1) ? 'true' : 'false',
+  );
+  
+  $attrs = drupal_attributes($attrs);
+  
+  return '<div id="fb-social-activity-widget"><fb:activity ' . $attrs . '></fb:activity></div>';
+}
+
+function theme_fb_social_livestream(){
+  global $_fb_script_init;
+  $_fb_script_init = TRUE;
+  $attrs = array(
+      'appid' => variable_get('fb_social_appid', ''), 
+      'width' => variable_get('fb_social_livestream_width', 300), 
+      'height' => variable_get('fb_social_livestream_height', 500),
+      'always_post_to_friends' => variable_get('fb_social_livestream_posttofriends', 0) ? 'true' : 'false', 
+
+  );
+  
+  $attrs = drupal_attributes($attrs);
+  
+  return '<div class="fb-social-live-stream-widget"><fb:live-stream ' . $attrs . '></fb:live-stream></div>';
+}
+
+
+function theme_fb_social_facepile(){
+  global $_fb_script_init;
+  $_fb_script_init = TRUE;
+  $attrs = array(
+      'max-rows' => variable_get('fb_social_facepile_numrows', 1),
+      'href' => variable_get('fb_social_facepile_url', '') ,
+      'width' => variable_get('fb_social_facepile_width', 200),
+
+  );
+  
+  $attrs = drupal_attributes($attrs);
+  
+  return '<div class="fb-social-facepile-widget"><fb:facepile ' . $attrs . '></fb:facepile></div>';
+  
+}
+
+
+/**
+ * Implementation of hook_footer
+ */
+function fb_social_footer($main = 0){
+  global $language, $_fb_script_init, $base_url;
+  
+  // If their is no fb plugin enabled on this page, do not load fb script then
+  if (! $_fb_script_init) {
+    return;
+  }
+  
+  $languages = _map_active_languages();
+  
+  if (fb_social_auto_language()) {
+    if (array_key_exists($language->language, $languages)) {
+      $fb_locale = $languages[$language->language];
+    }
+    else {
+      drupal_set_message("There is no mapping for the current language. Using the default locale.");
+    }
+  }
+  else {
+    $fb_locale = variable_get('fb_social_locale', 'en_US');
+  }
+  
+  $appid = variable_get('fb_social_appid', '');
+  $channel_url = $base_url . "/fb_social/channel";
+  
+  $output = '<div id="fb-root"></div>';
+  $output .= "<script type=\"text/javascript\">
+     window.fbAsyncInit = function() {
+       FB.init({
+         appId: " . drupal_to_js($appid) . ",
+         status: true, 
+         cookie: true,
+         xfbml: true,
+         channelUrl: " . drupal_to_js($channel_url) . "
+       });
+       
+       ";
+  
+  // let each module subscribe to different events
+  $output .= implode("\n", module_invoke_all('fb_social_event_subscribe'));
+  $output .= "
+       
+         
+     };
+     (function() {
+       var e = document.createElement('script'); 
+       e.async = true;
+       e.src = document.location.protocol + '//connect.facebook.net/" . $fb_locale . "/all.js';
+       document.getElementById('fb-root').appendChild(e);
+     }());
+  </script>";
+  
+  return $output;
+}
+
+/**
+ * The Custom Channel URL that FB.init has as an option
+ */
+function fb_social_custom_channel_url() {
+  header("Cache-Control: public, s-maxage=31536000, max-age=31536000");
+  header("Expires: Sun, 1 Oct 2079 00:00:00 GMT");
+  
+  global $language;
+  $languages = _map_active_languages();
+  $fb_locale = "en_US";
+
+  if (fb_social_auto_language()) {
+    if (array_key_exists($language->language, $languages)) {
+      $fb_locale = $languages[$language->language];
+    }
+  }
+  else {
+    $fb_locale = variable_get('fb_social_locale', 'en_US');
+  }
+  print '<script src="http://connect.facebook.net/' . $fb_locale . '/all.js"></script>';
+  exit;
+}
+
+function fb_social_auto_language() {
+  return variable_get('fb_social_locale_auto', 0);
+}
+
+function _map_active_languages() {
+  $languages = language_list();
+  $mapped = array();
+  foreach ($languages as $key => $language) {
+    $mapped[$language->language] = variable_get('fb_social_language_' . $language->language, '');
+  }
+  return $mapped;
+}
+
+// API functions
+
+/**
+ *  Based on the user settings return the aliased / unaliased version
+ *  of a given $url
+ */
+function fb_social_url($url = NULL){
+  $aliased = variable_get('fb_social_urls_mode', 0);
+  return url($url, array('absolute' => TRUE, 'alias' => $aliased ));
+}

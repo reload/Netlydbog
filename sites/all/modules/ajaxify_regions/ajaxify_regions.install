@@ -1,0 +1,12 @@
+<?php
+function ajaxify_regions_install() {
+  if (module_exists('authcache')) {
+    $pagecaching = variable_get('authcache_pagecaching', array(array('option' => 0,'pages' => AUTHCACHE_NOCACHE_DEFAULT, 'roles' => array(0,1))));
+    foreach($pagecaching as $page => $page_rules) {
+      if ($page_rules['option'] == 0) {
+        $pagecaching[$page]['pages'] .= "\najaxify_regions/ajax";
+      }
+    }
+    variable_set('authcache_pagecaching', $pagecaching);
+  }
+}

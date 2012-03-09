@@ -1,0 +1,6 @@
+name = Ding! periodical view
+description = Displays periodicals if the library system supports it.
+package = Ding!
+php = 5.2
+core = 6.x
+dependencies[] = ting

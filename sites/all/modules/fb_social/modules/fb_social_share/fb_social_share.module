@@ -1,0 +1,144 @@
+<?php
+
+/**
+ * Implementation of hook_theme
+ */
+function fb_social_share_theme(){
+  return array(
+    'fb_social_share_widget' => array(
+      'arguments' => array('url' => NULL) 
+      ) 
+  );
+}
+
+/**
+ * Implementation of hook_block
+ */
+function fb_social_share_block($op = 'list', $delta = 0){
+  
+  if ($op == "list") {
+    $block = array();
+    $block[0]["info"] = t('fb share');
+    return $block;
+  }
+  else if ($op == 'view') {
+    $url = fb_social_url($_GET['q']);
+    $layout = variable_get('fb_social_share_layout_style', 'button_count');
+    
+    $block_content .= theme('fb_social_share_widget', $url);
+    $block['subject'] = 'Facebook Share';
+    $block['content'] = $block_content;
+    return $block;
+  }
+}
+
+/**
+ * Implementation of hook_menu
+ */
+function fb_social_share_menu(){
+  
+  $items = array();
+  
+  $items['admin/settings/fb/social/share'] = array(
+      'title' => 'share', 
+      'description' => 'Facebook share module settings', 
+      'page callback' => 'drupal_get_form', 
+      'page arguments' => array(
+          'fb_social_share_settings_form' 
+      ), 
+      'access callback' => 'user_access', 
+      'access arguments' => array(
+          'access administration pages' 
+      ), 
+      'file' => 'fb_social_share.admin.inc', 
+      'type' => MENU_LOCAL_TASK 
+  );
+  
+  return $items;
+}
+
+/**
+ * Implementation of hook_content_extra_fields.
+ */
+function fb_social_share_content_extra_fields($type_name){
+  if (fb_social_share_type($type_name) && variable_get('fb_social_share_location', 0)) {
+    $extras['fb_social_share_widget'] = array(
+        'label' => t('Facebook socials share widget'), 
+        'description' => t('The facebook share pluging widget'), 
+        'weight' => - 10 
+    );
+    return $extras;
+  }
+}
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function fb_social_share_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL){
+  switch ($op) {
+    case 'view' :    
+      if ($node -> status && fb_social_share_type($node->type) && variable_get('fb_social_share_location', 0)) {
+        if (($a4 || !$a3) || variable_get('fb_social_share_display_teasers', 1) && $a3) {
+          
+          $output = theme('fb_social_share_widget', fb_social_url('node/' . $node->nid));
+          $weight = (module_exists('content')) ? content_extra_field_weight($node->type, 'fb_social_share_widget') : -10;
+          $node->content['fb_social_share_widget'] = array(
+              '#weight' => $weight, 
+              '#value' => $output 
+          );
+        }
+      }
+      break;
+  }
+}
+
+/**
+ * theme callback function
+ */
+function theme_fb_social_share_widget($url){
+  global $_fb_script_init;
+  $_fb_script_init = TRUE;
+  
+  $layout = variable_get('fb_social_share_layout_style', 'button_count');
+  return '<fb:share-button href="' . $url . '" type ="' . $layout . '" ></fb:share-button>';
+
+}
+
+/**
+ * Implementation of hook_link
+ */
+function fb_social_share_link($type, $object, $teaser = FALSE){
+  
+  if ('node' != $type) {
+    return;
+  }
+  
+  // dont like unpublished nodes
+  if (!$object -> status){
+    return;
+  }
+  
+  if ($teaser && ! variable_get('fb_social_share_check_teasers', 1)) {
+    return;
+  }
+  
+  // widget is not to be displayed in the node links. return
+  if (variable_get('fb_social_share_location', 0)){
+    return;
+  }
+  
+  $links = array();
+  if ($type == 'node' && fb_social_share_type($object->type)) {
+    $links['fb_social_share_class'] = array(
+        'title' => theme('fb_social_share_widget', fb_social_url('node/' . $object->nid)), 
+        'html' => TRUE 
+    );
+  }
+  
+  return $links;
+}
+
+function fb_social_share_type($type){
+  $fb_share_types = variable_get('fb_social_share_node_types', array());
+  return (isset($fb_share_types[$type]) && $fb_share_types[$type]) ? TRUE : FALSE;
+}

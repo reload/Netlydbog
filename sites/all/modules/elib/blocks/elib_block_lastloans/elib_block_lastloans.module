@@ -1,5 +1,63 @@
 <?php 
 
+/**
+ * Implements hook_menu().
+ */
+function elib_block_lastloans_menu() {
+  $items = array();
+
+  $items['popular/page'] = array(
+    'page callback' => 'elib_block_lastloans_popular_page',
+    'page arguments' => array(),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['admin/settings/elib/elib_block_lastloans'] = array(
+    'title' => 'eLIB block lastloans settings',
+    'description' => '.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('elib_block_lastloans_admin'),
+    'access arguments' => array('access administration pages'),
+    'file' => 'elib_block_lastloans.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
+/**
+ * AJAX handler for paged popular loans results.
+ */
+function elib_block_lastloans_popular_page() {
+  $page = (int)$_REQUEST['page'];
+  $page -= 1;
+  $content = '';
+
+  $cache_name = 'elib_popular_books_extended_cache';
+  $cache_table = 'cache';
+  
+  $cache = cache_get($cache_name, $cache_table);
+  $response = array();
+  
+  if ($cache && isset($cache->data[$page])) {
+    $content = $cache->data[$page];
+  }
+  elseif($cache && isset($cache->data[0])) {
+    $content = $cache->data[0];
+  }
+  else {
+    $content = '';
+  }
+
+  $response = array(
+    'status' => TRUE,
+    'content' => $content,
+  );
+
+  echo json_encode($response);
+  exit(0);
+}
 
 function elib_block_lastloans_block($op = 'list', $delta = 0) {
   if ($op == 'list') {
@@ -9,6 +67,7 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
 	  $blocks[3]['info'] = t('Welcome block - my page');
 	  $blocks[4]['info'] = t('dummyblock2 books');
 	  $blocks[5]['info'] = t('Logout block button');
+      $blocks[6]['info'] = t('Popular books extended');
 	  return $blocks;
   }
   elseif ($op == 'view') {
@@ -17,7 +76,6 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
     
     elib_client()->setLibrary(variable_get('elib_retailer_id', ''));
     
-    
     module_load_include('client.inc', 'ting');
     
     switch($delta){
@@ -25,8 +83,9 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
     		
 		    $response = elib_client()->getLatestLoans(10);  
 		    
+		    
 		    foreach($response as $isbn){
-		      $out .= elib_displaybookNEW(ting_get_object_by_isbn($isbn),'','small'); 
+		      $out .= elib_displaybookNEW(elib_get_ting_object_by_isbn($isbn),'','small');
 		    }
 		    $block['subject'] = t('Seneste Lån');	
     		break;
@@ -44,7 +103,7 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
 	    		  
 	    		  //krumo(array($isbn,$title));
 	    		  
-	    		  if(ting_get_object_by_isbn($isbn)){
+	    		  if(elib_get_ting_object_by_isbn($isbn)){
 	    		    $toplist[] = $isbn;
 	    		  //  krumo('hurray'.$isbn);
 	    		  }
@@ -54,32 +113,47 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
 	    		}
 	    		if(is_array($toplist)){  
   	    		foreach($toplist as $isbn){
-  	    		 	$out .= elib_displaybookNEW(ting_get_object_by_isbn($isbn),'','small'); 
+  	    		 	$out .= elib_displaybookNEW(elib_get_ting_object_by_isbn($isbn),'','small');
   	    		}
 	    		}
     		  $block['subject'] = t('Nyeste bøger');
     		break;
     	case 2:
-    		$response = elib_client()->getPopularBooks();
+          $cache_name = 'elib_popular_books_cache' . $delta;
+          $cache_table = 'cache';
 
-    		$index = 1;
-        foreach($response->data->toplistitem as $item){
-            
-            //print $item['ebookid'].'--';
-            if(ting_get_object_by_isbn(trim($item->ebookid))){
-              $out .= elib_displaybookNEW(ting_get_object_by_isbn(trim($item->ebookid)), array('popular' => 1), 'small', $index);
-              $index++;
-            }
-            else
-            {
-              watchdog('elib','eLib Popular books: Could not retrieve data from ting_get_object_by_isbn() "@data"',array('@data' => var_export($item, true), WATCHDOG_DEBUG));
-            }
+          $cache = cache_get($cache_name, $cache_table);
+          $out = '';
+          
+          if (isset($cache->data)) {
+            $out = $cache->data;
           }
-          if($out == ''){
-            $out = t('???');
+          else {
+            $response = elib_client()->getPopularBooks();
+            $index = 1;
+
+            foreach ($response->data->toplistitem as $item) {
+              //print $item['ebookid'].'--';
+              if (elib_get_ting_object_by_isbn(trim($item->ebookid))) {
+                $out .= elib_displaybookNEW(elib_get_ting_object_by_isbn(trim($item->ebookid)), array('popular' => 1), 'small', $index, $item);
+                $index++;
+              }
+            }
+
+            cache_set($cache_name, $out, $cache_table, strtotime('+1 day'));
           }
-    		$block['subject'] = t('populære bøger');
-    		break;
+
+          if($out == '') {
+            $out = '<h1>';
+            $out .= t('There are currently no popular items.');
+            $out .= '</h1>';
+          }
+          else {
+            $out .= '</div><div class="bottom-bar"><div class="see-more popular-more"><a href="/top100">' . t('See more popular items..') . '</a></div>';
+          }
+
+          $block['subject'] = t('populære bøger');
+          break;
       case 3:
         global $user;
         if($user->uid == 0){return false;}    		
@@ -95,7 +169,7 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
         if(!$library){
         	return;
         }
-        $out = '<p class="spacing-before">'.t('Velkommen! Som bruger i %library kan du låne %amount om måneden',array('%library' => $library,'%amount' => format_plural(elib_libraries_get_maxloans($u['lib']), 'en lydbog', '@count lydbøger'))).'</p>';
+        $out = '<p class="spacing-before">'.t('Velkommen! Som bruger i @library kan du låne @amount om måneden',array('@library' => $library,'@amount' => format_plural(elib_libraries_get_maxloans($u['lib']), 'en ebog', '@count ebøger'))).'</p>';
 
         elib_client()->setLoaner($u['cpr'],$u['pin'],$u['lib']);
         $loans = elib_client()->getLoans();
@@ -119,7 +193,7 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
       
             $hours = floor($rest/3600);
             
-            $out .= t('<p style="text-align:right;margin-top:10px;">Du kan låne en lydbog igen om %dage og %time</p>', array('%dage' => format_plural($days, 'en dag', '@count dage'),'%time' => format_plural($hours, 'en time', '@count timer')));
+            $out .= t('<p style="text-align:right;margin-top:10px;">Du kan låne en ebog igen om %dage og %time</p>', array('%dage' => format_plural($days, 'en dag', '@count dage'),'%time' => format_plural($hours, 'en time', '@count timer')));
           }
         }
         
@@ -132,6 +206,63 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
     			$out = '<p>Du er logget ind: '.l('Log ud','logout',array('attributes' => array('class' => 'biglogoutbutton'))).'</p>';
     		}
     		break;
+
+        case 6:
+          $cache_name = 'elib_popular_books_extended_cache';
+          $cache_table = 'cache';
+
+          $cache = cache_get($cache_name, $cache_table);
+          $out = '';
+          $pages = 0;
+          $items = 1;
+
+          if (isset($cache->data)) {
+            $out = $cache->data;
+          }
+          else {
+            $response = elib_client()->getPopularBooks(variable_get('elib_popular_item_count', ELIB_POPULAR_ITEM_COUNT_DEFAULT));
+
+            foreach ($response->data->toplistitem as $item) {
+              if ($items % 11 == 0) {
+                $pages++;
+                $items = 1;
+              }
+              
+              $isbn = trim($item->ebookid);
+              $ting_object = elib_get_ting_object_by_isbn($isbn);
+              if ($ting_object) {
+                $out[$pages] .= theme('elib_item', array(
+                    'ting_obj' => $ting_object,
+                    'isbn' => $isbn,
+                  )
+                );
+              }
+
+              $items++;
+            }
+
+            cache_set($cache_name, $out, $cache_table, strtotime('+1 day'));
+          }
+
+          if ($out == '') {
+            $out = '<h1>';
+            $out .= t('There are currently no popular items.');
+            $out .= '</h1>';
+          }
+          else {
+            $pages = count($out);
+            drupal_add_js(drupal_get_path('module', 'elib_block_lastloans') . '/js/jquery.url.js', 'file');
+            drupal_add_js(drupal_get_path('module', 'elib_block_lastloans') . '/js/popular_loans.js', 'file');
+            drupal_add_js(array('elib_popular' => array('pages' => $pages)), 'setting');
+
+            $pager = theme('elib_popular_pager', array('pages' => $pages));
+            $out = theme('elib_popular', array(
+              'elib_popular' => $out[0],
+              'elib_popular_pager' => $pager)
+            );
+          }
+
+          $block['subject'] = t('100 most popular items');
     }
     
     //krumo($books);
@@ -148,7 +279,31 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
     return $block;
   }
   
-} 
+}
+
+/**
+ * Implements hook_theme().
+ */
+function elib_block_lastloans_theme($existing, $type, $theme, $path) {
+  $hooks = array();
+
+  $hooks['elib_item'] = array(
+    'arguments' => array('data' => NULL),
+    'template' => 'templates/elib_popular_item',
+  );
+
+  $hooks['elib_popular'] = array(
+    'arguments' => array('data' => NULL),
+    'template' => 'templates/elib_popular',
+  );
+
+  $hooks['elib_popular_pager'] = array(
+    'arguments' => array('data' => NULL),
+    'template' => 'templates/elib_popular_pager',
+  );
+
+  return $hooks;
+}
 
 
 

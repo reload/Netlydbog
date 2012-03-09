@@ -1,5 +1,5 @@
 <?php
-// $Id: location.us.inc,v 1.23 2008/08/21 16:18:05 bdragon Exp $
+// $Id: location.us.inc,v 1.23.2.1 2009/02/04 23:16:17 bdragon Exp $
 
 /**
  * Returns a lat/lon pair of the approximate center of the given postal code in the given country
@@ -154,7 +154,7 @@ function location_map_link_us_google($location = array()) {
     }
   }
 
-  if ($location['latitude'] && $location['longitude']) {
+  if (location_has_coordinates($location)) {
     $q = urlencode($location['latitude'] . ' ' . $location['longitude'] . ' (' . implode(', ', $query_params) . ')' );
   } else if (count($query_params) > 0) {
     $q = urlencode(implode(", ", $query_params));

@@ -1,5 +1,4 @@
 <?php
-//$Id: date_admin.inc,v 1.40.2.3.2.39 2009/06/08 16:49:36 karens Exp $
 /**
  * @file
  * Date administration code.
@@ -31,7 +30,7 @@ function _date_widget_settings($op, &$field) {
           form_set_error('default_value_code2', t('The Strtotime default value for the To Date is invalid.'));
         }
       }
-      if ($field['type'] == 'date_select' && !preg_match('@\-[0-9]*:[\+|\-][0-9]*@', $field['year_range'])) {
+      if (in_array($field['widget']['type'], array('date_select', 'date_popup', 'date_select_repeat', 'date_popup_repeat')) && !date_range_valid($field['year_range'])) {
         form_set_error('year_range', t('Years back and forward must be in the format -9:+9.'));
       }
       break;
@@ -116,7 +115,7 @@ function date_widget_settings_form($widget) {
     '#options' => $options,
     '#description' => t('Set the order and format for the date parts in the input form. The format will be adapted to remove values not in the granularity for this field.'),
   );
-  
+
   // Only a limited set of formats is available for the Date Popup module
   if ($widget['type'] != 'date_popup') {
     $form['input']['format']['input_format_custom'] = array(
@@ -255,16 +254,18 @@ function _date_field_settings($op, $field) {
       $data = content_views_field_views_data($field);
       $db_info = content_database_info($field);
       $table_alias = content_views_tablename($field);
-      
+
       // Swap in the date multiple value handler for 
       // CCK's regular multiple value handler.
       $data[$table_alias][$field['field_name'] .'_value']['field']['handler'] = 'date_handler_field_multiple';
-      
+
       // Unset the filter and argument handlers, dates can use the generic 
       // date argument and filter handlers created by the Date API.
-      unset($data[$table_alias][$field['field_name'] .'_value']['argument']);
-      unset($data[$table_alias][$field['field_name'] .'_value']['filter']);
-     
+      //unset($data[$table_alias][$field['field_name'] .'_value']['argument']);
+      //unset($data[$table_alias][$field['field_name'] .'_value']['filter']);
+      $data[$table_alias][$field['field_name'] .'_value']['argument']['handler'] = 'date_api_argument_handler';
+      $data[$table_alias][$field['field_name'] .'_value']['filter']['handler'] = 'date_api_filter_handler';
+
       // Add in another set of fields for the To date.
       if (!empty($field['todate'])) {
         $data[$table_alias][$field['field_name'] .'_value']['field']['title'] = $data[$table_alias][$field['field_name'] .'_value']['title'];
@@ -276,7 +277,7 @@ function _date_field_settings($op, $field) {
         $data[$table_alias][$field['field_name'] .'_value']['title short'] .= ' - ' . t('From date');
         $data[$table_alias][$field['field_name'] .'_value']['field']['title'] .= ' - ' . t('From date');
         $data[$table_alias][$field['field_name'] .'_value']['field']['title short'] .= ' - ' . t('From date');
-        
+
         $data[$table_alias][$field['field_name'] .'_value2']['title'] .= ' - ' . t('To date');
         $data[$table_alias][$field['field_name'] .'_value2']['title short'] .= ' - ' . t('To date');
         $data[$table_alias][$field['field_name'] .'_value2']['field']['title'] .= ' - ' . t('To date');
@@ -305,7 +306,7 @@ function date_columns($field) {
   // If a second date is needed for 'To date', just make a copy of the first one.
   if (!empty($field['todate'])) {
     $db_columns['value2'] = $db_columns['value'];
-    
+
     // We don't want CCK to create additional columns, just the first.
     // We modify them our own way in views data.
     $db_columns['value2']['views'] = FALSE;
@@ -334,7 +335,7 @@ function date_field_settings_form($field) {
     $granularity = array('year', 'month', 'day', 'hour', 'minute');
   }
   $tz_handling = isset($field['tz_handling']) ? $field['tz_handling'] : (date_has_time($granularity) ? 'site' : 'none');
-  
+
   // If adding a repeat, override the Content module's handling of the multiple values option.
   if (module_exists('date_repeat') && date_is_repeat_field($field)) {
     $form['multiple'] = array('#type' => 'hidden', '#value' => 1);
@@ -368,7 +369,7 @@ function date_field_settings_form($field) {
     '#title' => t('Default Display'),
     '#default_value' => !empty($field['default_format']) ? $field['default_format'] : 'medium',
     '#options' => $format_types,
-    '#description' => t('Select a default format type to be used for the date display. Visit the <a href="@date-time-page">Date and time date format page</a> to add and edit format types.', array('@date-time-page' => base_path() .'admin/settings/date-time/formats')),
+    '#description' => t('Select a default format type to be used for the date display. Visit the <a href="@date-time-page">Date and time date format page</a> to add and edit format types.', array('@date-time-page' => url('admin/settings/date-time/formats'))),
     );
 
   $description = t('Select the timezone handling method to be used for this date field.');
@@ -386,7 +387,7 @@ function date_field_settings_form($field) {
     '#type' => 'hidden',
     '#value' => date_get_timezone_db($tz_handling),
     );
-  
+
   if (module_exists('date_repeat') && date_is_repeat_field($field)) {
     $form['repeat_collapsed'] = array(
       '#type' => 'radios',
@@ -473,7 +474,7 @@ function date_example_date() {
 function date_field_default_values($field_type, $widget_type, $tz_handling, $overrides = array()) {
   module_load_include('inc', 'content', 'includes/content.crud');
   $repeat_widgets = array('date_select_repeat', 'date_text_repeat', 'date_popup_repeat');
-  
+
   $base_field_values = array (
     'field_name' => '',
     'type_name' => '',
@@ -499,7 +500,7 @@ function date_field_default_values($field_type, $widget_type, $tz_handling, $ove
     'default_value_code' => '', 
     'default_value2' => 'same',
     'default_value_code2' => '', 
-    'input_format' => variable_get('date_format_short', 'm/d/Y - H:i'),
+    'input_format' => date_default_format($widget_type),
     'input_format_custom' => '', 
     'increment' => 1,
     'text_parts' => array (),
@@ -511,7 +512,7 @@ function date_field_default_values($field_type, $widget_type, $tz_handling, $ove
   );
   $field_values['date'] = $base_field_values;
   $field_values['date']['type'] = 'date';
-  
+
   $field_values['datestamp'] = $base_field_values;
   $field_values['datestamp']['type'] = 'datestamp';
 
@@ -520,26 +521,26 @@ function date_field_default_values($field_type, $widget_type, $tz_handling, $ove
 
   $widget_values['date_select'] = $base_widget_values;
   $widget_values['date_select']['type'] = 'date_select';
-  
+
   $widget_values['date_text'] = $base_widget_values;
   $widget_values['date_text']['type'] = 'date_text';
-  
+
   $widget_values['date_popup'] = $base_widget_values;
   $widget_values['date_popup']['type'] = 'date_popup';
   $widget_values['date_popup']['module'] = 'date_popup';
-    
+
   $widget_values['date_select_repeat'] = $base_widget_values;
   $widget_values['date_select_repeat']['type'] = 'date_select_repeat';
-  
+
   $widget_values['date_text_repeat'] = $base_widget_values;
   $widget_values['date_text_repeat']['type'] = 'date_text_repeat';
-  
+
   $widget_values['date_popup_repeat'] = $base_widget_values;
   $widget_values['date_popup_repeat']['type'] = 'date_popup_repeat';
-  
+
   // Get the basic field array with content module default values.
   $field = content_field_default_values($field_type);
-  
+
   // Update it with default values for this date field and widget type.
   foreach ($field_values[$field_type] as $key => $value) {
     $field[$key] = $value;
@@ -547,7 +548,7 @@ function date_field_default_values($field_type, $widget_type, $tz_handling, $ove
   foreach ($widget_values[$widget_type] as $key => $value) {
     $field['widget'][$key] = $value;
   }
-  
+
   // Allow overrides of specific default values. 
   foreach ($overrides as $key => $value) {
     if ($key != 'widget') {
@@ -561,12 +562,12 @@ function date_field_default_values($field_type, $widget_type, $tz_handling, $ove
   }
   // Make sure multiple gets set correctly for repeating dates.
   if ($field['repeat']) $field['multiple'] = 1;
-  
+
   // Reset columns and db_storage, which may need to be 
   // adjusted to the new values.
   $field['columns'] = date_columns($field);
   $field['db_storage'] = content_storage_type($field);
-  
+
   return $field;
 }
 
@@ -584,7 +585,7 @@ function _date_formatter_settings($form_state = NULL, $field, $options = array()
   if (empty($options['fromto'])) {
     $options = date_formatter_get_settings($field_name, $type_name, $context);
   }
-  
+
   $form = array();
   $form['fromto'] = array(
     '#access' => $field['todate'],
@@ -635,7 +636,7 @@ function _date_formatter_settings($form_state = NULL, $field, $options = array()
       '#dependency' => array('edit-options-multiple-group' => array(TRUE)),
     );
   }
-  
+
   if (isset($options['multiple']) && isset($options['multiple']['multiple_from'])) {
     $default = $options['multiple']['multiple_from'];    
   }
@@ -679,7 +680,7 @@ function _date_formatter_settings($form_state = NULL, $field, $options = array()
       '#dependency' => array('edit-options-multiple-group' => array(TRUE)),
     );
   }
-  
+
   $form['repeat'] = array(
     '#access' => $field['repeat'],
     '#weight' => 7,

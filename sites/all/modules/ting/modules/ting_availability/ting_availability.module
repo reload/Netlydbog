@@ -1,0 +1,189 @@
+<?php
+
+/**
+ * Implementation of hook_menu().
+ */
+function ting_availability_menu() {
+  $items = array();
+
+  $items['ting/availability/item/%'] = array(
+    'title' => 'Get item availability',
+    'description' => 'Get item availability for items.',
+    'page callback' => 'ting_availability_item_page',
+    'page arguments' => array(3),
+    'access arguments' => array('access content'),
+  );
+
+  $items['ting/availability/item/%/details'] = array(
+    'title' => 'Get item availability details',
+    'description' => 'Get all details for items. Availability, location, etc.',
+    'page callback' => 'ting_availability_item_details_page',
+    'page arguments' => array(3),
+    'access arguments' => array('access content'),
+  );
+
+  return $items;
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function ting_availability_theme() {
+  return array(
+    'ting_availability_box' => array(
+      'arguments' => array('object' => NULL),
+    ),
+  );
+}
+
+function ting_availability_trampoline() {
+  $items = array();
+  $items['ting/availability/item/%/details'] = array(
+    'includes' => array(
+      drupal_get_path('module', 'ding_provider') . '/ding_provider.module',
+      drupal_get_path('module', 'ctools') . '/ctools.module'),
+    'hooks' => array('ding_provider_availability', 'ctools_plugin_directory' => array('alma', 'openruth')),
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_ting_add_js().
+ */
+function ting_availability_ting_add_js($type) {
+  $path = drupal_get_path('module', 'ting_availability') . '/js';
+  switch ($type) {
+    case 'ting_object_view':
+      drupal_add_js($path . '/ting.availability.js', 'module', 'footer', TRUE);
+      drupal_add_js($path . '/ting.availability.ting_object_view.js', 'module', 'footer', TRUE);
+      break;
+    case 'ting_collection_view':
+      // Even though we're deferring the following code,
+      // Drupal.tingAvailability isn't defined when it runs, so we're
+      // *not* deferring ting.availability.js here.
+      drupal_add_js($path . '/ting.availability.js', 'module', 'footer', FALSE);
+      drupal_add_js('$(function(){Drupal.tingAvailability.get_details(Drupal.tingAvailability.updateStatus)});', 'inline', 'footer', TRUE);
+      break;
+    case 'ting_search_view':
+      drupal_add_js($path . '/ting.availability.js', 'module', 'footer', TRUE);
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_requirements().
+ */
+function ting_availability_requirements($phase) {
+  $requrements = array();
+
+  if ($phase == 'runtime') {
+    $availability_provider = ding_provider_description('availability');
+
+    $requrements['ding_availability'] = array(
+      'title' => t('Ding availability'),
+      'severity' => $availability_provider ? REQUIREMENT_INFO : REQUIREMENT_WARNING,
+      'value' => $availability_provider,
+      'description' => $availability_provider ? t('OK'): t('No availability provider active.'),
+    );
+  }
+
+  return $requrements;
+}
+
+/**
+ * AHAH callback to get library item availability.
+ *
+ * @param string $input
+ *    Input string, one or more library system item IDs, comma-separated.
+ */
+function ting_availability_item_page($provider_id) {
+  $items = ding_provider_invoke('availability', 'items', explode(',', $provider_id));
+  // We are returning JavaScript, so tell the browser.
+  drupal_set_header('Content-Type: application/json; charset=utf-8');
+  echo json_encode($items);
+  return;
+}
+
+/**
+ * AHAH callback to get library item details.
+ *
+ * @param string $input
+ *    Input string, one or more library system item IDs, comma-separated.
+ */
+function ting_availability_item_details_page($provider_id) {
+  $items = ding_provider_invoke('availability', 'details', explode(',', $provider_id));
+  // We are returning JavaScript, so tell the browser.
+  drupal_set_header('Content-Type: application/json; charset=utf-8');
+  echo json_encode($items);
+  return;
+}
+
+/**
+ * Implementation of hook_ting_object_is().
+ */
+function ting_availability_ting_object_is($object, $class) {
+  if ($class == 'limited_availability') {
+    // Online objects are never of limited availability. Ding should provide
+    // users with direct access to these if possible.
+    if (ting_object_is($object, 'online')) {
+      return FALSE;
+    }
+
+    // Objects which belong to the library holdings are always of limited availability.
+    $vars = ting_object_preprocess($object);
+    if (in_array(strtolower($vars['ting_source']), array('bibliotekets materialer'))) {
+      return TRUE;
+    }
+  }
+}
+
+/**
+ * Template preprocessor for ting objects.
+ */
+function ting_availability_preprocess_ting_object(&$vars) {
+  $object = $vars['object'];
+  if (ting_object_is($object, 'limited_availability')) {
+    $vars['additional_main_content'][] = array(
+      '#type' => 'markup',
+      '#value' => '<div class="ting-status ting-availability-status waiting">' . t('waiting for data') . '</div>',
+    );
+
+    $vars['additional_content'][] = array(
+      '#type' => 'markup',
+      '#weight' => -10,
+      '#value' => theme('ting_availability_box', $object),
+    );
+
+  };
+}
+
+/**
+ * Template preprocessor for ting list item.
+ */
+function ting_availability_preprocess_ting_list_item(&$vars) {
+  $object = $vars['object'];
+  if (ting_object_is($object, 'limited_availability')) {
+    $vars['additional_content'][] = array(
+      '#type' => 'markup',
+      '#value' => '<div class="ting-status ting-availability-status waiting">' . t('waiting for data') . '</div>',
+    );
+
+  };
+}
+
+/**
+ * Theme function for the availability box.
+ *
+ * If overriding this then note that the ting-availability and library-list classes are
+ * required for the AJAX based retrieval of availability information to work.
+ */
+function theme_ting_availability_box($object) {
+  return '<div class="ding-box-wide ting-availability">
+            <h3>' .
+              t('%title is available at the following libraries:', array('%title' => check_plain($object->title))) .
+            '</h3>' .
+            '<ul class="library-list">' .
+              '<li class="ting-status waiting even">' . t('waiting for data') .'</li>' .
+            '</ul>' .
+         '</div>';
+}
