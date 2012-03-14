@@ -844,7 +844,8 @@ function elib_get_sample($tingObjectID) {
 function elib_book_teaser(TingClientObject $object, $is_ajax = false) {
   module_load_include('isbn_static_func.inc', 'elib');
   $isbn = preg_replace('/[^0-9]+/', '', $object->record['dc:identifier']['dkdcplus:ISBN'][0]);
-  $isbn = convertFromIsbn13ToIsbn10($isbn);
+  // NOTE: We don't need isbn 10 any more
+  //$isbn = convertFromIsbn13ToIsbn10($isbn);
 
   $c = elib_client();
   $c->setLibrary(variable_get('elib_retailer_id', ''));
@@ -856,7 +857,9 @@ function elib_book_teaser(TingClientObject $object, $is_ajax = false) {
     return;
   }
 
-  $teasersamplelink = $book->data->product->teaser->link;
+  // NOTE: XML structure changes
+  //$teasersamplelink = $book->data->product->teaser->link;
+  $teasersamplelink = $book->data->teaser->link;
 
   if (!empty($teasersamplelink)) {
     // change to an https link
