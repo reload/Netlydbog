@@ -35,7 +35,7 @@ if ($op == 'list') {
  
     $block['subject'] = t('Top 5 mest lånte');   
       
-      $block['content'] = $out;
+    $block['content'] = $out;
 
     
     
