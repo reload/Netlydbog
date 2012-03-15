@@ -4,4 +4,4 @@ description = Adds extra features to Ting
 package = Ding!
 core = 6.x
 dependencies[] = ting
-
+dependencies[] = jquery_ui
