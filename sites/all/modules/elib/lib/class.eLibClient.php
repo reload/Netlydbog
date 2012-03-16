@@ -128,15 +128,23 @@ class eLibClient{
     
   }
 
-  public function getLatestLoans(){
+  /**
+   * Function to get the latest loans.
+   * @param int $type the type of items to fetch: 1- ebook, 2- audiobook. Defaults to audiobook for test purposes only
+   */
+  public function getLatestLoans($type = '2') {
     
-  	$params['fromdate'] = date('Y-m-d',time()-2592000);
+    // We set only the listtype parameter, the other 2 will be inserted
+    // automatically when executing the soap call
+    // TODO: Make it work with mixed content (audio + ebook)
+    if (in_array($type, array('1', '2'))) {
+     $params['listtype'] = $type;
+    }
     
-  	$response = $this->soapCall($this->base_url.'getlibrarylist.asmx?WSDL','GetLastLoans',$params);
-  	$xml = simplexml_load_string($response->GetLastLoansResult->any);
+    $response = $this->soapCall($this->base_url.'getlibrarylist.asmx?WSDL','GetLastLoansForAll',$params);
 
-  	//var_dump($xml);
-  	
+    $xml = simplexml_load_string($response->GetLastLoansForAllResult->any);
+
   	$ids = array();
   	
     if(($xml->data->orderinformationitem)){
@@ -146,8 +154,6 @@ class eLibClient{
         }
       }
   	}
-  	
-  //	var_dump($ids);
   	
   	return array_slice(array_reverse($ids),0,5);
   }
