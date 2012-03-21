@@ -132,7 +132,7 @@ Drupal.tingFacetBrowser = function(facetBrowserElement, searchResultElement, res
   };
 
   this.initCarousel = function(element) {
-    $(element).children().addClass('jcarousel-skin-ding-facet-browser').jcarousel();
+    //$(element).children().addClass('jcarousel-skin-ding-facet-browser').jcarousel();
   };
 
   this.renderResizeButton = function(element) {
