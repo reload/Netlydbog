@@ -183,11 +183,11 @@ if (module_exists('ding_voxb')) {
       </div>
       <div class="icons">
         <ul>
-          <li><?php print l(t('Stream'), $object->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) ?></li>
+          <li><?php print l(t('Stream'), $object->url.'/stream', array('html' => true, 'attributes' => array('class' => 'nice-popup'))) ?></li>
           <li class="seperator"></li>
-          <li><?php print l(t('Fetch'), $object->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe')))?></li>
+          <li><?php print l(t('Fetch'), $object->url.'/download', array('html' => true, 'attributes' => array('class' => 'nice-popup')))?></li>
           <li class="seperator"></li>
-          <li><?php print l(t('Sample'), $object->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) ?><li>
+          <li><?php print l(t('Sample'), $object->url.'/sample', array('html' => true, 'attributes' => array('class' => 'nice-popup'))) ?><li>
           <?php 
             if($user->uid){
               print '<li class="seperator"></li>';

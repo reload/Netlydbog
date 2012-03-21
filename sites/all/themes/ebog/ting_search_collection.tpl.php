@@ -68,11 +68,11 @@ foreach ($collection->objects as $obj){
         <?php endif; ?>
         <div class="icons">
           <ul>
-          <li><?php print l(t('Stream'), $Obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) ?></li>
+          <li><?php print l(t('Stream'), $Obj->url.'/stream', array('html' => true, 'attributes' => array('class' => 'nice-popup'))) ?></li>
             <li class="seperator"></li>
-          <li><?php print l(t('Fetch'), $Obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe')))?></li>
+          <li><?php print l(t('Fetch'), $Obj->url.'/download', array('html' => true, 'attributes' => array('class' => 'nice-popup')))?></li>
             <li class="seperator"></li>
-          <li><?php print l(t('Sample'), $Obj->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) ?></li>
+          <li><?php print l(t('Sample'), $Obj->url.'/sample', array('html' => true, 'attributes' => array('class' => 'nice-popup'))) ?></li>
           </ul>
         </div>
       </div>
