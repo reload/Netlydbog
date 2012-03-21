@@ -1,7 +1,7 @@
 .ui-dialog .ui-dialog-content {
-  width: 300px !important;
+  width: auto !important;
   height: auto !important;
-  margin-bottom: 60px !important;
+  margin-bottom: 20px !important;
   padding-bottom: 0 !important;
 }
 .ui-dialog .ebog-download-confirm p {

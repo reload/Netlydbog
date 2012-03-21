@@ -7,21 +7,18 @@ jQuery(document).ready(function($) {
     clicked.hide();
     clicked.parent().append('<div class="ajax-loader"></div>');
 
-    $.ajax({
-      type     : 'post',
-      url      : href,
-      dataType : 'html',
-      success  : function(response) {
-        clicked.parent().find('.ajax-loader').remove();
-        clicked.show();
-        $('<div id="nice_popup_response">' + response + '</div>').dialog({
-          modal  : true,
-          width  : 'auto',
-          height : 'auto',
-          //buttons: popup_buttons
-        });
-      }
-    })
+    $('<iframe id="iframe_inside_dialog" width="100%" height="100%" marginWidth="0" marginHeight="0" frameBorder="0" scrolling="auto"></iframe>').dialog({
+      modal     : true,
+      width     : 'auto',
+      height    : 'auto',
+      resizable : true,
+      //buttons: popup_buttons
+    });
+
+    $('#iframe_inside_dialog').attr('src', href + '/');
+    clicked.parent().find('.ajax-loader').remove();
+    clicked.show();
+
     return false; 
   });
 });
