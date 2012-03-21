@@ -167,7 +167,8 @@ function elib_get_lydbog($tingObjectID,$format){
     return $out;
   }
 
-  $isbn = elib_get_isbn_from_object_id($tingObjectID);
+  module_load_include('inc', 'elib', 'elib.isbn_static_func');
+  $isbn = convertToEAN(elib_get_isbn_from_object_id($tingObjectID));
 
   // verify user
   elib_client()->setLoaner($userinfo['cpr'],$userinfo['pin'],$userinfo['lib']);
@@ -192,11 +193,8 @@ function elib_get_lydbog($tingObjectID,$format){
   }
 
   $alreadyloaned = false;
-  /*$loanlimit = 1000000000000;*/
 
- // var_dump($loans);
-
-  if($loans){
+  if ($loans) {
     $nob = sizeof($loans);
     foreach($loans as $obj){
 
@@ -204,64 +202,44 @@ function elib_get_lydbog($tingObjectID,$format){
         $loanlimit = elib_str_to_time($obj->loanexpiredate,true);
       }
 
-      if(trim($obj->book['idtype']) == 'ISBN'){
-        if(trim($obj->book['id']) == $isbn){
-
-          $response = elib_client()->GetUrl(intval($obj->retailerordernumber).'');
-
+      if (trim($obj->book['idtype']) == 'ISBN') {
+        if (trim($obj->book['id']) == $isbn) {
+          $key = explode('cvoid=', (string)$obj->data->data->downloadurl);
+        
+          /*
+           *  Get client platform and use flash or livestream for iOS devices
+           */
+          $platform = elib_check_platform();
+          if ($platform == PLATFORM_GENERIC) {
+            $stream = elib_client()->getStreamUrl($key[1]);
+          } elseif ($platform == PLATFORM_IOS) {
+            $stream = elib_client()->getStreamUrl($key[1], 'livestream');
+          }
+          $downloadUrl = (string)$obj->data->data->downloadurl;
           // book is already loaned
           $alreadyloaned = true;
         }
       }
     }
   }
-  // There is no loans after all??!?
-  /*if($loanlimit == 1000000000000){
-    $loanlimit = 3600;
-  }*/
-  if($alreadyloaned){
+  
+  if ($alreadyloaned) {
 
     $pretext = '<h1>Din lydbog afspilles nu nedenfor</h1>';
-    $src = $response->data->downloadurl;
-    if($format != 'stream'){
-
-      $filesrc = (trim($response->data[1]->files[0]->file));
-      if(!empty($filesrc))
-      {
+    // download only
+    if ($format != 'stream') {
+     // $filesrc = (trim($response->data[1]->files[0]->file));
+      if (!empty($downloadUrl)) {
         // ok ready for download
-        $src = $filesrc;
         global $base_root;
-        $pretext = '<h1>Vi er ved at generere din lydbog.<br/> Vent venligst...</h1><div class="loader"></div><p>Vi er ved at pakke din lydbog til en fil</p><p>Problemer med download? Hent filen via <a href="'.$src.'">direkte link</a><p>Når du har gemt filen, tryk næste</p>'.l('Næste',$base_root.request_uri(),array('query'=> 'downloaded=1','attributes' => array('class' => 'nextknap knap')));
-
-      }
-      else
-      {
-        // hmm, something is up...
-        //$pretext = 'whatup? ('.$format.') ' . $src ;
-        $format = 'info';
-        $pretext = '';
-      }
-
-      // this should never happen.
-      if(empty($src))
-      {
+        $pretext = '<h1>Vi er ved at generere din lydbog.<br/> Vent venligst...</h1><div class="loader"></div><p>Vi er ved at pakke din lydbog til en fil</p><p>Problemer med download? Hent filen via <a href="'.$downloadUrl.'">direkte link</a><p>Når du har gemt filen, tryk næste</p>'.l('Næste',$base_root.request_uri(),array('query'=> 'downloaded=1','attributes' => array('class' => 'nextknap knap')));
+      } else {
         $pretext = '<h1>FEJL</h1><p>Der returneres ikke nogen download url fra eLib webservicen.</p>';
       }
-
-    }
-
-    watchdog('elib', 'eLib DOWNLOAD src: @message - @response',
-             array('@message' => $src, '@response' => var_export($response,true)
-                   , WATCHDOG_DEBUG));
-
-    $content = $pretext;
-
-    $platform = elib_check_platform();
-
-    if ($platform == PLATFORM_GENERIC) {
-      $content .= '<iframe src="' . $src . '" class="audioplayer-' . $format . '" frameborder="0" scrolling="no"></iframe>';
-    } elseif($platform == PLATFORM_IOS) {
-      $content .= t('<p>You are running iOS. We currently do not have a iOS stream for this item.</p>');
+      $content = $pretext;
+    } else {
+      // Streamin comes here
+      $content .= '<iframe src="' . $stream . '" class="audioplayer-' . $format . '" frameborder="0" scrolling="no"></iframe>';
     }
   } else {
 
@@ -289,17 +267,10 @@ function elib_get_lydbog($tingObjectID,$format){
 
     }
 
-    if(!$_GET['confirm']){
-
-    global $base_root;
-    //krumo(request_uri());
-
-
-
-    $loaned = $loaned ? format_plural($loaned,'en lånt lydbog','@count lånte lydbøger'): t('ikke lånt nogen bøger');
-
-    return '<h1>Lån denne lydbog?</h1><p>'.t('Du har %loaned og kan pt. låne %max.',array('%loaned' => $loaned,'%max' => format_plural($max,'en mere', '@count til'))).'</p>'.l('Ok',$base_root.request_uri(),array('query'=> 'confirm=1','attributes' => array('class' => 'okknap'))).l('Fortryd',$base_root.request_uri(),array('attributes' => array('class' => 'annullerknap')));
-
+    if (!$_GET['confirm']) {
+      global $base_root;
+      $loaned = $loaned ? format_plural($loaned,'en lånt lydbog','@count lånte lydbøger'): t('ikke lånt nogen bøger');
+      return '<h1>Lån denne lydbog?</h1><p>'.t('Du har %loaned og kan pt. låne %max.',array('%loaned' => $loaned,'%max' => format_plural($max,'en mere', '@count til'))).'</p>'.l('Ok',$base_root.request_uri(),array('query'=> 'confirm=1','attributes' => array('class' => 'okknap'))).l('Fortryd',$base_root.request_uri(),array('attributes' => array('class' => 'annullerknap')));
    }
 
 
@@ -355,15 +326,6 @@ function elib_get_lydbog($tingObjectID,$format){
     //$status = $response->status->code.': '.$response->status->message;
   }
   $status = t($response->status->code.': '.$response->status->message);
-  //krumo($response);
-
-  // hvis ikke bogen er lånt, så CreateLoan og opret lokal kopi i tabel elib_loan
-
-  // ellers så hent lokal URL
-  if($response->status->code != 101){
-    $content .= '<div class="status">Fejl: '.$status.'</div>';
-  }
-
   return $content;
 }
 
@@ -471,13 +433,16 @@ function elib_displaybook(TingClientObject $object,$elib_data = false){
   $isbn = convertToEAN($object->record['dc:identifier']['dkdcplus:ISBN'][0]);
   $image_url = elib_book_cover($isbn, '65_x');
 
+  $idt = explode('|', $object->record['ac:identifier'][''][0]);
+  $faust = variable_get('ting_agency', '') . ':' . $idt[0];
+  
   $out[] = '
     <div class="left">
   ';
 
   $out[] = '
       <div class="picture">' . 
-        l(theme('image', $image_url, '', '', null, false), $object->url, array('html' => true)) . '
+        l(theme('image', $image_url, '', '', null, false), 'ting/object/'.$faust, array('html' => true)) . '
       </div>
   ';
 
@@ -489,13 +454,14 @@ function elib_displaybook(TingClientObject $object,$elib_data = false){
     <div class="right">
   ';
 
+  $author = (string)$elib_data->book->authors[0]->author->attributes()->name;
     $out[] = '<h3 class="title">' . 
-      l($object->title, $object->url, array('attributes' => array('class' =>'title'))) . 
+      l($elib_data->book->title, 'ting/object/'.$faust, array('attributes' => array('class' =>'title'))) . 
     '</h3>';
     $out[] = '<div class="author">' .
-      t('!creator_name', array('!creator_name' => l($object->creators_string,'ting/search/'.$object->creators_string))) .
+      t('!creator_name', array('!creator_name' => l($author,'ting/search/'.$author))) .
     '</div>';
-    $out[] = '<div class="rating-for-faust"><div class="'.$object->localId.'"></div></div>';
+    $out[] = '<div class="rating-for-faust"><div class="'.$faust.'"></div></div>';
 
     if($elib_data->loanexpiredate){
       $loanlimit = elib_str_to_time($elib_data->loanexpiredate,true);
@@ -527,11 +493,11 @@ function elib_displaybook(TingClientObject $object,$elib_data = false){
       <div class="icons">
         <div class="icons">
           <ul>
-            <li>' . l(t('Stream'), $object->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
+            <li>' . l(t('Stream'), 'ting/object/'.$faust.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
             <li class="seperator"></li>
-            <li>' . l(t('Fetch'), $object->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
+            <li>' . l(t('Fetch'), 'ting/object/'.$faust.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
             <li class="seperator"></li>
-            <li>' . l(t('Sample'), $object->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) . '</li>
+            <li>' . l(t('Sample'), 'ting/object/'.$faust.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) . '</li>
           </ul>
         </div>
       </div>

@@ -36,6 +36,11 @@ class eLibClient{
     }
 	}
   
+  public function getStreamUrl($key, $player = 'flash') {
+    $url =  "http://service.qa.pubhub.dk/Download.aspx?id=";
+    return $url . $key .'&player=' . $player . '&stream=true';
+  }
+  
 	public function GetUrl($retailerorderid){
 		$params['retailerorderid'] = $retailerorderid;
 		$params['md5checksum'] = md5($this->retailerid.$retailerorderid.$this->retailerkeycode);
