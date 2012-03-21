@@ -205,7 +205,16 @@ function elib_get_lydbog($tingObjectID,$format){
       if (trim($obj->book['idtype']) == 'ISBN') {
         if (trim($obj->book['id']) == $isbn) {
           $key = explode('cvoid=', (string)$obj->data->data->downloadurl);
-          $stream = elib_client()->getStreamUrl($key[1]);
+        
+          /*
+           *  Get client platform and use flash or livestream for iOS devices
+           */
+          $platform = elib_check_platform();
+          if ($platform == PLATFORM_GENERIC) {
+            $stream = elib_client()->getStreamUrl($key[1]);
+          } elseif ($platform == PLATFORM_IOS) {
+            $stream = elib_client()->getStreamUrl($key[1], 'livestream');
+          }
           $downloadUrl = (string)$obj->data->data->downloadurl;
           // book is already loaned
           $alreadyloaned = true;
@@ -230,14 +239,7 @@ function elib_get_lydbog($tingObjectID,$format){
       $content = $pretext;
     } else {
       // Streamin comes here
-      $platform = elib_check_platform();
-
-      if ($platform == PLATFORM_GENERIC) {
-         $content .= '<iframe src="' . $stream . '" class="audioplayer-' . $format . '" frameborder="0" scrolling="no"></iframe>';
-        // $content .= $player;
-      } elseif($platform == PLATFORM_IOS) {
-        $content .= t('<p>You are running iOS. We currently do not have a iOS stream for this item.</p>');
-      }
+      $content .= '<iframe src="' . $stream . '" class="audioplayer-' . $format . '" frameborder="0" scrolling="no"></iframe>';
     }
   } else {
 
