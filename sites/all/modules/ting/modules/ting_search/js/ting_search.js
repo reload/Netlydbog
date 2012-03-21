@@ -51,6 +51,7 @@ Drupal.tingSearch.getTingData = function(url, keys) {
       // Pass the data on to the result and facet browser handlers.
       Drupal.tingResult("#ting-search-result", "#ting-facet-browser", result);
       Drupal.tingFacetBrowser("#ting-facet-browser", "#ting-search-result", result);
+      Drupal.behaviors.initLightbox();
     }
     else {
       window.location.href = '/nulsoegning/' + vars.query;
