@@ -662,7 +662,7 @@ voxb h3 {
   padding-top: 10px;
 }
 
-.pane-elib-user-account .loanperiod.short   { color: #C00;    }
+.pane-elib-user-account .loanperiod.short   { color: ##1B75BC; }
 .pane-elib-user-account .loanperiod.medium  { color: #FF8;     }
 .pane-elib-user-account .loanperiod.long    { color: #9BC833;  }
 
