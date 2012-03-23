@@ -660,6 +660,8 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
         <li>' . l(t('Fetch'), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
         <li class="seperator"></li>
         <li>' . l(t('Sample'), $obj->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) . '</li>
+        <li class="seperator"></li>
+        <li>' . l(t('Remove'), $obj->url.'/huskeliste/fjern?'.drupal_get_destination(), array('html' => true)) . '</li>
       </ul>
     </div>
     ';
