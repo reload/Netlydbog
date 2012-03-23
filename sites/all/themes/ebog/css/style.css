@@ -897,7 +897,7 @@ input[type=submit]:hover {
   margin: 0 0 5px 0;
 }
 
-/* CLEAN */
+/* CLEAN 
 
 body.clean #user-login{
 	width:500px;
@@ -991,6 +991,8 @@ body.clean h1{
 	border:1px solid #999999;
 }
 
+*/
+
 .panel-pane.pane-views-panes.pane-user-reviews-panel-pane-1 .views-field-created {
   display: none;
 }
@@ -1005,4 +1007,8 @@ body.clean h1{
 .panel-pane.pane-block.pane-netsound-review-1.grid-9,
 .panel-pane.pane-block.pane-netsound-review-2.grid-9 {
   margin-bottom: 35px;
+}
+
+.panel-region-separator {
+  height: 25px;
 }
