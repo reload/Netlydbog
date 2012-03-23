@@ -493,11 +493,11 @@ function elib_displaybook(TingClientObject $object,$elib_data = false){
       <div class="icons">
         <div class="icons">
           <ul>
-            <li>' . l(t('Stream'), 'ting/object/'.$faust.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
+            <li>' . l(t('Stream'), 'ting/object/'.$faust.'/stream', array('html' => TRUE, 'attributes' => array('class' => 'nice-popup'))) . '</li>
             <li class="seperator"></li>
-            <li>' . l(t('Fetch'), 'ting/object/'.$faust.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
+            <li>' . l(t('Fetch'), 'ting/object/'.$faust.'/download', array('html' => TRUE, 'attributes' => array('class' => 'nice-popup'))) . '</li>
             <li class="seperator"></li>
-            <li>' . l(t('Sample'), 'ting/object/'.$faust.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) . '</li>
+            <li>' . l(t('Sample'), 'ting/object/'.$faust.'/sample', array('html' => TRUE, 'attributes' => array('class' => 'nice-popup'))) . '</li>
           </ul>
         </div>
       </div>
@@ -548,11 +548,11 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
   $part['icons'] = '
     <div class="icons">
       <ul>
-        <li>' . l(t('Stream'), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
+        <li>' . l(t('Stream'), $obj->url.'/stream', array('html' => TRUE, 'attributes' => array('class' => 'nice-popup'))) . '</li>
         <li class="seperator"></li>
-        <li>' . l(t('Fetch'), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
+        <li>' . l(t('Fetch'), $obj->url.'/download', array('html' => TRUE, 'attributes' => array('class' => 'nice-popup'))) . '</li>
         <li class="seperator"></li>
-        <li>' . l(t('Sample'), $obj->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) . '</li>
+        <li>' . l(t('Sample'), $obj->url.'/sample', array('html' => TRUE, 'attributes' => array('class' => 'nice-popup'))) . '</li>
       </ul>
     </div>
   ';
@@ -565,11 +565,11 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
         $part['icons'] = '
     <div class="icons">
       <ul>
-        <li>' . l(t('Stream'), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
+        <li>' . l(t('Stream'), $obj->url.'/stream', array('html' => TRUE, 'attributes' => array('class' => 'nice-popup'))) . '</li>
         <li class="seperator"></li>
-        <li>' . l(t('Fetch'), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
+        <li>' . l(t('Fetch'), $obj->url.'/download', array('html' => TRUE, 'attributes' => array('class' => 'nice-popup'))) . '</li>
         <li class="seperator"></li>
-        <li>' . l(t('Sample'), $obj->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) . '</li>
+        <li>' . l(t('Sample'), $obj->url.'/sample', array('html' => TRUE, 'attributes' => array('class' => 'nice-popup'))) . '</li>
       </ul>
     </div>
     ';
@@ -640,11 +640,11 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
     $part['icons'] = '
     <div class="icons">
       <ul>
-        <li>' . l(t('Stream'), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
+        <li>' . l(t('Stream'), $obj->url.'/stream', array('html' => TRUE, 'attributes' => array('class' => 'nice-popup'))) . '</li>
         <li class="seperator"></li>
-        <li>' . l(t('Fetch'), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
+        <li>' . l(t('Fetch'), $obj->url.'/download', array('html' => TRUE, 'attributes' => array('class' => 'nice-popup'))) . '</li>
         <li class="seperator"></li>
-        <li>' . l(t('Sample'), $obj->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) . '</li>
+        <li>' . l(t('Sample'), $obj->url.'/sample', array('html' => TRUE, 'attributes' => array('class' => 'nice-popup'))) . '</li>
       </ul>
     </div>
     ';
@@ -655,11 +655,11 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
     $part['icons'] = '
     <div class="icons">
       <ul>
-        <li>' . l(t('Stream'), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
+        <li>' . l(t('Stream'), $obj->url.'/stream', array('html' => TRUE, 'attributes' => array('class' => 'nice-popup'))) . '</li>
         <li class="seperator"></li>
-        <li>' . l(t('Fetch'), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
+        <li>' . l(t('Fetch'), $obj->url.'/download', array('html' => TRUE, 'attributes' => array('class' => 'nice-popup'))) . '</li>
         <li class="seperator"></li>
-        <li>' . l(t('Sample'), $obj->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) . '</li>
+        <li>' . l(t('Sample'), $obj->url.'/sample', array('html' => TRUE, 'attributes' => array('class' => 'nice-popup'))) . '</li>
         <li class="seperator"></li>
         <li>' . l(t('Remove'), $obj->url.'/huskeliste/fjern?'.drupal_get_destination(), array('html' => true)) . '</li>
       </ul>
@@ -743,11 +743,11 @@ function elib_displaybook2(TingClientObject $obj,$fields,$settings='',$displaysi
   $part['icons'] = '
     <div class="icons">
       <ul>
-        <li>' . l(t('Stream'), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
+        <li>' . l(t('Stream'), $obj->url.'/stream', array('html' => TRUE, 'attributes' => array('class' => 'nice-popup'))) . '</li>
         <li class="seperator"></li>
-        <li>' . l(t('Fetch'), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
+        <li>' . l(t('Fetch'), $obj->url.'/download', array('html' => TRUE, 'attributes' => array('class' => 'nice-popup'))) . '</li>
         <li class="seperator"></li>
-        <li>' . l(t('Sample'), $obj->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) . '</li>
+        <li>' . l(t('Sample'), $obj->url.'/sample', array('html' => TRUE, 'attributes' => array('class' => 'nice-popup'))) . '</li>
       </ul>
     </div>
   ';
@@ -760,11 +760,11 @@ function elib_displaybook2(TingClientObject $obj,$fields,$settings='',$displaysi
     $part['icons'] = '
     <div class="iconsnoheight">
       <ul>
-        <li>' . l(t('Stream'), $obj->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
+        <li>' . l(t('Stream'), $obj->url.'/stream', array('html' => TRUE, 'attributes' => array('class' => 'nice-popup'))) . '</li>
         <li class="seperator"></li>
-        <li>' . l(t('Fetch'), $obj->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) . '</li>
+        <li>' . l(t('Fetch'), $obj->url.'/download', array('html' => TRUE, 'attributes' => array('class' => 'nice-popup'))) . '</li>
         <li class="seperator"></li>
-        <li>' . l(t('Sample'), $obj->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) . '</li>
+        <li>' . l(t('Sample'), $obj->url.'/sample', array('html' => TRUE, 'attributes' => array('class' => 'nice-popup'))) . '</li>
       </ul>
     </div>
     ';
@@ -1008,4 +1008,14 @@ function elib_get_ting_object_by_isbn($isbn, $enrich = FALSE) {
   $object = isset($r->collections[0]->objects[0]) ? $r->collections[0]->objects[0] : FALSE;
 
   return $object;
+}
+
+/**
+ * Implementation of hook_preprocess_page()
+ */
+function elib_preprocess_page(&$vars) {
+  jquery_ui_add(array('ui.dialog'));
+  jquery_ui_theme_load();
+  drupal_add_js(drupal_get_path('module', 'elib') . '/js/nice_popups.js');
+  drupal_add_css(drupal_get_path('module', 'elib') . '/css/elib.css');
 }
