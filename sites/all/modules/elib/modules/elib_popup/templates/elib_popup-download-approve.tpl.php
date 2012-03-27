@@ -1,6 +1,6 @@
 <div class="ebog-download-confirm">
   <p>
-    Yes, I would like to loan this title.
-    Click OK to continue.
+    <?php print t('Yes, I would like to loan this title.'); ?>
+    <?php print t('Click OK to continue.'); ?>
   </p>
 </div>

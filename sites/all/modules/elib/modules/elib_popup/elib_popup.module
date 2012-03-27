@@ -209,7 +209,7 @@ function elib_popup_download_loan_initial($ting_id, $type = "download") {
             'status' => FALSE,
             'title' => t('Error'),
             'content' => theme('elib_popup_notice', array(
-              'message' => t('Failed to fetch download url.'))
+              'message' => t('Failed to fetch download URL.'))
             )
           );
         }

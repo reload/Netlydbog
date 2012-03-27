@@ -8,5 +8,5 @@
 ?>
 <audio controls="controls">
   <source src="<?php echo $data; ?>" type="audio/mp3" />
-  Your browser does not support the audio tag.
+  <?php print t('Your browser does not support the audio tag.'); ?>
 </audio> 
