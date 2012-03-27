@@ -160,7 +160,7 @@ class eLibClient{
       }
   	}
   	
-  	return array_slice(array_reverse($ids),0,5);
+  	return array_slice(array_reverse($ids),0,7);
   }
 
   public function makeLoan($ebookid){
