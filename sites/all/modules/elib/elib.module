@@ -251,20 +251,18 @@ function elib_displaybook(TingClientObject $object,$elib_data = false){
  * 
  */
 function _elib_action_icons($url, $postfix = '') {
-   $html = '
-     <div class="icons">
-       <div class="icons">
-        <ul>
-          <li>' . l(t('Stream'), $url . '/stream', array('html' => TRUE, 'attributes' => array('action' => 'stream'))) . '</li>
-          <li class="seperator"></li>
-          <li>' . l(t('Fetch'), $url . '/download', array('html' => TRUE, 'attributes' => array('action' => 'download'))) . '</li>
-          <li class="seperator"></li>
-          <li>' . l(t('Sample'), $url . $faust.'/sample', array('html' => TRUE, 'attributes' => array('action' => 'sample'))) . '</li>'
-         . ($postfix != '' ? $postfix : '')   
-        . '</ul>
-      </div>
+  $html = '
+    <div class="icons">
+      <ul>
+        <li>' . l(t('Stream'), $url . '/stream', array('html' => TRUE, 'attributes' => array('action' => 'stream'))) . '</li>
+        <li class="seperator"></li>
+        <li>' . l(t('Fetch'), $url . '/download', array('html' => TRUE, 'attributes' => array('action' => 'download'))) . '</li>
+        <li class="seperator"></li>
+        <li>' . l(t('Sample'), $url . $faust.'/sample', array('html' => TRUE, 'attributes' => array('action' => 'sample'))) . '</li>'
+       . ($postfix != '' ? $postfix : '')   
+      . '</ul>
     </div>';
-   return $html;
+  return $html;
 }
 
 function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1, $item){

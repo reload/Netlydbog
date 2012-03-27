@@ -157,7 +157,7 @@ if (module_exists('ding_voxb')) {
           <?php if (!empty($object->record['dc:rights'][''])) { ?>
             <?php print theme('item_list', $object->record['dc:rights'][''], t('Rights').t(':&nbsp;'), 'span', array('class' => 'rights'));?>
           <?php } ?>
-          <?php print elib_book_teaser($object) ?>
+          <?php //print elib_book_teaser($object) ?>
         </div>
       </div>
       <div class="icons">
