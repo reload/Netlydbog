@@ -249,6 +249,16 @@
     margin: 0;
   }
 
+  .feed-and-compare-front .display-book .left {
+    width: 55%;
+    margin: 0;
+  }
+
+  .feed-and-compare-front .display-book .right {
+    width: 45%;
+    margin: 0;
+  }
+
   #ting-object .picture {
     float: left;
     width: 30%;
