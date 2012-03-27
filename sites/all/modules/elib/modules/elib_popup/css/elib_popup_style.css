@@ -1,5 +1,6 @@
 .ui-dialog .ui-dialog-content {
-  margin-bottom: 20px !important;
+  height: auto !important;
+  margin-bottom: 60px !important;
   padding-bottom: 0 !important;
 }
 .ui-dialog .ebog-download-confirm p {

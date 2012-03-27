@@ -1,0 +1,5 @@
+name = Netlydbog Popup
+description = Implements download/stream flow for audio books.
+version = 0.1
+core = 6.x
+dependencies[] = jquery_ui
