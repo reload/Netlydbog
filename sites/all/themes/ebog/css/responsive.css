@@ -369,7 +369,10 @@
 
   #footer #footer-first #block-block-9 h2,
   #footer #footer-first #block-block-10 h2,
-  #footer #footer-first #block-block-11 h2 {
+  #footer #footer-first #block-block-11 h2,
+  #footer #footer-first #block-block-13 h2,
+  #footer #footer-first #block-block-15 h2,
+  #footer #footer-first #block-block-16 h2 {
     display: none;
   }
 
