@@ -518,7 +518,7 @@ voxb h3 {
   margin-top: 6px;
 }
 
-.display-book .icons .icons,
+.display-book .icons,
 #ting-object .inner .icons,
 #ting-search-result .record .icons {
   float: right;
@@ -527,7 +527,7 @@ voxb h3 {
   margin-top: 15px;
 }
 
-.display-book .icons .icons img,
+.display-book .icons img,
 #ting-object .inner .icons img {
   padding: 4px;
   vertical-align: text-bottom;
@@ -748,7 +748,7 @@ input[type=submit],
 .pane-content div.bottom-bar,
 .pane-elib-block-lastloans-2 .bottom-bar,
 #sidebar-first #block-views-latest_news-block_1 .content .view-footer,
-.display-book .icons .icons,
+.display-book .icons,
 #ting-object .inner .icons,
 #ting-search-result .record .icons,
 #ting-search-form input.form-submit {
@@ -773,7 +773,7 @@ div.messages,
 .pane-front .feed-and-compare-front,
 .pane-faq-panel-pane-1 .view-content .item-list ul,
 .panel-pane.pane-latest-news .pane-content .view-content .views-row,
-.display-book .icons .icons,
+.display-book .icons,
 #ting-object .inner .icons,
 #ting-search-result .record .icons,
 .voxb textarea,
