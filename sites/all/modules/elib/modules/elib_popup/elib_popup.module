@@ -16,6 +16,7 @@ function elib_popup_init() {
   
   drupal_add_js(ELIB_POPUP_PATH . '/js/elib_popup_download.js', 'file');
   drupal_add_js(ELIB_POPUP_PATH . '/js/elib_popup_sample.js', 'file');
+  drupal_add_js(drupal_get_path('theme', 'ebog') . '/js/audio-player/audio-player.js', 'file');
   drupal_add_css(ELIB_POPUP_PATH . '/css/elib_popup_style.css', 'file');
   jquery_ui_add(array('ui.dialog', 'ui.draggable'));
   jquery_ui_theme_load();
@@ -101,11 +102,16 @@ function elib_popup_theme($existing, $type, $theme, $path) {
     'template' => 'templates/elib_popup-stream-info',
   );
   
-  $hooks['elib_popup_sample'] = array(
+  $hooks['elib_popup_sample_generic'] = array(
     'arguments' => array('data' => NULL),
-    'template' => 'templates/elib_popup-sample',
+    'template' => 'templates/elib_popup-sample-generic',
   );
 
+  $hooks['elib_popup_sample_ios'] = array(
+    'arguments' => array('data' => NULL),
+    'template' => 'templates/elib_popup-sample-ios',
+  );
+  
   return $hooks;
 }
 
@@ -148,11 +154,11 @@ function elib_popup_download_sample($ting_id) {
   module_load_include('isbn_static_func.inc', 'elib');
   $object = ting_get_object_by_id($ting_id);
   
-  module_load_include('isbn_static_func.inc', 'elib');
   $isbn = preg_replace('/[^0-9]+/', '', $object->record['dc:identifier']['dkdcplus:ISBN'][0]);
 
   $c = elib_client();
   $c->setLibrary(variable_get('elib_retailer_id', ''));
+  
   try {
     $book = $c->getBook($isbn);
   }
@@ -161,15 +167,39 @@ function elib_popup_download_sample($ting_id) {
     return;
   }
 
-  // NOTE: XML structure changes
-  $link = (string)$book->data->teaser->link;
+  $teasersamplelink = $book->data->teaser->link;
 
-  $status = array(
-    'status' => TRUE,
-    'title' => t('Sample'),
-    'content' => theme('elib_popup_sample', $link)
-  );
-  // Send response
+  if (!empty($teasersamplelink)) {
+    // change to an https link
+    $teasersamplelink = str_replace("http://","https://", $teasersamplelink);
+
+    $title = $book->data->title;
+    
+    $platform = elib_check_platform();
+
+    if ($platform == PLATFORM_GENERIC) {
+      $status = array(
+        'status' => TRUE,
+        'title' => t('Sample'),
+        'content' => theme('elib_popup_sample_generic', array(
+            'title' => $title,
+            'link' => $teasersamplelink)),
+         'file' => $teasersamplelink,
+         'itemTitle' => $title,
+         'itemAuthor' =>  $book->data->contributors[0]->first_name 
+              . ' ' 
+              . $book->data->contributors[0]->family_name
+       );
+    } elseif ($platform == PLATFORM_IOS) {
+      $status = array(
+        'status' => TRUE,
+        'title' => t('Sample'),
+        'content' => theme('elib_popup_sample_ios', array(
+            'title' => $title,
+            'link' => (string)$book->data->teaser->link))
+      );
+    }
+  }
   echo json_encode($status);
   exit(0);
 }
@@ -302,8 +332,6 @@ function elib_popup_loan_popup($ting_id, $type = 'download') {
   global $user;
   $status = array();
   
-  // @todo: if book is loaned stream it or give download link
-
   // Whether user is logged in.
   if ($user->uid) {
     // Check if item is lready loaned

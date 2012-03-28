@@ -8,6 +8,18 @@
 
   // Handle clicked loan link, those matching 'ting/object/%/download' pattern
   $(document).ready(function() {
+    
+    AudioPlayer.setup("js/audio-player/player.swf", {
+      width: 290,
+      leftbg: "7DAFC3",
+      rightbg: "BECE8C",
+      leftbghover: "ADCBD7",
+      rightbghover: "C4D296",
+      loader: "C4D296",
+      transparentpagebg: "yes",
+      autostart: 'yes'
+    });
+
     $('a[action="sample"]').live('click', function() {
       href = $(this).attr('href');
 
@@ -52,6 +64,12 @@
             modal : true,
             width: 'auto',
             height: 'auto'
+          });
+          
+          AudioPlayer.embed("audio-player", {
+            soundFile: response.file,
+            titles: response.itemIitle,
+            artists: response.itemAuthor
           });
         }
       });
