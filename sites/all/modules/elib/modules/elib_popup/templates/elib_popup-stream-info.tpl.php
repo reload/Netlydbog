@@ -6,5 +6,5 @@
  */
 ?>
 <div class="ebog-download-info" style="width: 500px">
-   <iframe src="<?php echo $stream;?>"  frameborder="0" scrolling="no" width="500"></iframe>
+   <iframe src="<?php echo $data['link'];?>"  frameborder="0" scrolling="no" width="400" height="400"></iframe>
 </div>

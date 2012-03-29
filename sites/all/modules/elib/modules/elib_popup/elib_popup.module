@@ -131,10 +131,11 @@ function _elib_popup_return_content($type, $downloadUrl) {
        *  Get client platform and use flash or livestream for iOS devices
        */
       $platform = elib_check_platform();
-      if ($platform == PLATFORM_GENERIC) {
-        $stream = elib_client()->getStreamUrl($key[1]);
-      } elseif ($platform == PLATFORM_IOS) {
+
+      if ($platform == PLATFORM_IOS) {
         $stream = elib_client()->getStreamUrl($key[1], 'livestream');
+      } else {
+        $stream = elib_client()->getStreamUrl($key[1]);
       }
       $content = theme('elib_popup_stream_info', array('link' => $stream));
   }
