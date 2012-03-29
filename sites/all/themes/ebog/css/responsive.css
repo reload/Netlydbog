@@ -394,4 +394,8 @@
   #ting-object h1.book-title {
     width: 100%;
   }
+
+  #main-content .icons ul li a {
+    font-size: 9px;
+  }
 }

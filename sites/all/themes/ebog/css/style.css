@@ -628,7 +628,8 @@ voxb h3 {
 /**
  * MIN SIDE
  */
-.page-min-side .panel-separator {
+.page-min-side .panel-separator,
+.page-min-side .panel-region-separator {
   clear: none;
   display: none;
 }
