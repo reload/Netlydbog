@@ -15,13 +15,15 @@
 #ting-object .description,
 #ting-object .details,
 #ting-object .icons,
-.panel-separator {
+.panel-separator,
+.panel-region-separator {
   clear:both;
   list-style-type: none;
 }
 
-.panel-separator {
-  height: 0;
+.panel-separator,
+.panel-region-separator {
+  height: 25px;
 }
 
 #ting-object .details .item-list h3 {

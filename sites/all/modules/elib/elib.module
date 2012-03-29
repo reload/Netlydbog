@@ -254,13 +254,16 @@ function _elib_action_icons($url, $postfix = '') {
   $html = '
     <div class="icons">
       <ul>
-        <li>' . l(t('Stream'), $url . '/stream', array('html' => TRUE, 'attributes' => array('action' => 'stream'))) . '</li>
+        <li>' . l(t('Sample'), $url . $faust.'/sample', array('html' => TRUE, 'attributes' => array('action' => 'sample'))) . '</li>
         <li class="seperator"></li>
-        <li>' . l(t('Fetch'), $url . '/download', array('html' => TRUE, 'attributes' => array('action' => 'download'))) . '</li>
-        <li class="seperator"></li>
-        <li>' . l(t('Sample'), $url . $faust.'/sample', array('html' => TRUE, 'attributes' => array('action' => 'sample'))) . '</li>'
-       . ($postfix != '' ? $postfix : '')   
-      . '</ul>
+        <li>' . l(t('Stream'), $url . '/stream', array('html' => TRUE, 'attributes' => array('action' => 'stream'))) . '</li>';
+        // Do not show the fetch button on mobile.
+        $platform = elib_check_platform();
+        if ($platform == PLATFORM_GENERIC) {
+          $html .= '<li class="seperator"></li>
+          <li>' . l(t('Fetch'), $url . '/download', array('html' => TRUE, 'attributes' => array('action' => 'download'))) . '</li>';
+        }
+      $html .= '</ul>
     </div>';
   return $html;
 }
@@ -387,7 +390,7 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
 
   }
 
-  $part['icons'] = '<div class="icons">'.$part['icons'].'</div>';
+  $part['icons'] = $part['icons'];
   return '<div class="display-book '.$displaysize.' line ruler-after index-' . $block_index . '">
     <div class="left">'.
     $part['picture'].
@@ -506,7 +509,7 @@ function elib_book_cover($isbn, $presetname) {
   if (!$isbn || $isbn == '') {
     _elib_covers_default_image();
   }
-  $isbn = '9788702071849';
+  //$isbn = '9788702071849';
   $path = elib_init_cover_path($isbn);
   if (file_exists(file_create_path($path))) {
     return imagecache_create_url($presetname, $path);
