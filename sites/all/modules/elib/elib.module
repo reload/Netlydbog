@@ -256,11 +256,14 @@ function _elib_action_icons($url, $postfix = '') {
       <ul>
         <li>' . l(t('Sample'), $url . $faust.'/sample', array('html' => TRUE, 'attributes' => array('action' => 'sample'))) . '</li>
         <li class="seperator"></li>
-        <li>' . l(t('Stream'), $url . '/stream', array('html' => TRUE, 'attributes' => array('action' => 'stream'))) . '</li>
-        <li class="seperator"></li>
-        <li>' . l(t('Fetch'), $url . '/download', array('html' => TRUE, 'attributes' => array('action' => 'download'))) . '</li>'
-       . ($postfix != '' ? $postfix : '')   
-      . '</ul>
+        <li>' . l(t('Stream'), $url . '/stream', array('html' => TRUE, 'attributes' => array('action' => 'stream'))) . '</li>';
+        // Do not show the fetch button on mobile.
+        $platform = elib_check_platform();
+        if ($platform == PLATFORM_GENERIC) {
+          $html .= '<li class="seperator"></li>
+          <li>' . l(t('Fetch'), $url . '/download', array('html' => TRUE, 'attributes' => array('action' => 'download'))) . '</li>';
+        }
+      $html .= '</ul>
     </div>';
   return $html;
 }

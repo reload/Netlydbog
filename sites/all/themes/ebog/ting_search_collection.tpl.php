@@ -69,10 +69,17 @@ foreach ($collection->objects as $obj){
         <div class="icons">
           <ul>
             <li><?php print l(t('Sample'), $Obj->url.'/sample', array('html' => true, 'attributes' => array('action' => 'sample'))) ?></li>
+            <?php
+              $platform = elib_check_platform();
+              if ($platform == PLATFORM_GENERIC) {
+                print '<li class="seperator"></li>';
+                print '<li>';
+                print l(t('Fetch'), $Obj->url.'/download', array('html' => true, 'attributes' => array('action' => 'download')));
+                print '</li>';
+              }
+            ?>
             <li class="seperator"></li>
             <li><?php print l(t('Stream'), $Obj->url.'/stream', array('html' => true, 'attributes' => array('action' => 'stream'))) ?></li>
-            <li class="seperator"></li>
-            <li><?php print l(t('Fetch'), $Obj->url.'/download', array('html' => true, 'attributes' => array('action' => 'download')))?></li>
           </ul>
         </div>
       </div>
