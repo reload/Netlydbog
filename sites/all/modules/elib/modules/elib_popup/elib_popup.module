@@ -172,13 +172,9 @@ function elib_popup_download_sample($ting_id) {
   $teasersamplelink = $book->data->teaser->link;
 
   if (!empty($teasersamplelink)) {
-    // change to an https link
-    $teasersamplelink = str_replace("http://","https://", $teasersamplelink);
-
     $title = $book->data->title;
     
     $platform = elib_check_platform();
-
     if ($platform == PLATFORM_GENERIC) {
       $status = array(
         'status' => TRUE,
