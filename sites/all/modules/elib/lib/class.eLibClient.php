@@ -37,7 +37,7 @@ class eLibClient{
 	}
   
   public function getStreamUrl($key, $player = 'flash') {
-    $url =  "http://service.qa.pubhub.dk/Download.aspx?id=";
+    $url =  "http://service.pubhub.dk/Download.aspx?id=";
     return $url . $key .'&player=' . $player . '&stream=true';
   }
   
