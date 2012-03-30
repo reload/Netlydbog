@@ -144,7 +144,7 @@ function _elib_popup_return_content($type, $downloadUrl) {
     'status' => TRUE,
     'title' => t('Success'),
     'processed' => TRUE,
-    'content' => $content
+    'stream' => $stream
   );
 }
 
