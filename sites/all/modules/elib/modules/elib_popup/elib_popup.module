@@ -171,7 +171,7 @@ function elib_popup_download_sample($ting_id) {
     return;
   }
 
-  $teasersamplelink = $book->data->teaser->link;
+  $teasersamplelink = (string)$book->data->teaser->link;
 
   if (!empty($teasersamplelink)) {
     $title = $book->data->title;

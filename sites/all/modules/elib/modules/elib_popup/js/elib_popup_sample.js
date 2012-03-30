@@ -61,10 +61,10 @@
 
           $('<div id="ting-download-popup" title="' + response.title + '">' + response.content + '</div>').dialog({
             modal : true,
-            width: 'auto',
+            width: '380px',
             height: 'auto'
           });
-          
+
           AudioPlayer.embed("audio-player", {
             soundFile: response.file,
             titles: response.itemIitle,
