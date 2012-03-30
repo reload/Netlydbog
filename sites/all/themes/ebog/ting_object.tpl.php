@@ -162,22 +162,15 @@ if (module_exists('ding_voxb')) {
       </div>
       <div class="icons">
         <ul>
-          <li><?php print l(t('Sample'), $object->url.'/sample', array('html' => true, 'attributes' => array('action' => 'sample'))) ?><li>
-          <?php
-            $platform = elib_check_platform();
-            if ($platform == PLATFORM_GENERIC) {
-              print '<li class="seperator"></li>';
-              print '<li>';
-              print l(t('Fetch'), $object->url.'/download', array('html' => true, 'attributes' => array('action' => 'download')));
-              print '</li>';
-            }
-          ?>
+          <li class="sample"><?php print l(t('Sample'), $object->url.'/sample', array('html' => true, 'attributes' => array('action' => 'sample'))) ?><li>
           <li class="seperator"></li>
-          <li><?php print l(t('Stream'), $object->url.'/stream', array('html' => true, 'attributes' => array('action' => 'stream'))) ?></li>
+          <li class="fetch"><?php print l(t('Fetch'), $object->url.'/download', array('html' => true, 'attributes' => array('action' => 'download'))) ?></li>
+          <li class="seperator"></li>
+          <li class="stream"><?php print l(t('Stream'), $object->url.'/stream', array('html' => true, 'attributes' => array('action' => 'stream'))) ?></li>
           <?php 
             if($user->uid){
               print '<li class="seperator"></li>';
-              print '<li>';
+              print '<li class="husk">';
               print l(t('Husk'), $object->url.'/huskeliste?'.drupal_get_destination(), array('html' => true));
               print '</li>';
             }

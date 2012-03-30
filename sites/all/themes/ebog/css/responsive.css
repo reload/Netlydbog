@@ -398,4 +398,8 @@
   #main-content .icons ul li a {
     font-size: 9px;
   }
+
+  li.fetch {
+    display: none;
+  }
 }
