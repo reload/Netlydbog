@@ -219,20 +219,12 @@ function elib_displaybook(TingClientObject $object,$elib_data = false){
       $diff = $loanlimit-time();
       $days = floor($diff/86400);
       $hours     = floor($diff/3600);
-      $extra     = $hours+24;
     }
 
     if ($days < 1) {
-      if ($extra <= 24) {
-        $out[] = '
-          <div class="loanperiod short">'.t('Loan expired. You can re-loan.').'</div>
-        ';
-      }
-      else {
       $out[] = '
           <div class="loanperiod short">'.t('Loan expires in %hours',array('%hours' => format_plural($hours, 'one hour.', '@count hours.'))).'</div>
         ';
-      }
     }
     else {
       $out[] = '
