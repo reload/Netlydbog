@@ -164,9 +164,16 @@ if (module_exists('ding_voxb')) {
         <ul>
           <li class="sample"><?php print l(t('Sample'), $object->url.'/sample', array('html' => true, 'attributes' => array('action' => 'sample'))) ?><li>
           <li class="seperator"></li>
-          <li class="fetch"><?php print l(t('Fetch'), $object->url.'/download', array('html' => true, 'attributes' => array('action' => 'download'))) ?></li>
-          <li class="seperator"></li>
           <li class="stream"><?php print l(t('Stream'), $object->url.'/stream', array('html' => true, 'attributes' => array('action' => 'stream'))) ?></li>
+          <?php
+            $platform = elib_check_platform();
+            if ($platform == PLATFORM_GENERIC) {
+              print '<li class="seperator"></li>';
+              print '<li class="fetch">';
+              print l(t('Fetch'), $object->url.'/download', array('html' => true, 'attributes' => array('action' => 'download')));
+              print '</li>';
+            }
+          ?>
           <?php 
             if($user->uid){
               print '<li class="seperator"></li>';

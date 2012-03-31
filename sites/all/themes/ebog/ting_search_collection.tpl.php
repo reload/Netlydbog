@@ -70,9 +70,16 @@ foreach ($collection->objects as $obj){
           <ul>
             <li class="sample"><?php print l(t('Sample'), $Obj->url.'/sample', array('html' => true, 'attributes' => array('action' => 'sample'))) ?></li>
             <li class="seperator"></li>
-            <li class="fetch"><?php print l(t('Fetch'), $Obj->url.'/download', array('html' => true, 'attributes' => array('action' => 'download'))) ?> </li>
-            <li class="seperator"></li>
             <li class="stream"><?php print l(t('Stream'), $Obj->url.'/stream', array('html' => true, 'attributes' => array('action' => 'stream'))) ?></li>
+            <?php
+              $platform = elib_check_platform();
+              if ($platform == PLATFORM_GENERIC) {
+                print '<li class="seperator"></li>';
+                print '<li class="fetch">';
+                print l(t('Fetch'), $object->url.'/download', array('html' => true, 'attributes' => array('action' => 'download')));
+                print '</li>';
+              }
+            ?>
           </ul>
         </div>
       </div>
