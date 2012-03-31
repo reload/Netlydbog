@@ -362,7 +362,7 @@ voxb h3 {
 
 #main-content .icons ul li {
   float: left;
-  margin: 0 4px;
+  margin: 0;
 }
 
 #main-content .icons ul li.seperator {
@@ -374,7 +374,7 @@ voxb h3 {
 }
 
 #main-content .icons ul li a {
-  padding: 4px 7px;
+  padding: 4px 12px;
 }
 
 #main-content .feed-and-compare-page ul {
