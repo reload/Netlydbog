@@ -176,7 +176,7 @@ function elib_popup_download_sample($ting_id) {
   $teasersamplelink = (string)$book->data->teaser->link;
 
   if (!empty($teasersamplelink)) {
-    $title = $book->data->title;
+    $title = (string)$book->data->title;
     
     $platform = elib_check_platform();
     if ($platform == PLATFORM_GENERIC) {
@@ -188,9 +188,9 @@ function elib_popup_download_sample($ting_id) {
             'link' => $teasersamplelink)),
          'file' => $teasersamplelink,
          'itemTitle' => $title,
-         'itemAuthor' =>  $book->data->contributors[0]->first_name 
+         'itemAuthor' =>  (string)$book->data->contributors[0]->first_name 
               . ' ' 
-              . $book->data->contributors[0]->family_name
+              . (string)$book->data->contributors[0]->family_name
        );
     } elseif ($platform == PLATFORM_IOS) {
       $status = array(
