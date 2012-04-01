@@ -127,8 +127,9 @@ function _elib_popup_return_content($type = 'download', $downloadUrl) {
       return array(
         'status' => TRUE,
         'title' => t('Success'),
-        'content' => theme('elib_popup_download_info', array('message' => t('Book download url.'), 'link' => $downloadUrl)
-      ));
+        'content' => theme('elib_popup_download_info', array('message' => t('Book download url.'), 'link' => $downloadUrl)),
+        'final' => true
+      );
     case 'stream':
       // it can be void= or id=, we explode by "id=" that correcponds to both situations.
       $key = explode('id=', (string)$downloadUrl);
