@@ -255,7 +255,7 @@ function _elib_action_icons($url, $postfix = '') {
           $html .= '<li class="seperator"></li>';
           $html .= '<li class="fetch">' . l(t('Fetch'), $url . '/download', array('html' => TRUE, 'attributes' => array('action' => 'download'))) . '</li>';
         }
-      $html .= '</ul>
+      $html .= ($postfix != '' ? $postfix : '') . '</ul>
     </div>';
   return $html;
 }
