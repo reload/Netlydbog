@@ -142,7 +142,7 @@
                   button = $('#ting-download-popup').parents('.ui-dialog:first').find('button');
                   button.css('visibility', 'hidden');
                   button.parent().append('<div class="ajax-loader"></div>');
-                  $('#ting-download-popup').dialog('close');
+                  $('#ting-download-popup-info').dialog('close');
                 }
 
                 $('<div id="ting-download-popup" title="' + response.title + '">' + response.content + '</div>').dialog({
