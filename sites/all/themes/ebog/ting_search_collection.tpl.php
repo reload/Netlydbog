@@ -76,7 +76,7 @@ foreach ($collection->objects as $obj){
               if ($platform == PLATFORM_GENERIC) {
                 print '<li class="seperator"></li>';
                 print '<li class="fetch">';
-                print l(t('Fetch'), $object->url.'/download', array('html' => true, 'attributes' => array('action' => 'download')));
+                print l(t('Fetch'), $Obj->url.'/download', array('html' => true, 'attributes' => array('action' => 'download')));
                 print '</li>';
               }
             ?>
