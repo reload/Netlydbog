@@ -107,75 +107,53 @@
 
     // Check those checkboxes
     var check_rules = function() {
-      var boxes = $('.ebog-download-confirm').find('input[type=checkbox]');
-      if (boxes.length == boxes.filter(':checked').length) {
-        $.ajax({
-          type : 'post',
-          url : href + '/request',
-          dataType : 'json',
-          success : function(response) {
-            button.css('visibility', 'visible');
-            button.parent().find('.ajax-loader').remove();
-            $('#ting-download-popup').dialog('close');
-            $('#ting-download-popup-info').remove();
-            var options = {};
-            if (response.status == false) {
-              popup_buttons = {};
-              popup_buttons[ok_button] = function() {
+     
+      $.ajax({
+        type : 'post',
+        url : href + '/request',
+        dataType : 'json',
+        success : function(response) {
+          button.css('visibility', 'visible');
+          button.parent().find('.ajax-loader').remove();
+          $('#ting-download-popup').dialog('close');
+          $('#ting-download-popup-info').remove();
+          var options = {};
+          if (response.status == false) {
+            popup_buttons = {};
+            popup_buttons[ok_button] = function() {
+              $('#ting-download-popup-info').dialog('close');
+            }
+
+            options = {
+              modal: true,
+              width: 'auto',
+              height: 'auto',
+              buttons: popup_buttons
+            }
+
+            $('<div id="ting-download-popup-info" title="' + response.title + '">' + response.content + '</div>').dialog(options);
+          }
+          else {
+            if (response.processed && response.processed == true) {
+              window.open(response.stream);
+            } else {
+              popup_buttons[download_button] = function() {
+                button = $('#ting-download-popup').parents('.ui-dialog:first').find('button');
+                button.css('visibility', 'hidden');
+                button.parent().append('<div class="ajax-loader"></div>');
                 $('#ting-download-popup-info').dialog('close');
               }
 
-              options = {
-                modal: true,
+              $('<div id="ting-download-popup" title="' + response.title + '">' + response.content + '</div>').dialog({
+                modal : true,
                 width: 'auto',
                 height: 'auto',
                 buttons: popup_buttons
-              }
-
-              $('<div id="ting-download-popup-info" title="' + response.title + '">' + response.content + '</div>').dialog(options);
-            }
-            else {
-              if (response.processed && response.processed == true) {
-                window.open(response.stream);
-              } else {
-                popup_buttons[download_button] = function() {
-                  button = $('#ting-download-popup').parents('.ui-dialog:first').find('button');
-                  button.css('visibility', 'hidden');
-                  button.parent().append('<div class="ajax-loader"></div>');
-                  $('#ting-download-popup-info').dialog('close');
-                }
-
-                $('<div id="ting-download-popup" title="' + response.title + '">' + response.content + '</div>').dialog({
-                  modal : true,
-                  width: 'auto',
-                  height: 'auto',
-                  buttons: popup_buttons
-                });
-              }
+              });
             }
           }
-        });
-      }
-      else {
-        button.css('visibility', 'visible');
-        button.parent().find('.ajax-loader').remove();
-        $('#ting-download-popup-error').remove();
-        
-        popup_buttons = {};
-        popup_buttons[ok_button] = function() {
-          $('#ting-download-popup-error').dialog('close');
         }
-
-        $('<div id="ting-download-popup-error" title="' + Drupal.t('Error') + '"><p>' + Drupal.t('Check all checkboxes') + '</p></div>').dialog({
-          modal : true,
-          width: 'auto',
-          height: 'auto',
-          buttons: popup_buttons
-        });
-
-        return true;
-      }
-
+      });
       return false;
     }
   });
