@@ -130,7 +130,8 @@ function _elib_popup_return_content($type = 'download', $downloadUrl) {
         'content' => theme('elib_popup_download_info', array('message' => t('Book download url.'), 'link' => $downloadUrl)
       ));
     case 'stream':
-      $key = explode('cvoid=', (string)$downloadUrl);
+      // it can be void= or id=, we explode by "id=" that correcponds to both situations.
+      $key = explode('id=', (string)$downloadUrl);
       /*
        *  Get client platform and use flash or livestream for iOS devices
        */
