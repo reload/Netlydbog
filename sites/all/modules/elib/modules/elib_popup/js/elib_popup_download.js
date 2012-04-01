@@ -133,6 +133,12 @@
             else {
               if (response.processed && response.processed == true) {
                 window.open(response.stream);
+              } else {
+                $('<div id="ting-download-popup" title="' + response.title + '">' + response.content + '</div>').dialog({
+                  modal : true,
+                  width: 'auto',
+                  height: 'auto'
+                });
               }
             }
             
