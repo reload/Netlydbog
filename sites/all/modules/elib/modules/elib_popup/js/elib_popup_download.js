@@ -144,7 +144,7 @@
                 $('#ting-download-popup-info').dialog('close');
               }
 
-              $('<div id="ting-download-popup" title="' + response.title + '">' + response.content + '</div>').dialog({
+              $('<div id="ting-download-popup-info" title="' + response.title + '">' + response.content + '</div>').dialog({
                 modal : true,
                 width: 'auto',
                 height: 'auto',
