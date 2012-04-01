@@ -74,6 +74,15 @@ function elib_popup_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  $menu['elib/stream/redirect'] = array(
+    'title' => 'Stream sample book',
+    'description' => 'Redirect to external stream domain.',
+    'page callback' => 'elib_popup_stream_redirect',
+    'page arguments' => array(),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
   return $menu;
 }
 
@@ -117,6 +126,14 @@ function elib_popup_theme($existing, $type, $theme, $path) {
 }
 
 /**
+ * Redirect streaming to pubhub
+ */
+function elib_popup_stream_redirect() {
+  header("location:".$_GET['url'] . '&player=' . $_GET['player'] . '&stream=' . $_GET['stream']);
+  exit();
+}
+
+/**
  * Return content for download or stream
  * @param type $type
  * @param type $downloadUrl 
@@ -147,7 +164,7 @@ function _elib_popup_return_content($type = 'download', $downloadUrl) {
         'status' => TRUE,
         'title' => t('Success'),
         'processed' => TRUE,
-        'stream' => $stream
+        'stream' => url('elib/stream/redirect', array('query' => 'url=' . $stream))
       );
   }
 }
