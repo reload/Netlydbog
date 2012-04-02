@@ -7,9 +7,10 @@
 
 ?>
 <h4>
-  <?php echo t('You are now listening to a taste of the book')?> - 
+  <?php echo t('You are now listening the book')?> - 
   <?php echo $data['title']?>
 </h4>
+<br />
 <div id="audio-player">
   <?php echo t('Since your browser does not support flash, we can not play the teaser for you, but you can download it')?>
   <?php echo l(t('here'), $data['link'])?>

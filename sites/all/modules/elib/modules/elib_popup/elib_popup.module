@@ -148,7 +148,7 @@ function _elib_popup_return_content($type = 'download', $downloadUrl) {
     case 'download': 
       return array(
         'status' => TRUE,
-        'title' => t('Success'),
+        'title' => t('Download'),
         'content' => theme('elib_popup_download_info', array('message' => t('Book download url.'), 'link' => $downloadUrl)),
         'final' => true
       );
@@ -170,7 +170,7 @@ function _elib_popup_return_content($type = 'download', $downloadUrl) {
       }
       
       $response['status'] = TRUE;
-      $response['title'] = t('Success');
+      $response['title'] = t('Stream');
       $response['processed'] = TRUE;
       $response['platform'] = $platform;
       return $response;
