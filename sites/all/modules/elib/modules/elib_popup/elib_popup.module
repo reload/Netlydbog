@@ -121,6 +121,11 @@ function elib_popup_theme($existing, $type, $theme, $path) {
     'arguments' => array('data' => NULL),
     'template' => 'templates/elib_popup-sample-ios',
   );
+
+  $hooks['elib_popup_stream_ios'] = array(
+    'arguments' => array('data' => NULL),
+    'template' => 'templates/elib_popup-stream-ios',
+  );
   
   return $hooks;
 }
@@ -154,18 +159,21 @@ function _elib_popup_return_content($type = 'download', $downloadUrl) {
        *  Get client platform and use flash or livestream for iOS devices
        */
       $platform = elib_check_platform();
+      $response = array();
 
       if ($platform == PLATFORM_IOS) {
         $stream = elib_client()->getStreamUrl($key[1], 'livestream');
+        $response['content'] = theme('elib_popup_stream_ios', array('link' => $stream));
       } else {
         $stream = elib_client()->getStreamUrl($key[1]);
+        $response['stream'] = url('elib/stream/redirect', array('query' => 'url=' . $stream));
       }
-      return array(
-        'status' => TRUE,
-        'title' => t('Success'),
-        'processed' => TRUE,
-        'stream' => url('elib/stream/redirect', array('query' => 'url=' . $stream))
-      );
+      
+      $response['status'] = TRUE;
+      $response['title'] = t('Success');
+      $response['processed'] = TRUE;
+      $response['platform'] = $platform;
+      return $response;
   }
 }
 
@@ -219,6 +227,7 @@ function elib_popup_download_sample($ting_id) {
       );
     }
   }
+  
   echo json_encode($status);
   exit(0);
 }
