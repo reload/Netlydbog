@@ -6,9 +6,10 @@
  */
 ?>
 <h4>
-  <?php echo t('You are now listening to a taste of the book')?> - 
+  <?php echo t('You are now listening to the book')?> - 
   <?php echo $data['title']?>
 </h4>
+<br />
 <audio controls="controls">
   <source src="<?php echo $data['link']; ?>" type="audio/mp3" />
   <?php print t('Your browser does not support the audio tag.'); ?>

@@ -8,7 +8,7 @@
 
   // Handle clicked loan link, those matching 'ting/object/%/sample' pattern
   $(document).ready(function() {
-    AudioPlayer.setup(Drupal.settings.elib_popup.theme_path + "/js/audio-player/player.swf", {
+    AudioPlayer.setup('/' + Drupal.settings.elib_popup.theme_path + "/js/audio-player/player.swf", {
       width: 290,
       leftbg: "7DAFC3",
       rightbg: "BECE8C",
@@ -61,7 +61,7 @@
 
           $('<div id="ting-download-popup" title="' + response.title + '">' + response.content + '</div>').dialog({
             modal : true,
-            width: '380px',
+            width: 'auto',
             height: 'auto'
           });
 
