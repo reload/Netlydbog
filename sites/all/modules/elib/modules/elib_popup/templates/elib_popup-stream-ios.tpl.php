@@ -6,7 +6,7 @@
  */
 ?>
 <h4>
-  <?php echo t('You are now listening to the book')?> - 
+  <?php echo t('You are now listening to the book')?>:<br /> 
   <?php echo $data['title']?>
 </h4>
 <br />
