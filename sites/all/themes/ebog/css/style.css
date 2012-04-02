@@ -374,7 +374,12 @@ voxb h3 {
 }
 
 #main-content .icons ul li a {
-  padding: 4px 12px;
+  padding: 4px 11px;
+}
+
+#main-content .icons ul li a:hover {
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 #main-content .feed-and-compare-page ul {
