@@ -267,7 +267,7 @@
             html += '<br />';
             html += '<p><input type="text" name="alias-name" value="" /></p>';
             html += '<br />';
-            html += '<p><input type="checkbox" id="voxb-terms" class="voxb-terms" /><label for="voxb-terms">' + Drupal.t('I accept to provide my certain credentials to 3-rd party services, such as VoxB') + ' (<a href="/brugerskabt">' + Drupal.t('read more') + '</a>).' +'</label></p>';
+            html += '<p><input type="checkbox" id="voxb-terms" class="voxb-terms" /><label for="voxb-terms">' + Drupal.t('I accept to provide my certain credentials to 3-rd party services, such as VoxB') + ' (<a href="/betingelser">' + Drupal.t('read more about terms') + '</a>).' +'</label></p>';
             html += '</div>';
             $('body').append(html);
 
