@@ -143,10 +143,13 @@
           else {
             if (response.processed && response.processed == true) {
               if (response.platform == 2) {
-                
+                popup_buttons[ok_button] = function() {
+                  $('#ting-download-popup-info').dialog('close');
+                }
               }
               else {
                 window.open(response.stream);
+                return;
               }
             } else {
               popup_buttons[download_button] = function() {
@@ -156,13 +159,14 @@
                 $('#ting-download-popup-info').dialog('close');
               }
 
-              $('<div id="ting-download-popup-info" title="' + response.title + '">' + response.content + '</div>').dialog({
+              
+            }
+            $('<div id="ting-download-popup-info" title="' + response.title + '">' + response.content + '</div>').dialog({
                 modal : true,
                 width: 'auto',
                 height: 'auto',
                 buttons: popup_buttons
               });
-            }
           }
         }
       });
