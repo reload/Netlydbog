@@ -10,4 +10,4 @@
   <?php echo $data['title']?>
 </h4>
 <br />
-<iframe src="<?php echo $data['link']; ?>"></iframe>
+<iframe style="width: 100%;" src="<?php echo $data['link']; ?>"></iframe>
