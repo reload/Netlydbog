@@ -143,7 +143,7 @@ function elib_popup_stream_redirect() {
  * @param type $type
  * @param type $downloadUrl 
  */
-function _elib_popup_return_content($type = 'download', $downloadUrl) {
+function _elib_popup_return_content($type = 'download', $downloadUrl, $title = '') {
   switch ($type) {
     case 'download': 
       return array(
@@ -163,7 +163,7 @@ function _elib_popup_return_content($type = 'download', $downloadUrl) {
 
       if ($platform == PLATFORM_IOS) {
         $stream = elib_client()->getStreamUrl($key[1], 'livestream');
-        $response['content'] = theme('elib_popup_stream_ios', array('link' => $stream));
+        $response['content'] = theme('elib_popup_stream_ios', array('link' => $stream, 'title' => $title));
       } else {
         $stream = elib_client()->getStreamUrl($key[1]);
         $response['stream'] = url('elib/stream/redirect', array('query' => 'url=' . $stream));
@@ -260,7 +260,7 @@ function elib_popup_download_loan_initial($ting_id, $type = "download") {
     if ((int)$book->status->code == 101) {
       if ($loaned) {
         if ($down_link != '') {
-          $status = _elib_popup_return_content($type, $down_link);
+          $status = _elib_popup_return_content($type, $down_link, (string)$book->data->title);
         }
         else {
           $status = array(
@@ -277,7 +277,7 @@ function elib_popup_download_loan_initial($ting_id, $type = "download") {
         // Whether book loaned well
         if ((int)$loan->status->code == 101) {
           $down_link = $loan->data->downloadurl;
-          $status = _elib_popup_return_content($type, $down_link);
+          $status = _elib_popup_return_content($type, $down_link, (string)$book->data->title);
         }
         else {
           $status = array(
@@ -348,7 +348,7 @@ function _elib_popup_is_loaned($ting_id) {
 
   $book = $client->getBook($ean);
   $down_link = get_download_url($client->getLoans(), $ean);
-  return (is_string($down_link)) ? $down_link : FALSE;
+  return (is_string($down_link)) ? array('book' => $book, 'download_link' => $down_link) : FALSE;
 }
 /**
  * More a dummy method, used only for confirmation dialog retrieval.
@@ -363,8 +363,9 @@ function elib_popup_loan_popup($ting_id, $type = 'download') {
   // Whether user is logged in.
   if ($user->uid) {
     // Check if item is lready loaned
-    if (($link = _elib_popup_is_loaned($ting_id))) {
-      $status = _elib_popup_return_content($type, $link);
+    $loan = _elib_popup_is_loaned($ting_id);
+    if (($loan)) {
+      $status = _elib_popup_return_content($type, $loan['download_link'], $loan['book']->data->title);
     } else {
       $status = array(
         'title' => t('Confirm loan'),
