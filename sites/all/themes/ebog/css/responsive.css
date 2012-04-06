@@ -398,4 +398,9 @@
   li.fetch {
     display: none;
   }
+
+  #audio-player {
+    width: 200px !important;
+  }
+
 }
