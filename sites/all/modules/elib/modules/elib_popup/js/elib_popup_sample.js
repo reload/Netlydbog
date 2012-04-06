@@ -2,14 +2,15 @@
   $('.ebog-dlink').live('click', function() {
     $('#ting-download-popup-info').dialog('close');
   });
-  
+
   var href = '';
   var clicked = null;
+  var dlg = null;
 
   // Handle clicked loan link, those matching 'ting/object/%/sample' pattern
   $(document).ready(function() {
     AudioPlayer.setup('/' + Drupal.settings.elib_popup.theme_path + "/js/audio-player/player.swf", {
-      width: 290,
+      width: 'auto',
       leftbg: "7DAFC3",
       rightbg: "BECE8C",
       leftbghover: "ADCBD7",
@@ -49,21 +50,29 @@
               $('#ting-download-popup').dialog('close');
             }
 
-            $('<div id="ting-download-popup" title="' + response.title + '">' + response.content + '</div>').dialog({
+            dlg = $('<div id="ting-download-popup" title="' + response.title + '">' + response.content + '</div>').dialog({
               modal : true,
               width: 'auto',
               height: 'auto',
               buttons: popup_buttons
             });
 
+            if ($.browser.msie) {
+              $(dlg).dialog('option', 'position', $(dlg).dialog('option','position'));
+            }
+
             return;
           }
 
-          $('<div id="ting-download-popup" title="' + response.title + '">' + response.content + '</div>').dialog({
+          dlg = $('<div id="ting-download-popup" title="' + response.title + '">' + response.content + '</div>').dialog({
             modal : true,
             width: 'auto',
             height: 'auto'
           });
+
+          if ($.browser.msie) {
+            $(dlg).dialog('option', 'position', $(dlg).dialog('option','position'));
+          }
 
           AudioPlayer.embed("audio-player", {
             soundFile: response.file,
