@@ -91,4 +91,21 @@ class VoxbReviews extends VoxbBase implements Iterator{
   public function getCount() {
     return count($this->items);
   }
+
+  /**
+   * Sorts reviews by creation date.
+   * @param type $desc
+   */
+  public function sortByTimestamp($desc = true) {
+    function sortItemsAsc($review1, $review2) {
+      return strtotime($review1->getTimestamp()) - strtotime($review2->getTimestamp());
+    }
+
+    function sortItemsDesc($review1, $review2) {
+      return strtotime($review2->getTimestamp()) - strtotime($review1->getTimestamp());
+    }
+
+    usort($this->items, 'sortItems' . ($desc ? 'Desc' : 'Asc'));
+    $this->rewind();
+  }
 }
