@@ -94,7 +94,7 @@ class VoxbReviews extends VoxbBase implements Iterator{
 
   /**
    * Sorts reviews by creation date.
-   * @param type $desc
+   * @param boolean $desc set to 'true' to get latest first.
    */
   public function sortByTimestamp($desc = true) {
     function sortItemsAsc($review1, $review2) {
