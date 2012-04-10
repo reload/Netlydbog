@@ -47,5 +47,13 @@ function ding_voxb_admin(&$form_state) {
     '#default_value' => variable_get('voxb_reviews_per_page', VOXB_REVIEWS_PER_PAGE),
   );
 
+  $form['voxb']['voxb_reviews_latest_first'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show latest reviews first'),
+    '#description' => t('If checked latest reviews will be show first, and older will be show last.'),
+    '#required' => TRUE,
+    '#default_value' => variable_get('voxb_reviews_latest_first', true),
+  );
+
   return system_settings_form($form);
 }

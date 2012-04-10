@@ -539,7 +539,7 @@ function ding_voxb_preprocess_ting_object(&$variables) {
   // Tagging section
   $is_able_to_tag = ($user->uid) ? TRUE : FALSE;
   $tags = '';
-  
+
   // Prepare tags for display.
   foreach ($voxb_item->getTags() as $v) {
     $tags .= theme('voxb_tag_record', array('tag_name' => htmlspecialchars($v->getName())));
@@ -567,8 +567,17 @@ function ding_voxb_preprocess_ting_object(&$variables) {
   $limit = variable_get('voxb_reviews_per_page', VOXB_REVIEWS_PER_PAGE);
   $reviews = '';
 
+  // Sort reviews by creation date.
+  $voxb_reviews = $voxb_item->getReviews('review');
+  if (variable_get('voxb_reviews_latest_first', true)) {
+    $voxb_reviews->sortByTimestamp();
+  }
+  else {
+    $voxb_reviews->sortByTimestamp(false);
+  }
+
   // Prepare the needed number of existing reviews.
-  foreach ($voxb_item->getReviews('review') as $k => $v) {
+  foreach ($voxb_reviews as $k => $v) {
     if ($k >= $limit) {
       break;
     }
@@ -579,7 +588,7 @@ function ding_voxb_preprocess_ting_object(&$variables) {
   }
 
   $review_form = '';
-  
+
   // Either show review form only if user has no reviews at all,
   //   or he reviewed with a text review.
   // Also fill the form with the review if it exists and set correct button values.
@@ -615,7 +624,7 @@ function ding_voxb_preprocess_ting_object(&$variables) {
             'pager' => $voxb_pager,
           )
   );
-  
+
   $variables['object']->voxb_reviews = $voxb_reviews;
 
   // Rating section

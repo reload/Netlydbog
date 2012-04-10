@@ -13,6 +13,7 @@ class VoxbReviewRecord extends VoxbBase{
   private $authorVoxbId;
   private $authorName;
   private $voxbId;
+  private $timestamp;
 
   /**
    * Constructor as parameter gets a part of SimpleXml object received from the server.
@@ -27,6 +28,7 @@ class VoxbReviewRecord extends VoxbBase{
       $this->authorVoxbId = (int)$voxbObj->userId;
       $this->authorName = (string)$voxbObj->userAlias->aliasName;
       $this->voxbId = intval($voxbObj->voxbIdentifier);
+      $this->timestamp = (string)$voxbObj->timestamp;
     }
   }
 
@@ -76,6 +78,15 @@ class VoxbReviewRecord extends VoxbBase{
   }
 
   /**
+   * Getter function.
+   *
+   * @return string
+   */
+  public function getTimestamp() {
+    return $this->timestamp;
+  }
+
+  /**
    * Returns class attributes as array.
    * This method is user in Ajax responders.
    *
@@ -87,7 +98,8 @@ class VoxbReviewRecord extends VoxbBase{
       'text' => $this->text,
       'authorId' => $this->authorVoxbId,
       'authorName' => $this->authorName,
-      'voxbId' => $this->voxbId
+      'voxbId' => $this->voxbId,
+      'timestamp' => $this->timestamp
     );
   }
 
