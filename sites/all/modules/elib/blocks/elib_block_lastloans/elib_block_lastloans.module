@@ -67,7 +67,7 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
 	  $blocks[3]['info'] = t('Welcome block - my page');
 	  $blocks[4]['info'] = t('dummyblock2 books');
 	  $blocks[5]['info'] = t('Logout block button');
-      $blocks[6]['info'] = t('Popular books extended');
+    $blocks[6]['info'] = t('Popular books extended');
 	  return $blocks;
   }
   elseif ($op == 'view') {
@@ -83,8 +83,7 @@ function elib_block_lastloans_block($op = 'list', $delta = 0) {
     		
 		    $response = elib_client()->getLatestLoans();  
 		    
-		    
-		    foreach($response as $isbn){
+		    foreach($response as $isbn) {
 		      $out .= elib_displaybookNEW(elib_get_ting_object_by_isbn($isbn),'','small');
 		    }
 		    $block['subject'] = t('Seneste Lån');	

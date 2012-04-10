@@ -362,7 +362,7 @@ voxb h3 {
 
 #main-content .icons ul li {
   float: left;
-  margin: 0 4px;
+  margin: 0;
 }
 
 #main-content .icons ul li.seperator {
@@ -374,7 +374,12 @@ voxb h3 {
 }
 
 #main-content .icons ul li a {
-  padding: 4px 7px;
+  padding: 4px 11px;
+}
+
+#main-content .icons ul li a:hover {
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 #main-content .feed-and-compare-page ul {
@@ -518,7 +523,7 @@ voxb h3 {
   margin-top: 6px;
 }
 
-.display-book .icons .icons,
+.display-book .icons,
 #ting-object .inner .icons,
 #ting-search-result .record .icons {
   float: right;
@@ -527,7 +532,7 @@ voxb h3 {
   margin-top: 15px;
 }
 
-.display-book .icons .icons img,
+.display-book .icons img,
 #ting-object .inner .icons img {
   padding: 4px;
   vertical-align: text-bottom;
@@ -628,7 +633,8 @@ voxb h3 {
 /**
  * MIN SIDE
  */
-.page-min-side .panel-separator {
+.page-min-side .panel-separator,
+.page-min-side .panel-region-separator {
   clear: none;
   display: none;
 }
@@ -662,7 +668,7 @@ voxb h3 {
   padding-top: 10px;
 }
 
-.pane-elib-user-account .loanperiod.short   { color: #C00;    }
+.pane-elib-user-account .loanperiod.short   { color: ##1B75BC; }
 .pane-elib-user-account .loanperiod.medium  { color: #FF8;     }
 .pane-elib-user-account .loanperiod.long    { color: #9BC833;  }
 
@@ -748,7 +754,7 @@ input[type=submit],
 .pane-content div.bottom-bar,
 .pane-elib-block-lastloans-2 .bottom-bar,
 #sidebar-first #block-views-latest_news-block_1 .content .view-footer,
-.display-book .icons .icons,
+.display-book .icons,
 #ting-object .inner .icons,
 #ting-search-result .record .icons,
 #ting-search-form input.form-submit {
@@ -773,7 +779,7 @@ div.messages,
 .pane-front .feed-and-compare-front,
 .pane-faq-panel-pane-1 .view-content .item-list ul,
 .panel-pane.pane-latest-news .pane-content .view-content .views-row,
-.display-book .icons .icons,
+.display-book .icons,
 #ting-object .inner .icons,
 #ting-search-result .record .icons,
 .voxb textarea,
@@ -897,7 +903,7 @@ input[type=submit]:hover {
   margin: 0 0 5px 0;
 }
 
-/* CLEAN */
+/* CLEAN
 
 body.clean #user-login{
 	width:500px;
@@ -921,7 +927,7 @@ body.clean #user-login .form-text{
 	height:320px;
 	border:0;
 }
-body.clean{                                                                                                                  
+body.clean{
   background:#F7F2ED;
   height:95%;
   margin:0;
@@ -952,10 +958,10 @@ body.clean .addtocart{
 	font-weight:bold;
 	padding:10px;
 }
-body.clean h1{                                                                                     
+body.clean h1{
   font-family: "American Typewriter", "Courier New", serif;
   font-weight: bold;
-  font-size:1.6em; 
+  font-size:1.6em;
   color:#666666;
   border-bottom: 1px dashed #999999;
   padding: 0 0 0.2em 0;
@@ -991,6 +997,8 @@ body.clean h1{
 	border:1px solid #999999;
 }
 
+*/
+
 .panel-pane.pane-views-panes.pane-user-reviews-panel-pane-1 .views-field-created {
   display: none;
 }
@@ -1005,4 +1013,8 @@ body.clean h1{
 .panel-pane.pane-block.pane-netsound-review-1.grid-9,
 .panel-pane.pane-block.pane-netsound-review-2.grid-9 {
   margin-bottom: 35px;
+}
+
+.panel-region-separator {
+  height: 25px;
 }

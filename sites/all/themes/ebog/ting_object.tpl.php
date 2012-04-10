@@ -94,6 +94,13 @@ if (module_exists('ding_voxb')) {
           <?php if (!empty($object->record['dkdcplus:version'][''])) { ?>
             <?php print theme('item_list', $object->record['dkdcplus:version'][''], t('Version').t(':&nbsp;'), 'span', array('class' => 'version'));?>
           <?php } ?>
+          <?php print theme('item_list', array($object->type), t('Type').t(':&nbsp;'), 'span', array('class' => 'type')); ?>
+          <?php if (!empty($object->record['dc:format'][''])) { ?>
+            <?php print theme('item_list', $object->record['dc:format'][''], t('Format').t(':&nbsp;'), 'span', array('class' => 'format'));?>
+          <?php } ?>
+          <?php if (!empty($object->record['dc:subject']['dkdcplus:genre'])) { ?>
+            <?php print theme('item_list', $object->record['dc:subject']['dkdcplus:genre'], t('Genre').t(':&nbsp;'), 'span', array('class' => 'subject'));?>
+          <?php } ?>
           <?php if (!empty($object->subjects)) { ?>
             <?php print theme('item_list', $object->subjects, t('Subjects').t(':&nbsp;'), 'ul', array('class' => 'subject'));?>
           <?php } ?>
@@ -108,90 +115,69 @@ if (module_exists('ding_voxb')) {
           <?php if (!empty($object->record['dc:publisher'][''])) { ?>
             <?php print theme('item_list', $object->record['dc:publisher'][''], t('Publisher'.t(':&nbsp;')), 'span', array('class' => 'publisher'));?>
           <?php } ?>
-        </div>
-
-        <div class="various" style="display:none;">
-          <?php print theme('item_list', array($object->type), t('Type').t(':&nbsp;'), 'span', array('class' => 'type')); ?>
-          <?php if (!empty($object->record['dc:format'][''])) { ?>
-            <?php print theme('item_list', $object->record['dc:format'][''], t('Format'), 'span', array('class' => 'format'));?>
-          <?php } ?>
           <?php if (!empty($object->record['dcterms:isPartOf'][''])) { ?>
-            <?php print theme('item_list', $object->record['dcterms:isPartOf'][''], t('Available in'), 'span', array('class' => 'is-part-of'));?>
+            <?php print theme('item_list', $object->record['dcterms:isPartOf'][''], t('Available in').t(':&nbsp;'), 'span', array('class' => 'is-part-of'));?>
           <?php } ?>
           <?php if (!empty($object->record['dc:language']['oss:spoken'])) { ?>
-            <?php print theme('item_list', $object->record['dc:language']['oss:spoken'], t('Speech'), 'span', array('class' => 'language'));?>
+            <?php print theme('item_list', $object->record['dc:language']['oss:spoken'], t('Speech').t(':&nbsp;'), 'span', array('class' => 'language'));?>
           <?php } ?>
-
           <?php if (!empty($object->record['dc:language']['oss:subtitles'])) { ?>
-            <?php print theme('item_list', $object->record['dc:language']['oss:subtitles'], t('Subtitles'), 'span', array('class' => 'language'));?>
-          <?php } ?>
-
-          <?php if (!empty($object->record['dc:subject']['oss:genre'])) { ?>
-            <?php print theme('item_list', $object->record['dc:subject']['oss:genre'], t('Genre'), 'span', array('class' => 'subject'));?>
+            <?php print theme('item_list', $object->record['dc:language']['oss:subtitles'], t('Subtitles').t(':&nbsp;'), 'span', array('class' => 'language'));?>
           <?php } ?>
           <?php if (!empty($object->record['dcterms:spatial'][''])) { ?>
             <?php print theme('item_list', $object->record['dcterms:spatial'][''], NULL, 'span', array('class' => 'spatial')); ?>
           <?php } ?>
-          <?php if (!empty($object->record['dc:contributor']['oss:dkind'])) { ?>
-            <?php foreach($object->record['dc:contributor']['oss:dkind'] as $reader): ?>
+          <?php if (!empty($object->record['dc:contributor']['dkdcplus:dkind'])) { ?>
+            <?php foreach($object->record['dc:contributor']['dkdcplus:dkind'] as $reader): ?>
               <?php $readers[] = l($reader,'ting/search/'.$reader); ?>
             <?php endforeach;?>
-            <?php print theme('item_list', $readers, t('Reader'), 'span', array('class' => 'contributor'));?>
+            <?php print theme('item_list', $readers, t('Reader').t(':&nbsp;'), 'span', array('class' => 'contributor'));?>
           <?php } ?>
           <?php if (!empty($object->record['dc:contributor']['oss:act'])) { ?>
-            <?php print theme('item_list', $object->record['dc:contributor']['oss:act'], t('Actor'), 'span', array('class' => 'contributor'));?>
+            <?php print theme('item_list', $object->record['dc:contributor']['oss:act'], t('Actor').t(':&nbsp;'), 'span', array('class' => 'contributor'));?>
           <?php } ?>
           <?php if (!empty($object->record['dc:contributor']['oss:mus'])) { ?>
-            <?php print theme('item_list', $object->record['dc:contributor']['oss:mus'], t('Musician'), 'span', array('class' => 'contributor'));?>
+            <?php print theme('item_list', $object->record['dc:contributor']['oss:mus'], t('Musician').t(':&nbsp;'), 'span', array('class' => 'contributor'));?>
           <?php } ?>
-
           <?php if (!empty($object->record['dcterms:hasPart']['oss:track'])) { ?>
-            <?php print theme('item_list', $object->record['dcterms:hasPart']['oss:track'], t('Contains'), 'span', array('class' => 'contains'));?>
+            <?php print theme('item_list', $object->record['dcterms:hasPart']['oss:track'], t('Contains').t(':&nbsp;'), 'span', array('class' => 'contains'));?>
           <?php } ?>
-
           <?php if (!empty($object->record['dcterms:isReferencedBy'][''])) { ?>
-            <?php print theme('item_list', $object->record['dcterms:isReferencedBy'][''], t('Referenced by'), 'span', array('class' => 'referenced-by'));?>
-          <?php } ?>
-          <?php if (!empty($object->record['dc:description'])) { ?>
-            <?php foreach ($object->record['dc:description'] as $type => $dc_description) { ?>
-              <?php #print theme('item_list', $dc_description, t('Description'), 'span', array('class' => 'description'));?>
-            <?php } ?>
+            <?php print theme('item_list', $object->record['dcterms:isReferencedBy'][''], t('Referenced by').t(':&nbsp;'), 'span', array('class' => 'referenced-by'));?>
           <?php } ?>
           <?php if (!empty($object->record['dcterms:replaces'][''])) { ?>
-            <?php print theme('item_list', $object->record['dcterms:replaces'][''], t('Previous title'), 'span', array('class' => 'titles'));?>
+            <?php print theme('item_list', $object->record['dcterms:replaces'][''], t('Previous title').t(':&nbsp;'), 'span', array('class' => 'titles'));?>
           <?php } ?>
           <?php if (!empty($object->record['dcterms:isReplacedBy'][''])) { ?>
-            <?php print theme('item_list', $object->record['dcterms:isReplacedBy'][''], t('Later title'), 'span', array('class' => 'titles'));?>
+            <?php print theme('item_list', $object->record['dcterms:isReplacedBy'][''], t('Later title').t(':&nbsp;'), 'span', array('class' => 'titles'));?>
           <?php } ?>
-          <?php
-            if (!empty($object->record['dc:identifier']['dcterms:URI'])) {
-              $uris = array();
-              foreach ($object->record['dc:identifier']['dcterms:URI'] as $uri) {
-                $uris[] = l($uri, $uri);
-              }
-              #print theme('item_list', $uris, t('Host publication'), 'span', array('class' => 'identifier'));                
-            }
-          ?>
           <?php if (!empty($object->record['dcterms:extent'][''])) { ?>
-            <?php print theme('item_list', $object->record['dcterms:extent'][''], t('Extent'), 'span', array('class' => 'version'));?>
+            <?php print theme('item_list', $object->record['dcterms:extent'][''], t('Extent').t(':&nbsp;'), 'span', array('class' => 'version'));?>
           <?php } ?>
           <?php if (!empty($object->record['dc:rights'][''])) { ?>
-            <?php print theme('item_list', $object->record['dc:rights'][''], t('Rights'), 'span', array('class' => 'rights'));?>
+            <?php print theme('item_list', $object->record['dc:rights'][''], t('Rights').t(':&nbsp;'), 'span', array('class' => 'rights'));?>
           <?php } ?>
-          <?php print elib_book_teaser($object) ?>
+          <?php //print elib_book_teaser($object) ?>
         </div>
       </div>
       <div class="icons">
         <ul>
-          <li><?php print l(t('Stream'), $object->url.'/stream', array('html' => true, 'attributes' => array('rel' => 'lightframe'))) ?></li>
+          <li class="sample"><?php print l(t('Sample'), $object->url.'/sample', array('html' => true, 'attributes' => array('action' => 'sample'))) ?><li>
           <li class="seperator"></li>
-          <li><?php print l(t('Fetch'), $object->url.'/download', array('html' => true, 'attributes' => array('rel' => 'lightframe')))?></li>
-          <li class="seperator"></li>
-          <li><?php print l(t('Sample'), $object->url.'/sample', array('html' => true, 'attributes' => array('rel' => 'lightframe[|width:350px; height:120px;]'))) ?><li>
+          <li class="stream"><?php print l(t('Stream'), $object->url.'/stream', array('html' => true, 'attributes' => array('action' => 'stream'))) ?></li>
+          <?php
+            $platform = elib_check_platform();
+            if ($platform == PLATFORM_GENERIC) {
+              print '<li class="seperator"></li>';
+              print '<li class="fetch">';
+              print l(t('Fetch'), $object->url.'/download', array('html' => true, 'attributes' => array('action' => 'download')));
+              print '</li>';
+            }
+          ?>
           <?php 
             if($user->uid){
               print '<li class="seperator"></li>';
-              print '<li>';
+              print '<li class="husk">';
               print l(t('Husk'), $object->url.'/huskeliste?'.drupal_get_destination(), array('html' => true));
               print '</li>';
             }
