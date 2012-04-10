@@ -38,3 +38,7 @@
   position: absolute;
   top: 10px;
 }
+
+#audio-player {
+  width: 355px;
+}

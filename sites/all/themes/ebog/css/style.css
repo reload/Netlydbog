@@ -903,7 +903,7 @@ input[type=submit]:hover {
   margin: 0 0 5px 0;
 }
 
-/* CLEAN 
+/* CLEAN
 
 body.clean #user-login{
 	width:500px;
@@ -927,7 +927,7 @@ body.clean #user-login .form-text{
 	height:320px;
 	border:0;
 }
-body.clean{                                                                                                                  
+body.clean{
   background:#F7F2ED;
   height:95%;
   margin:0;
@@ -958,10 +958,10 @@ body.clean .addtocart{
 	font-weight:bold;
 	padding:10px;
 }
-body.clean h1{                                                                                     
+body.clean h1{
   font-family: "American Typewriter", "Courier New", serif;
   font-weight: bold;
-  font-size:1.6em; 
+  font-size:1.6em;
   color:#666666;
   border-bottom: 1px dashed #999999;
   padding: 0 0 0.2em 0;
