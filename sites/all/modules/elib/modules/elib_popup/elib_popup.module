@@ -326,7 +326,7 @@ function elib_popup_download_loan_initial($ting_id, $type = "download") {
 function get_download_url($loans, $ean) {
   if ($loans instanceof SimpleXMLElement) {
     foreach ($loans->data->orderitem as $book) {
-      if ($book->book['id'] == $ean && $book->loanstate == 1) {
+      if ($book->book['id'] == $ean) {
         return (string)$book->data->data->downloadurl;
       }
     }
