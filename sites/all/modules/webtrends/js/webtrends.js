@@ -6,10 +6,10 @@
 function WebTrends(){
 	var that=this;
 	// begin: user modifiable
-	this.dcsid="dcspimbaa10000oqojwrx2td2_1c3r";
+	this.dcsid="mu8zc710000c1l2tvxwsmk_7s9c;
 	this.domain="visionize10.visionize.dk";
 	this.timezone=1;
-	this.fpcdom=".ereolen.dk";
+	this.fpcdom=".netlydbog.dk";
 	this.onsitedoms="";
 	this.downloadtypes="arc,arj,ashx,avi,bin,dll,doc,docx,exe,gz,hqx,mp2,mp3,mp4,mpeg,mpg,pdf,pps,ppsx,ppt,pptx,rar,rpm,sit,svg,swf,tar,txt,wav,xls,xlsx,z,zip";
 	this.navigationtag="div,table";

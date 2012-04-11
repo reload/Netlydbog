@@ -79,7 +79,7 @@ function webtrends_footer() {
     $script .= '</script>'."\n";
     $script .= '<noscript>'."\n";
     $script .= '<div>'."\n";
-    $script .= '<img alt="DCSIMG" id="DCSIMG" width="1" height="1" src="https://visionize10.visionize.dk/dcspimbaa10000oqojwrx2td2_1c3r/njs.gif?dcsuri=/nojavascript&amp;WT.js=No&amp;WT.tv=9.4.0&amp;dcssip=www.ereolen.dk"/>'."\n";
+    $script .= '<img alt="DCSIMG" id="DCSIMG" width="1" height="1" src="https://visionize10.visionize.dk/dcsmu8zc710000c1l2tvxwsmk_7s9c/njs.gif?dcsuri=/nojavascript&amp;WT.js=No&amp;WT.tv=9.4.0&amp;dcssip=www.netlydbog.dk"/>'."\n";
     $script .= '</div>'."\n";
     $script .= '</noscript>'."\n";
   }
