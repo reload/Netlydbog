@@ -70,8 +70,10 @@
             height: 'auto'
           });
 
+          // Some special behavior for IE
           if ($.browser.msie) {
             $(dlg).dialog('option', 'position', $(dlg).dialog('option','position'));
+            dlg.bind('dialogclose', function(event, ui){ $(this).remove(); });
           }
 
           AudioPlayer.embed("audio-player", {
