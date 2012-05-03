@@ -199,6 +199,9 @@ Drupal.tingSearch.selectTab = function (event, ui) {
 Drupal.getAnchorVars = function() {
   anchorValues = {};
 
+  if (!jQuery.url) {
+    return anchorValues;
+  }
   anchor = jQuery.url.attr('anchor');
   anchor = (anchor == null) ? '' : anchor;
 
