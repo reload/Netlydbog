@@ -49,6 +49,9 @@
             popup_buttons[ok_button] = function() {
               $('#ting-download-popup').dialog('close');
             }
+            popup_buttons[cancel_button] = function() {
+              $('#ting-download-popup').dialog('close');
+            }
 
             dlg = $('<div id="ting-download-popup" title="' + response.title + '">' + response.content + '</div>').dialog({
               modal : true,
