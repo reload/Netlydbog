@@ -153,7 +153,7 @@
                   $('#ting-download-popup-info').dialog('close');
                 }
                 popup_buttons[cancel_button] = function() {
-                  $('#ting-download-popup').dialog('close');
+                  $('#ting-download-popup-info').dialog('close');
                 }
               }
               else {
@@ -168,7 +168,7 @@
                 $('#ting-download-popup-info').dialog('close');
               }
               popup_buttons[cancel_button] = function() {
-                $('#ting-download-popup').dialog('close');
+                $('#ting-download-popup-info').dialog('close');
               }
 
               
