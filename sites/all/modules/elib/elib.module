@@ -385,8 +385,8 @@ function elib_displaybookNEW($obj, $elib='',$displaysize=false, $block_index = 1
 
     $part['icons'] = _elib_action_icons($obj->url, '
        <li class="seperator"></li>
-       <li>' . l(t('Remove'), $obj->url.'/huskeliste/fjern?'.drupal_get_destination(), array('html' => true)) . '</li>'
-            );
+       <li>' . l(t('Remove'), $obj->url.'/huskeliste/fjern', array('html' => true, 'query' => drupal_get_destination())) . '</li>'
+    );
 
   }
 
