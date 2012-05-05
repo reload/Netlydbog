@@ -56,7 +56,7 @@ jQuery(function($){
   }
 
   $('#block-block-12').click(function() {
-    document.location.href = "help";
+    document.location.href = "/help";
   });
 
   $('.display-book').parent().find('.display-book:last').addClass('last');
