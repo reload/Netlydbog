@@ -81,6 +81,7 @@
           }
 
           if (response.processed && response.processed == true) {
+            // Prepare download popup buttons
             if (response.platform == 2) {
               popup_buttons[ok_button] = function() {
                 $('#ting-download-popup').dialog('close');
@@ -90,8 +91,14 @@
               }
             }
             else {
-              window.open(response.stream);
-              return;
+              // Prepare the stream popup
+              popup_buttons = {};
+              popup_buttons[cancel_button] = function() {
+                $('#ting-download-popup').dialog('close');
+              }
+
+              // Prepare popup content
+              response.content = Drupal.t('Click on the Strem link in order to start streaming of this audiobook.') + '<br />' + '<a href="' + response.stream + '" target="_blank">' + Drupal.t('Stream') + '</a>';
             }
           } else {
             popup_buttons[download_button] = function() {
@@ -157,8 +164,14 @@
                 }
               }
               else {
-                window.open(response.stream);
-                return;
+              // Prepare the stream popup
+              popup_buttons = {};
+              popup_buttons[cancel_button] = function() {
+                $('#ting-download-popup-info').dialog('close');
+              }
+
+              // Prepare popup content
+              response.content = Drupal.t('Click on the Strem link in order to start streaming of this audiobook.') + '<br />' + '<a href="' + response.stream + '" target="_blank">' + Drupal.t('Stream') + '</a>';
               }
             } else {
               popup_buttons[download_button] = function() {
