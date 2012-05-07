@@ -103,7 +103,7 @@ function elib_infinite_carousel_block($op = 'list', $delta = 0, $edit = array())
 
       $list .= '
         <li>
-          <a href="' . $object->url . '" title="' . $alttext . '">
+          <a tabindex="-1" href="' . $object->url . '" title="' . $alttext . '">
             ' . $image . '
           </a>
         </li>
