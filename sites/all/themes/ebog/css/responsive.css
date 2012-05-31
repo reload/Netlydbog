@@ -1,29 +1,4 @@
-@media screen and (min-width:481px) and (max-width: 980px) {
-  #ting-search-form .form-item {
-    width: 85%;
-  }
-
-  .pane-front {
-    float: left;
-    width: 47%;
-  }
-
-  .pane-views-panes {
-    float: right;
-    width: 47%;
-  }
-
-  .panel-region-separator {
-    display: none;
-  }
-
-  .feed_and_compare_item img,
-  .display-book .picture img {
-    width: 85%;
-  }
-}
-
-@media screen and (max-width: 980px) {
+@media screen and (max-width: 480px) {
   .front #main-wrapper #main-content .panel-panel.panel-col-first,
   .block-elib_infinite_carousel h2,
   .infiniteCarousel a.arrow,
